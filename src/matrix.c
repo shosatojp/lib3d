@@ -2,11 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef double vtype;
-typedef vtype* mat;
-typedef vtype* mat44;
-typedef vtype* mat41;
+#include "lib3d.h"
 
 /**
  * a    4*4
@@ -91,22 +87,22 @@ vtype inner_product_1d(mat a, mat b, int n) {
     return sum;
 }
 
-void view_axis(mat41 camera, mat41 target, mat41 up, mat41 cx, mat41 cy, mat41 cz) {
-    // cz
-    vector_sub(target, camera, cz, 3);
-    normarize_vector(cz, cz, 3);
-    cz[3] = 1;
+// void view_axis(mat41 camera, mat41 target, mat41 up, mat41 cx, mat41 cy, mat41 cz) {
+//     // cz
+//     vector_sub(target, camera, cz, 3);
+//     normarize_vector(cz, cz, 3);
+//     cz[3] = 1;
 
-    // cx
-    vector_product3(&unit_y, cz, cx);
-    normarize_vector(cx, cx, 3);
-    cx[3] = 1;
+//     // cx
+//     vector_product3(&unit_y, cz, cx);
+//     normarize_vector(cx, cx, 3);
+//     cx[3] = 1;
 
-    // cy
-    vector_product3(cz, cx, cy);
-    normarize_vector(cy, cy, 3);
-    cy[3] = 1;
-}
+//     // cy
+//     vector_product3(cz, cx, cy);
+//     normarize_vector(cy, cy, 3);
+//     cy[3] = 1;
+// }
 
 void world_to_camera_mat44(mat41 camera, mat41 target, mat41 upper, mat44 r) {
     vtype tmp[4] = {0};
@@ -116,6 +112,7 @@ void world_to_camera_mat44(mat41 camera, mat41 target, mat41 upper, mat44 r) {
     // cz
     vector_sub(target, camera, tmp, 3);
     normarize_vector(tmp, cz, 3);
+    mat_print(cz, 4, 1);
     // cx
     vector_product3(cz, upper, tmp);
     normarize_vector(tmp, cx, 3);
@@ -222,11 +219,10 @@ int main() {
     // make_matrix_scale(2, 2, 4, s);
     vtype camera[4] = {-1, -1, -1, 1};
     vtype target[4] = {0, 0, 0, 1};
-    vtype upper[4] = {-1, 1, -1, 1};
+    vtype upper[4] = {0, 1, 0, 1};
     vtype wc[16] = {0};
     world_to_camera_mat44(camera, target, upper, wc);
     mat_print(wc, 4, 4);
-
 
     mul44(wc, p_local, r);
 
