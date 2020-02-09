@@ -60,7 +60,8 @@ void l3MakeLocalToWorldMat44(l3Type dx, l3Type dy, l3Type dz,
     l3MakeRoundYMat44(-theta_y, ry);
     l3MakeRoundZMat44(-theta_z, rz);
 
-    l3Type* mat44s[] = {rx, ry, rz, d, s};
+    // l3Type* mat44s[] = {rx, ry, rz, d, s};
+    l3Type* mat44s[] = {s, d, rz, ry, rx};
     l3MulMat44s44(5, (l3Mat44*)mat44s, r);
 }
 

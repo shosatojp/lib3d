@@ -121,33 +121,33 @@ l3Type l3InnerProductVec(l3Mat a, l3Mat b, int n) {
 }
 
 void l3MulMat44s44(int c, l3Mat44* _as[], l3Mat44 r) {
-    l3Type*** as = (l3Type***)_as;
+    l3Type** as = (l3Type**)_as;
     if (c <= 1) {
         fprintf(stderr, "invalid matrix count\n");
     }
     switch (c) {
         case 2:
-            l3MulMat4444(as[1], as[0], r);
+            l3MulMat4444(as[0], as[1], r);
         default: {
             l3Type tmp0[16] = {0};
             l3Type tmp1[16] = {0};
-            l3MulMat4444(as[c - 1], as[c - 2], tmp0);
+            l3MulMat4444(as[c - 2], as[c - 1], tmp0);
             int tmp_num = 0;
             for (int i = c - 3; i > 0; i--) {
                 if (tmp_num == 0) {
                     l3InitMat(tmp1, 4, 4);
-                    l3MulMat4444(tmp0, as[i], tmp1);
+                    l3MulMat4444(as[i], tmp0, tmp1);
                     tmp_num = 1;
                 } else {
                     l3InitMat(tmp0, 4, 4);
-                    l3MulMat4444(tmp1, as[i], tmp0);
+                    l3MulMat4444(as[i], tmp1, tmp0);
                     tmp_num = 0;
                 }
             }
             if (tmp_num == 0) {
-                l3MulMat4444(tmp0, as[0], r);
+                l3MulMat4444(as[0], tmp0, r);
             } else {
-                l3MulMat4444(tmp1, as[0], r);
+                l3MulMat4444(as[0], tmp1, r);
             }
         }
     }
