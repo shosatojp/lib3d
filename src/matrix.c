@@ -286,8 +286,8 @@ bool is_in_2d_poligon(int c, vertex* _poligon[], mat21 a) {
     return true;
 }
 
-point** make_raster_map(int w, int h) {
-    return (point**)calloc(sizeof(point*), w * h);
+point_info** make_raster_map(int w, int h) {
+    return (point_info**)calloc(sizeof(point_info*), w * h);
 }
 
 void poligon_rect(int c, vertex* _poligon[], mat21 min, mat21 max) {
@@ -314,7 +314,11 @@ void poligon_rect(int c, vertex* _poligon[], mat21 min, mat21 max) {
         __map[x + y * w] = _point;                      \
     }
 
-void write_raster_map(point** __map, int w, int h, int c, vertex* _poligon[]) {
+vtype triangle_area(mat21 p, mat21 a, mat21 b) {
+    return fabs((a[0] - p[0]) * (b[1] - p[1]) - (a[1] - p[1]) * (b[0] - p[0])) / 2;
+}
+
+void write_raster_map(point_info** __map, int w, int h, int c, vertex* _poligon[]) {
     vtype min[2] = {0};
     vtype max[2] = {0};
     poligon_rect(c, _poligon, min, max);
@@ -323,17 +327,27 @@ void write_raster_map(point** __map, int w, int h, int c, vertex* _poligon[]) {
         for (int j = min[1]; j < max[1]; ++j) {
             vtype v[2] = {i, j};
             if (is_in_2d_poligon(c, _poligon, v)) {
-                point* p = (point*)calloc(sizeof(point), 1);
-                p->color[0] = 0;
-                p->color[1] = 0;
-                p->color[2] = 0;
+                point_info* p = (point_info*)calloc(sizeof(point_info), 1);
+                vtype area_0 = triangle_area(v, _poligon[1]->coordinate, _poligon[2]->coordinate);
+                vtype area_1 = triangle_area(v, _poligon[2]->coordinate, _poligon[0]->coordinate);
+                vtype area_2 = triangle_area(v, _poligon[0]->coordinate, _poligon[1]->coordinate);
+                vtype area_sum = area_0 + area_1 + area_2;
+                p->color[0] = area_0 / area_sum * _poligon[0]->color[0] +
+                              area_1 / area_sum * _poligon[1]->color[0] +
+                              area_2 / area_sum * _poligon[2]->color[0];
+                p->color[1] = area_0 / area_sum * _poligon[0]->color[1] +
+                              area_1 / area_sum * _poligon[1]->color[1] +
+                              area_2 / area_sum * _poligon[2]->color[1];
+                p->color[2] = area_0 / area_sum * _poligon[0]->color[2] +
+                              area_1 / area_sum * _poligon[1]->color[2] +
+                              area_2 / area_sum * _poligon[2]->color[2];
                 SET_POINT_RASTER_MAP(__map, w, h, i, j, p)
             }
         }
     }
 }
 
-void raster_map_to_buffer(point** __map, unsigned char* __buf, int w, int h) {
+void raster_map_to_buffer(point_info** __map, unsigned char* __buf, int w, int h) {
     for (int i = 0, len = w * h; i < len; i++) {
         if (__map[i]) {
             __buf[i * 3] = __map[i]->color[0];
@@ -354,11 +368,20 @@ int main() {
     vertex vc;
 
     va.coordinate = a;
+    va.color[0] = 0;
+    va.color[1] = 255;
+    va.color[2] = 255;
     vb.coordinate = b;
+    vb.color[0] = 255;
+    vb.color[1] = 0;
+    vb.color[2] = 255;
     vc.coordinate = c;
+    vc.color[0] = 255;
+    vc.color[1] = 255;
+    vc.color[2] = 0;
 
     vertex* p[] = {&va, &vb, &vc};
-    vertex** map = make_raster_map(w, h);
+    point_info** map = make_raster_map(w, h);
     write_raster_map(map, w, h, 3, p);
 
     unsigned char* buf = make_buffer(w, h, 255);
@@ -366,6 +389,7 @@ int main() {
     write_buffer(buf, w, h, "test.ppm");
 
     exit(0);
+    
     vtype r[4] = {0};
     vtype r2[4] = {0};
 

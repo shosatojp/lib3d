@@ -19,6 +19,5 @@ typedef struct {
 } object;
 
 typedef struct {
-    vtype coordinate[2];
     vtype color[3];
-} point;
+} point_info;
