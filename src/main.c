@@ -2,6 +2,19 @@
 #include "lib3d.h"
 
 int main() {
+    {
+        l3Type a[16] = {0};
+        l3Type b[16] = {0};
+        l3Type c[16] = {0};
+        l3MakeRoundXMat44(1, a);
+        l3PrintMat(a, 4, 4);
+        l3InverseMat(4, a, b);
+        l3PrintMat(b, 4, 4);
+        l3MulMat4444(a, b, c);
+        l3PrintMat(c, 4, 4);
+        // exit(0);
+    }
+
     int w = 1920, h = 1080;
     l3RGB red = {255, 0, 0};
     l3RGB green = {0, 255, 0};
@@ -40,7 +53,7 @@ int main() {
         l3Type* mats[] = {ps, cp, wc};
         l3MulMat44s44(3, mats, wcps);
 
-        // ラスタライザマップとバッファーを作る
+        // ラスタマップとバッファーを作る
         l3PixelInfo* map = l3CreateRasterMap(w, h);
         unsigned char* buf = l3CreateBuffer(w, h);
 
