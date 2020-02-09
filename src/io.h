@@ -1,4 +1,4 @@
-
+#include "common.h"
 void write_buffer(unsigned char* __buffer, int __w, int __h, const char* __name);
 unsigned char* make_buffer(int __w, int __h, char __c);
 #define SET_BUFFER_RGB(__buffer, __w, __h, __x, __y, __c) \
