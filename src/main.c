@@ -29,19 +29,14 @@ int main() {
                             sizeof(poligons) / sizeof(l3Poligon*), poligons);
 
         // 変換行列作成
-        l3Type camera[4] = {14, 0, -10, 1};
-        l3Type target[4] = {20, 20, 20, 1};
-        l3Type upper[4] = {0, 1, 0, 1};
-        l3Type wc[16] = {0};
-        l3Type cp[16] = {0};
-        l3Type ps[16] = {0};
-        l3Type wcps[16] = {0};
+        l3Type camera[4] = {14, 0, -10, 1},
+               target[4] = {20, 20, 20, 1},
+               upper[4] = {0, 1, 0, 1},
+               wc[16] = {0}, cp[16] = {0}, ps[16] = {0}, wcps[16] = {0};
         l3MakeWorldToCameraMat44(camera, target, upper, wc);
         l3MakeCameraToProjectionMat44(120, (double)w / h, 10, 100, cp);
         l3MakeProjectionToScreenMat44(w, h, ps);
 
-        l3Type r2[16] = {0};
-        // l3Type* mats[] = {wc, cp, ps};
         l3Type* mats[] = {ps, cp, wc};
         l3MulMat44s44(3, (l3Mat44**)mats, wcps);
 
