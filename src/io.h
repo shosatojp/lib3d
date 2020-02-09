@@ -1,11 +1,11 @@
 #include "common.h"
-void write_buffer(unsigned char* __buffer, int __w, int __h, const char* __name);
-unsigned char* make_buffer(int __w, int __h, char __c);
-#define SET_BUFFER_RGB(__buffer, __w, __h, __x, __y, __c) \
-    if (0 <= __x && __x < __w && 0 <= __y && __y < __h) { \
-        __buffer[(__x + __y * __w) * 3] = __c[0];         \
-        __buffer[(__x + __y * __w) * 3 + 1] = __c[1];     \
-        __buffer[(__x + __y * __w) * 3 + 2] = __c[2];     \
+void l3WriteBuffer(unsigned char* buffer, int w, int h, const char* name);
+unsigned char* l3MakeBuffer(int w, int h, char c);
+#define SET_BUFFER_RGB(buffer, w, h, x, y, c) \
+    if (0 <= x && x < w && 0 <= y && y < h) { \
+        buffer[(x + y * w) * 3] = c[0];       \
+        buffer[(x + y * w) * 3 + 1] = c[1];   \
+        buffer[(x + y * w) * 3 + 2] = c[2];   \
     }
 
-void clear_buffer(unsigned char* buf, int w, int h);
+void l3ClearBuffer(unsigned char* buf, int w, int h);

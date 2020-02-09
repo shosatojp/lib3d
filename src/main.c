@@ -10,10 +10,10 @@ int main() {
         object _object;
         memset(&_object, 0, sizeof(object));
         vertex* vs[] = {
-            create_vertex(5, 5, 5, &red),
-            create_vertex(-5, -5, 5, &green),
-            create_vertex(5, -5, -5, &blue),
-            create_vertex(-5, 5, -5, &black),
+            l3CreateVertex(5, 5, 5, &red),
+            l3CreateVertex(-5, -5, 5, &green),
+            l3CreateVertex(5, -5, -5, &blue),
+            l3CreateVertex(-5, 5, -5, &black),
         };
 
         _object.dx = -15;
@@ -23,10 +23,10 @@ int main() {
         _object.sy = 1;
         _object.sz = 1;
         poligon* poligons[] = {
-            create_poligon(vs[0], vs[2], vs[1]),
-            create_poligon(vs[0], vs[3], vs[2]),
-            create_poligon(vs[1], vs[2], vs[3]),
-            create_poligon(vs[0], vs[1], vs[3]),
+            l3CreatePoligon(vs[0], vs[2], vs[1]),
+            l3CreatePoligon(vs[0], vs[3], vs[2]),
+            l3CreatePoligon(vs[1], vs[2], vs[3]),
+            l3CreatePoligon(vs[0], vs[1], vs[3]),
         };
         _object.poligons = poligons;
         _object.poligon_count = 4;
@@ -37,27 +37,27 @@ int main() {
         vtype wc[16] = {0};
         vtype cp[16] = {0};
         vtype ps[16] = {0};
-        make_world_to_camera_mat44(camera, target, upper, wc);
-        make_camera_to_projection_mat44(120, (double)w / h, 10, 100, cp);
-        make_projection_to_screen_mat44(w, h, ps);
+        l3MakeWorldToCameraMat44(camera, target, upper, wc);
+        l3MakeCameraToProjectionMat44(120, (double)w / h, 10, 100, cp);
+        l3MakeProjectionToScreenMat44(w, h, ps);
         vtype wcp[16] = {0};
-        mul4444(cp, wc, wcp);
+        l3MulMat4444(cp, wc, wcp);
 
-        pixel_info* map = create_raster_map(w, h);
-        unsigned char* buf = make_buffer(w, h, 255);
+        pixel_info* map = l3CreateRasterMap(w, h);
+        unsigned char* buf = l3MakeBuffer(w, h, 255);
         for (int i = 0; i < 300; i++) {
             for (int j = 0; j < 4; j++) {
                 vs[j]->converted = false;
             }
-            clear_raster_map(map, w, h);
-            clear_buffer(buf, w, h);
+            l3ClearRasterMap(map, w, h);
+            l3ClearBuffer(buf, w, h);
             _object.theta_y = i * 5 * 3.14 / 180.0;
-            convert_object(&_object, wcp, ps, map, w, h);
+            l3ConvertObject(&_object, wcp, ps, map, w, h);
 
-            raster_map_to_buffer(map, buf, w, h);
+            l3ConvertRasterMapToBuffer(map, buf, w, h);
             char name[16] = {0};
             sprintf(name, "hoge-%03d.ppm", i);
-            write_buffer(buf, w, h, name);
+            l3WriteBuffer(buf, w, h, name);
         }
     }
 }

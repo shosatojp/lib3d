@@ -4,4 +4,4 @@
 /**
  * フラグメントシェーダ
  */
-void fragment_shader(pixel_info* p, mat21 v);
+void l3FragmentShader(pixel_info* p, mat21 v);

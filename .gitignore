@@ -3,3 +3,4 @@
 *.ppm
 /.vscode/settings.json
 *.gif
+*.o

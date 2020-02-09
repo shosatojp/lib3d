@@ -1,7 +1,6 @@
-
 #include "lib3d.h"
 
-void poligon_rect(int c, vertex* _vertices[], mat21 min, mat21 max) {
+void l3GetPoligonOuterRect(int c, vertex* _vertices[], mat21 min, mat21 max) {
     int maxx = _vertices[0]->coordinate2d[0],
         maxy = _vertices[0]->coordinate2d[1],
         minx = _vertices[0]->coordinate2d[0],
@@ -20,11 +19,11 @@ void poligon_rect(int c, vertex* _vertices[], mat21 min, mat21 max) {
     min[1] = miny;
 }
 
-vtype triangle_area(mat21 p, mat21 a, mat21 b) {
+vtype l3GetTriangleArea(mat21 p, mat21 a, mat21 b) {
     return fabs((a[0] - p[0]) * (b[1] - p[1]) - (a[1] - p[1]) * (b[0] - p[0])) / 2;
 }
 
-vertex* create_vertex(vtype x, vtype y, vtype z, rgb* color) {
+vertex* l3CreateVertex(vtype x, vtype y, vtype z, rgb* color) {
     vertex* _v = (vertex*)calloc(sizeof(vertex), 1);
     _v->coordinate[0] = x;
     _v->coordinate[1] = y;
@@ -36,7 +35,7 @@ vertex* create_vertex(vtype x, vtype y, vtype z, rgb* color) {
     return _v;
 }
 
-poligon* create_poligon(vertex* v1, vertex* v2, vertex* v3) {
+poligon* l3CreatePoligon(vertex* v1, vertex* v2, vertex* v3) {
     poligon* _p = (poligon*)calloc(sizeof(poligon), 1);
     _p->vertices[0] = v1;
     _p->vertices[1] = v2;
