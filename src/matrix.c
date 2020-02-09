@@ -4,6 +4,7 @@
 #include <string.h>
 #include "io.h"
 #include "lib3d.h"
+int white[3] = {0, 0, 0};
 
 void init_mat(mat a, int x, int y) {
     memset(a, 0, sizeof(vtype) * x * y);
@@ -274,12 +275,12 @@ bool is_in_2d_poligon(int c, vertex* _poligon[], mat21 a) {
     for (int i = 0; i < c; i++) {
         int next = i == c - 1 ? 0 : i + 1;
         vtype d[2] = {0};
-        vector_sub(_poligon[next]->coordinate, _poligon[i]->coordinate, d, 2);
+        vector_sub(_poligon[next]->coordinate2d, _poligon[i]->coordinate2d, d, 2);
 
         vtype d2[2] = {0};
-        vector_sub(a, _poligon[i]->coordinate, d2, 2);
+        vector_sub(a, _poligon[i]->coordinate2d, d2, 2);
 
-        if (vector_product2(d, d2) < 0) {
+        if (vector_product2(d, d2) > 0) {
             return false;
         }
     }
@@ -290,17 +291,21 @@ point_info** make_raster_map(int w, int h) {
     return (point_info**)calloc(sizeof(point_info*), w * h);
 }
 
-void poligon_rect(int c, vertex* _poligon[], mat21 min, mat21 max) {
-    int maxx = _poligon[0]->coordinate[0],
-        maxy = _poligon[0]->coordinate[1],
-        minx = _poligon[0]->coordinate[0],
-        miny = _poligon[0]->coordinate[1];
+void clear_raster_map(point_info** map, int w, int h) {
+    memset(map, 0, w * h * sizeof(point_info*));
+}
+
+void poligon_rect(int c, vertex* _vertices[], mat21 min, mat21 max) {
+    int maxx = _vertices[0]->coordinate2d[0],
+        maxy = _vertices[0]->coordinate2d[1],
+        minx = _vertices[0]->coordinate2d[0],
+        miny = _vertices[0]->coordinate2d[1];
 
     for (int i = 1; i < c; i++) {
-        if (_poligon[i]->coordinate[0] > maxx) maxx = _poligon[i]->coordinate[0];
-        if (_poligon[i]->coordinate[1] > maxy) maxy = _poligon[i]->coordinate[1];
-        if (_poligon[i]->coordinate[0] < minx) minx = _poligon[i]->coordinate[0];
-        if (_poligon[i]->coordinate[1] < miny) miny = _poligon[i]->coordinate[1];
+        if (_vertices[i]->coordinate2d[0] > maxx) maxx = _vertices[i]->coordinate2d[0];
+        if (_vertices[i]->coordinate2d[1] > maxy) maxy = _vertices[i]->coordinate2d[1];
+        if (_vertices[i]->coordinate2d[0] < minx) minx = _vertices[i]->coordinate2d[0];
+        if (_vertices[i]->coordinate2d[1] < miny) miny = _vertices[i]->coordinate2d[1];
     }
 
     max[0] = maxx;
@@ -318,29 +323,30 @@ vtype triangle_area(mat21 p, mat21 a, mat21 b) {
     return fabs((a[0] - p[0]) * (b[1] - p[1]) - (a[1] - p[1]) * (b[0] - p[0])) / 2;
 }
 
-void write_raster_map(point_info** __map, int w, int h, int c, vertex* _poligon[]) {
+void write_raster_map(point_info** __map, int w, int h, poligon* _poligon) {
     vtype min[2] = {0};
     vtype max[2] = {0};
-    poligon_rect(c, _poligon, min, max);
+    poligon_rect(3, _poligon->vertices, min, max);
 
     for (int i = min[0]; i < max[0]; ++i) {
         for (int j = min[1]; j < max[1]; ++j) {
             vtype v[2] = {i, j};
-            if (is_in_2d_poligon(c, _poligon, v)) {
+            if (is_in_2d_poligon(3, _poligon->vertices, v)) {
                 point_info* p = (point_info*)calloc(sizeof(point_info), 1);
-                vtype area_0 = triangle_area(v, _poligon[1]->coordinate, _poligon[2]->coordinate);
-                vtype area_1 = triangle_area(v, _poligon[2]->coordinate, _poligon[0]->coordinate);
-                vtype area_2 = triangle_area(v, _poligon[0]->coordinate, _poligon[1]->coordinate);
+                vtype area_0 = triangle_area(v, _poligon->vertices[1]->coordinate2d, _poligon->vertices[2]->coordinate2d);
+                vtype area_1 = triangle_area(v, _poligon->vertices[2]->coordinate2d, _poligon->vertices[0]->coordinate2d);
+                vtype area_2 = triangle_area(v, _poligon->vertices[0]->coordinate2d, _poligon->vertices[1]->coordinate2d);
                 vtype area_sum = area_0 + area_1 + area_2;
-                p->color[0] = area_0 / area_sum * _poligon[0]->color[0] +
-                              area_1 / area_sum * _poligon[1]->color[0] +
-                              area_2 / area_sum * _poligon[2]->color[0];
-                p->color[1] = area_0 / area_sum * _poligon[0]->color[1] +
-                              area_1 / area_sum * _poligon[1]->color[1] +
-                              area_2 / area_sum * _poligon[2]->color[1];
-                p->color[2] = area_0 / area_sum * _poligon[0]->color[2] +
-                              area_1 / area_sum * _poligon[1]->color[2] +
-                              area_2 / area_sum * _poligon[2]->color[2];
+                p->color[0] = area_0 / area_sum * _poligon->vertices[0]->color[0] +
+                              area_1 / area_sum * _poligon->vertices[1]->color[0] +
+                              area_2 / area_sum * _poligon->vertices[2]->color[0];
+                p->color[1] = area_0 / area_sum * _poligon->vertices[0]->color[1] +
+                              area_1 / area_sum * _poligon->vertices[1]->color[1] +
+                              area_2 / area_sum * _poligon->vertices[2]->color[1];
+                p->color[2] = area_0 / area_sum * _poligon->vertices[0]->color[2] +
+                              area_1 / area_sum * _poligon->vertices[1]->color[2] +
+                              area_2 / area_sum * _poligon->vertices[2]->color[2];
+                p->_poligon = _poligon;
                 SET_POINT_RASTER_MAP(__map, w, h, i, j, p)
             }
         }
@@ -357,89 +363,175 @@ void raster_map_to_buffer(point_info** __map, unsigned char* __buf, int w, int h
     }
 }
 
+void convert_object(object* _object, mat44 wcp, mat44 ps, point_info** _map, int w, int h) {
+    vtype lw[16] = {0};
+    make_local_to_world_mat44(_object->dx, _object->dy, _object->dz,
+                              _object->sx, _object->sy, _object->sz,
+                              _object->theta_x, _object->theta_y, _object->theta_z, lw);
+    vtype lp[16] = {0};
+    mul4444(wcp, lw, lp);
+
+    vtype r[4] = {0},
+          r2[4] = {0};
+    for (int i = 0; i < _object->poligon_count; i++) {
+        poligon* _poligon = _object->poligons[i];
+        for (int j = 0; j < 3; j++) {
+            vertex* _vertex = _poligon->vertices[j];
+            if (!_vertex->converted) {
+                init_mat(r, 4, 1);
+                // ローカル->ワールド->プロジェクション座標変換
+                mul44(lp, _vertex->coordinate, r);
+
+                vector_div(r, r[3], r, 4);
+
+                init_mat(r2, 4, 1);
+                // スクリーン座標変換
+                mul44(ps, r, r2);
+
+                // 結果格納
+                memcpy(_vertex->coordinate2d, r2, sizeof(_vertex->coordinate2d));
+                _vertex->converted = true;
+            }
+        }
+        write_raster_map(_map, w, h, _poligon);
+    }
+}
+
+vertex* create_vertex(vtype x, vtype y, vtype z, rgb* color) {
+    vertex* _v = (vertex*)calloc(sizeof(vertex), 1);
+    _v->coordinate[0] = x;
+    _v->coordinate[1] = y;
+    _v->coordinate[2] = z;
+    _v->coordinate[3] = 1;
+    _v->color[0] = color->r;
+    _v->color[1] = color->g;
+    _v->color[2] = color->b;
+    return _v;
+}
+
+poligon* create_poligon(vertex* v1, vertex* v2, vertex* v3) {
+    poligon* _p = (poligon*)calloc(sizeof(poligon), 1);
+    _p->vertices[0] = v1;
+    _p->vertices[1] = v2;
+    _p->vertices[2] = v3;
+    return _p;
+}
+
 int main() {
     int w = 400, h = 200;
-    vtype a[] = {100, 100};
-    vtype b[] = {200, 100};
-    vtype c[] = {100, 200};
+    rgb red = {255, 0, 0};
+    rgb green = {0, 255, 0};
+    rgb blue = {0, 0, 255};
+    rgb black = {0, 0, 0};
+    {
+        object _object;
+        memset(&_object, 0, sizeof(object));
+        vertex* vs[] = {
+            create_vertex(5, 5, 5, &red),
+            create_vertex(-5, -5, 5, &green),
+            create_vertex(5, -5, -5, &blue),
+            create_vertex(-5, 5, -5, &black),
+        };
 
-    vertex va;
-    vertex vb;
-    vertex vc;
+        _object.dx = -15;
+        _object.dy = -15;
+        _object.dz = -15;
+        _object.sx = 1;
+        _object.sy = 1;
+        _object.sz = 1;
+        poligon* poligons[] = {
+            create_poligon(vs[0], vs[2], vs[1]),
+            create_poligon(vs[0], vs[3], vs[2]),
+            create_poligon(vs[1], vs[3], vs[2]),
+            create_poligon(vs[0], vs[1], vs[3]),
+        };
+        _object.poligons = poligons;
+        _object.poligon_count = 4;
 
-    va.coordinate = a;
-    va.color[0] = 0;
-    va.color[1] = 255;
-    va.color[2] = 255;
-    vb.coordinate = b;
-    vb.color[0] = 255;
-    vb.color[1] = 0;
-    vb.color[2] = 255;
-    vc.coordinate = c;
-    vc.color[0] = 255;
-    vc.color[1] = 255;
-    vc.color[2] = 0;
+        vtype camera[4] = {14, 0, -10, 1};
+        vtype target[4] = {20, 20, 20, 1};
+        vtype upper[4] = {0, 1, 0, 1};
+        vtype wc[16] = {0};
+        vtype cp[16] = {0};
+        vtype ps[16] = {0};
+        make_world_to_camera_mat44(camera, target, upper, wc);
+        make_camera_to_projection_mat44(120, (double)w / h, 10, 100, cp);
+        make_projection_to_screen_mat44(w, h, ps);
+        vtype wcp[16] = {0};
+        mul4444(cp, wc, wcp);
 
-    vertex* p[] = {&va, &vb, &vc};
-    point_info** map = make_raster_map(w, h);
-    write_raster_map(map, w, h, 3, p);
-
-    unsigned char* buf = make_buffer(w, h, 255);
-    raster_map_to_buffer(map, buf, w, h);
-    write_buffer(buf, w, h, "test.ppm");
-
-    // exit(0);
-    
-    vtype r[4] = {0};
-    vtype r2[4] = {0};
-
-    vtype p_local[] = {10, 10, 10, 1};
-    vtype locals[] = {5, 5, 5, 1,
-                      5, -5, 5, 1,
-                      -5, -5, 5, 1,
-                      -5, 5, 5, 1,
-                      5, 5, -5, 1,
-                      5, -5, -5, 1,
-                      -5, -5, -5, 1,
-                      -5, 5, -5, 1};
-
-    vtype camera[4] = {14, 0, -10, 1};
-    vtype target[4] = {20, 20, 20, 1};
-    vtype upper[4] = {0, 1, 0, 1};
-    vtype lw[16] = {0};
-    vtype wc[16] = {0};
-    vtype cp[16] = {0};
-    vtype ps[16] = {0};
-    make_world_to_camera_mat44(camera, target, upper, wc);
-    make_camera_to_projection_mat44(120, (double)w / h, 10, 100, cp);
-    make_projection_to_screen_mat44(w, h, ps);
-
-    for (int i = 0; i < 100; i++) {
-        init_mat(lw, 4, 4);
-        make_local_to_world_mat44(-15, -15, -15, 1, 1, 1, 0, i * 5 * 3.14 / 180.0, 0, lw);
-        vtype lp[16] = {0};
-        vtype* mat44s[] = {lw, wc, cp};
-        mul44s(3, (mat44*)mat44s, lp);
-        int white[3] = {0, 0, 0};
-
+        point_info** map = make_raster_map(w, h);
         unsigned char* buf = make_buffer(w, h, 255);
-        for (int i = 0; i < 8; i++) {
-            vtype* p_local = locals + i * 4;
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 4; j++) {
+                vs[j]->converted = false;
+            }
+            clear_raster_map(map, w, h);
+            clear_buffer(buf, w, h);
+            _object.theta_y = i * 5 * 3.14 / 180.0;
+            convert_object(&_object, wcp, ps, map, w, h);
 
-            init_mat(r, 4, 1);
-            mul44(lp, p_local, r);
-
-            vector_div(r, r[3], r, 4);
-
-            init_mat(r2, 4, 1);
-            mul44(ps, r, r2);
-
-            // mat_print(r2, 4, 1);
-
-            SET_BUFFER_RGB(buf, w, h, (int)r2[0], (int)r2[1], white);
+            raster_map_to_buffer(map, buf, w, h);
+            char name[16] = {0};
+            sprintf(name, "hoge-%d.ppm", i);
+            write_buffer(buf, w, h, name);
         }
-        char name[16] = {0};
-        sprintf(name, "hoge-%d.ppm", i);
-        write_buffer(buf, w, h, name);
+    }
+    exit(0);
+    {
+        vtype r[4] = {0};
+        vtype r2[4] = {0};
+
+        // vtype locals[] = {5, 5, 5, 1,
+        //                   5, -5, 5, 1,
+        //                   -5, -5, 5, 1,
+        //                   -5, 5, 5, 1,
+        //                   5, 5, -5, 1,
+        //                   5, -5, -5, 1,
+        //                   -5, -5, -5, 1,
+        //                   -5, 5, -5, 1};
+        vtype locals[] = {5, 5, 5, 1,
+                          -5, 5, -5, 1,
+                          5, -5, -5, 1,
+                          -5, 5, 5, 1};
+
+        vtype camera[4] = {14, 0, -10, 1};
+        vtype target[4] = {20, 20, 20, 1};
+        vtype upper[4] = {0, 1, 0, 1};
+        vtype lw[16] = {0};
+        vtype wc[16] = {0};
+        vtype cp[16] = {0};
+        vtype ps[16] = {0};
+        make_world_to_camera_mat44(camera, target, upper, wc);
+        make_camera_to_projection_mat44(120, (double)w / h, 10, 100, cp);
+        make_projection_to_screen_mat44(w, h, ps);
+
+        for (int i = 0; i < 100; i++) {
+            init_mat(lw, 4, 4);
+            make_local_to_world_mat44(-15, -15, -15, 1, 1, 1, 0, i * 5 * 3.14 / 180.0, 0, lw);
+            vtype lp[16] = {0};
+            vtype* mat44s[] = {lw, wc, cp};
+            mul44s(3, (mat44*)mat44s, lp);
+
+            unsigned char* buf = make_buffer(w, h, 255);
+            for (int i = 0; i < 4; i++) {
+                vtype* p_local = locals + i * 4;
+
+                init_mat(r, 4, 1);
+                mul44(lp, p_local, r);
+
+                vector_div(r, r[3], r, 4);
+
+                init_mat(r2, 4, 1);
+                mul44(ps, r, r2);
+
+                // mat_print(r2, 4, 1);
+
+                SET_BUFFER_RGB(buf, w, h, (int)r2[0], (int)r2[1], white);
+            }
+            char name[16] = {0};
+            sprintf(name, "hoge-%d.ppm", i);
+            write_buffer(buf, w, h, name);
+        }
     }
 }

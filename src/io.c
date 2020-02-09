@@ -21,6 +21,10 @@ unsigned char* make_buffer(int __w, int __h, char __c) {
     return buffer;
 }
 
+void clear_buffer(unsigned char* buf, int w, int h) {
+    memset(buf, 0, w * h * sizeof(char) * 3);
+}
+
 // int main() {
 //     int w = 1920,
 //         h = 1080;

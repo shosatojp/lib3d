@@ -7,3 +7,5 @@ unsigned char* make_buffer(int __w, int __h, char __c);
         __buffer[(__x + __y * __w) * 3 + 1] = __c[1];     \
         __buffer[(__x + __y * __w) * 3 + 2] = __c[2];     \
     }
+
+void clear_buffer(unsigned char* buf, int w, int h);
