@@ -12,12 +12,8 @@ l3PixelInfo* l3CreateRasterMap(int w, int h) {
 }
 
 void l3WriteRasterMap(l3PixelInfo* map, int w, int h, l3Poligon* _poligon) {
-    l3Type min[2] = {0};
-    l3Type max[2] = {0};
-    l3GetPoligonOuterRect(l3POLIGON_VERTEX_COUNT, _poligon->vertices, min, max);
-
-    for (int i = min[0]; i < max[0]; ++i) {
-        for (int j = min[1]; j < max[1]; ++j) {
+    for (int i = _poligon->min[0]; i < _poligon->max[0]; ++i) {
+        for (int j = _poligon->min[1]; j < _poligon->max[1]; ++j) {
             l3Type v[2] = {i, j};
             if (l3InsideOfPoligon2D(l3POLIGON_VERTEX_COUNT, _poligon->vertices, v)) {
                 l3PixelInfo* p = &l3RasterMapAt(map, w, h, i, j);
@@ -49,6 +45,6 @@ int l3ComparePoligons(const void* p, const void* q) {
     return -((l3Poligon*)p)->max_z + ((l3Poligon*)q)->max_z;
 }
 
-void l3SortPoligonsByZ(int c, l3Poligon* _poligons[]) {
+void l3SortPoligonsByMaxZ(int c, l3Poligon* _poligons[]) {
     qsort(_poligons, c, sizeof(l3Poligon*), l3ComparePoligons);
 }

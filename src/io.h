@@ -1,6 +1,6 @@
 #include "common.h"
 void l3WriteBuffer(unsigned char* buffer, int w, int h, const char* name);
-unsigned char* l3MakeBuffer(int w, int h, char c);
+unsigned char* l3CreateBuffer(int w, int h, char c);
 #define SET_BUFFER_RGB(buffer, w, h, x, y, c) \
     if (0 <= x && x < w && 0 <= y && y < h) { \
         buffer[(x + y * w) * 3] = c[0];       \

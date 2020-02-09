@@ -1,22 +1,22 @@
 #include "lib3d.h"
 
-void l3GetPoligonOuterRect(int c, l3Vertex* _vertices[], l3Mat21 min, l3Mat21 max) {
-    int maxx = _vertices[0]->coordinate2d[0],
-        maxy = _vertices[0]->coordinate2d[1],
-        minx = _vertices[0]->coordinate2d[0],
-        miny = _vertices[0]->coordinate2d[1];
+void l3SetOuterRectPoligon(int c, l3Poligon* _poligon) {
+    int maxx = _poligon->vertices[0]->coordinate2d[0],
+        maxy = _poligon->vertices[0]->coordinate2d[1],
+        minx = _poligon->vertices[0]->coordinate2d[0],
+        miny = _poligon->vertices[0]->coordinate2d[1];
 
     for (int i = 1; i < c; i++) {
-        if (_vertices[i]->coordinate2d[0] > maxx) maxx = _vertices[i]->coordinate2d[0];
-        if (_vertices[i]->coordinate2d[1] > maxy) maxy = _vertices[i]->coordinate2d[1];
-        if (_vertices[i]->coordinate2d[0] < minx) minx = _vertices[i]->coordinate2d[0];
-        if (_vertices[i]->coordinate2d[1] < miny) miny = _vertices[i]->coordinate2d[1];
+        if (_poligon->vertices[i]->coordinate2d[0] > maxx) maxx = _poligon->vertices[i]->coordinate2d[0];
+        if (_poligon->vertices[i]->coordinate2d[1] > maxy) maxy = _poligon->vertices[i]->coordinate2d[1];
+        if (_poligon->vertices[i]->coordinate2d[0] < minx) minx = _poligon->vertices[i]->coordinate2d[0];
+        if (_poligon->vertices[i]->coordinate2d[1] < miny) miny = _poligon->vertices[i]->coordinate2d[1];
     }
 
-    max[0] = maxx;
-    max[1] = maxy;
-    min[0] = minx;
-    min[1] = miny;
+    _poligon->max[0] = maxx;
+    _poligon->max[1] = maxy;
+    _poligon->min[0] = minx;
+    _poligon->min[1] = miny;
 }
 
 l3Type l3GetTriangleArea(l3Mat21 p, l3Mat21 a, l3Mat21 b) {
@@ -51,4 +51,25 @@ l3Poligon* l3CreatePoligon(l3Vertex* v1, l3Vertex* v2, l3Vertex* v3) {
 void l3DestructPoligons(int pc, l3Poligon* ps[]) {
     while (pc)
         free((void*)ps[--pc]);
+}
+
+void l3InitializeObject(l3Object* o) {
+    memset(o, 0, sizeof(l3Object));
+}
+
+void l3SetTransposeObject(l3Object* o, l3Type dx, l3Type dy, l3Type dz) {
+    o->dx = dx;
+    o->dy = dy;
+    o->dz = dz;
+}
+
+void l3SetScaleObject(l3Object* o, l3Type sx, l3Type sy, l3Type sz) {
+    o->sx = sx;
+    o->sy = sy;
+    o->sz = sz;
+}
+
+void l3SetPoligonsObject(l3Object* o, int count, l3Poligon* ps[]) {
+    o->poligons = ps;
+    o->poligon_count = count;
 }

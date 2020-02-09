@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "array.h"
 
 #define l3POLIGON_VERTEX_COUNT 3
 
@@ -49,6 +50,11 @@ typedef struct {
      * ソート用（裏は描画されないからいらなかったりして）
      */
     l3Type max_z;
+    /**
+     * ポリゴンを囲う四角形の左上と右下
+     */
+    l3Type min[2];
+    l3Type max[2];
 } l3Poligon;
 
 typedef struct {

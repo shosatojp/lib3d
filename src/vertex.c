@@ -3,7 +3,7 @@
 void l3MakeRoundXMat44(l3Type theta, l3Mat44 r) {
     r[0] = 1;
     l3Type cos_theta = cos(theta),
-          sin_theta = sin(theta);
+           sin_theta = sin(theta);
     r[5] = cos_theta;
     r[6] = sin_theta;
     r[9] = -sin_theta;
@@ -12,7 +12,7 @@ void l3MakeRoundXMat44(l3Type theta, l3Mat44 r) {
 }
 void l3MakeRoundYMat44(l3Type theta, l3Mat44 r) {
     l3Type cos_theta = cos(theta),
-          sin_theta = sin(theta);
+           sin_theta = sin(theta);
     r[0] = cos_theta;
     r[2] = -sin_theta;
     r[5] = 1;
@@ -22,7 +22,7 @@ void l3MakeRoundYMat44(l3Type theta, l3Mat44 r) {
 }
 void l3MakeRoundZMat44(l3Type theta, l3Mat44 r) {
     l3Type cos_theta = cos(theta),
-          sin_theta = sin(theta);
+           sin_theta = sin(theta);
     r[0] = cos_theta;
     r[1] = sin_theta;
     r[4] = -sin_theta;
@@ -68,10 +68,10 @@ void l3MakeLocalToWorldMat44(l3Type dx, l3Type dy, l3Type dz,
  * camera = target = upper = r
  */
 void l3MakeWorldToCameraMat44(l3Mat41 camera, l3Mat41 target, l3Mat41 upper, l3Mat44 r) {
-    l3Type tmp[4] = {0};
-    l3Type cx[4] = {0};
-    l3Type cy[4] = {0};
-    l3Type cz[4] = {0};
+    l3Type tmp[4] = {0},
+           cx[4] = {0},
+           cy[4] = {0},
+           cz[4] = {0};
     // cz
     l3SubMat(target, camera, tmp, 3);
     l3NormarizeVec(tmp, cz, 3);
@@ -117,7 +117,7 @@ void l3MakeProjectionToScreenMat44(l3Type width, l3Type height, l3Mat44 r) {
     r[15] = 1;
 }
 
-void l3ConvertObject(l3Object* _object, l3Mat44 wcp, l3Mat44 ps, l3PixelInfo* _map, int w, int h) {
+void l3AppendPoligonsFromObject(l3Object* _object, l3Mat44 wcp, l3Mat44 ps, int w, int h, array* poligons) {
     l3Type lw[16] = {0};
     l3MakeLocalToWorldMat44(_object->dx, _object->dy, _object->dz,
                             _object->sx, _object->sy, _object->sz,
@@ -126,7 +126,7 @@ void l3ConvertObject(l3Object* _object, l3Mat44 wcp, l3Mat44 ps, l3PixelInfo* _m
     l3MulMat4444(wcp, lw, lp);
 
     l3Type r[4] = {0},
-          r2[4] = {0};
+           r2[4] = {0};
     for (int i = 0; i < _object->poligon_count; i++) {
         l3Poligon* _poligon = _object->poligons[i];
         for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
@@ -147,11 +147,12 @@ void l3ConvertObject(l3Object* _object, l3Mat44 wcp, l3Mat44 ps, l3PixelInfo* _m
                 _vertex->converted = true;
             }
         }
-        // set_max_z(_poligon);
+        l3SetMaxZofPoligon(_poligon);
+        l3SetOuterRectPoligon(l3POLIGON_VERTEX_COUNT, _poligon);
+        array_push(poligons, _poligon);
     }
-    // sort_by_z(_object->poligon_count, _object->poligons);
-    for (int i = 0; i < _object->poligon_count; i++) {
-        l3Poligon* _poligon = _object->poligons[i];
-        l3WriteRasterMap(_map, w, h, _poligon);
-    }
+}
+
+void l3ClearVertices(int count, l3Vertex* vs[]) {
+    while (count) vs[--count]->converted = false;
 }
