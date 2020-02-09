@@ -1,58 +1,5 @@
 #include "lib3d.h"
 
-/**
- * camera = target = upper = r
- */
-void l3MakeWorldToCameraMat44(mat41 camera, mat41 target, mat41 upper, mat44 r) {
-    vtype tmp[4] = {0};
-    vtype cx[4] = {0};
-    vtype cy[4] = {0};
-    vtype cz[4] = {0};
-    // cz
-    l3SubMat(target, camera, tmp, 3);
-    l3NormarizeVec(tmp, cz, 3);
-    // cx
-    l3CrossProductVec3(cz, upper, tmp);
-    l3NormarizeVec(tmp, cx, 3);
-    // cy
-    l3CrossProductVec3(cx, cz, tmp);
-    l3NormarizeVec(tmp, cy, 3);
-
-    r[0] = cx[0];
-    r[4] = cx[1];
-    r[8] = cx[2];
-    r[1] = cy[0];
-    r[5] = cy[1];
-    r[9] = cy[2];
-    r[2] = cz[0];
-    r[6] = cz[1];
-    r[10] = cz[2];
-    r[12] = -l3InnerProductVec(camera, cx, 3);
-    r[13] = -l3InnerProductVec(camera, cy, 3);
-    r[14] = -l3InnerProductVec(camera, cz, 3);
-    r[15] = 1;
-}
-
-void l3MakeCameraToProjectionMat44(vtype angle, vtype aspect, vtype near, vtype far, mat44 r) {
-    vtype tan_angle_2 = tan(angle / 2);
-    r[5] = 1 / tan_angle_2;
-    r[0] = r[5] / aspect;
-    r[10] = far / (far - near);
-    r[11] = 1;
-    r[14] = -near * r[10];
-}
-
-void l3MakeProjectionToScreenMat44(vtype width, vtype height, mat44 r) {
-    vtype width_2 = width / 2.0;
-    vtype height_2 = height / 2.0;
-    r[0] = width_2;
-    r[5] = -height_2;
-    r[10] = 1;
-    r[12] = width_2;
-    r[13] = height_2;
-    r[15] = 1;
-}
-
 void l3MakeRoundXMat44(vtype theta, mat44 r) {
     r[0] = 1;
     vtype cos_theta = cos(theta),
@@ -117,6 +64,59 @@ void l3MakeLocalToWorldMat44(vtype dx, vtype dy, vtype dz,
     l3MulMat44s44(5, (mat44*)mat44s, r);
 }
 
+/**
+ * camera = target = upper = r
+ */
+void l3MakeWorldToCameraMat44(mat41 camera, mat41 target, mat41 upper, mat44 r) {
+    vtype tmp[4] = {0};
+    vtype cx[4] = {0};
+    vtype cy[4] = {0};
+    vtype cz[4] = {0};
+    // cz
+    l3SubMat(target, camera, tmp, 3);
+    l3NormarizeVec(tmp, cz, 3);
+    // cx
+    l3CrossProductVec3(cz, upper, tmp);
+    l3NormarizeVec(tmp, cx, 3);
+    // cy
+    l3CrossProductVec3(cx, cz, tmp);
+    l3NormarizeVec(tmp, cy, 3);
+
+    r[0] = cx[0];
+    r[4] = cx[1];
+    r[8] = cx[2];
+    r[1] = cy[0];
+    r[5] = cy[1];
+    r[9] = cy[2];
+    r[2] = cz[0];
+    r[6] = cz[1];
+    r[10] = cz[2];
+    r[12] = -l3InnerProductVec(camera, cx, 3);
+    r[13] = -l3InnerProductVec(camera, cy, 3);
+    r[14] = -l3InnerProductVec(camera, cz, 3);
+    r[15] = 1;
+}
+
+void l3MakeCameraToProjectionMat44(vtype angle, vtype aspect, vtype near, vtype far, mat44 r) {
+    vtype tan_angle_2 = tan(angle / 2);
+    r[5] = 1 / tan_angle_2;
+    r[0] = r[5] / aspect;
+    r[10] = far / (far - near);
+    r[11] = 1;
+    r[14] = -near * r[10];
+}
+
+void l3MakeProjectionToScreenMat44(vtype width, vtype height, mat44 r) {
+    vtype width_2 = width / 2.0;
+    vtype height_2 = height / 2.0;
+    r[0] = width_2;
+    r[5] = -height_2;
+    r[10] = 1;
+    r[12] = width_2;
+    r[13] = height_2;
+    r[15] = 1;
+}
+
 void l3ConvertObject(object* _object, mat44 wcp, mat44 ps, pixel_info* _map, int w, int h) {
     vtype lw[16] = {0};
     l3MakeLocalToWorldMat44(_object->dx, _object->dy, _object->dz,
@@ -129,7 +129,7 @@ void l3ConvertObject(object* _object, mat44 wcp, mat44 ps, pixel_info* _map, int
           r2[4] = {0};
     for (int i = 0; i < _object->poligon_count; i++) {
         poligon* _poligon = _object->poligons[i];
-        for (int j = 0; j < POLIGON_VERTEX_COUNT; j++) {
+        for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
             vertex* _vertex = _poligon->vertices[j];
             if (!_vertex->converted) {
                 l3InitMat(r, 4, 1);

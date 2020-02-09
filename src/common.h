@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define POLIGON_VERTEX_COUNT 3
+#define l3POLIGON_VERTEX_COUNT 3
 
 typedef double vtype;
 typedef vtype* mat;
