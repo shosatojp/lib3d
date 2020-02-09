@@ -38,7 +38,7 @@ int main() {
         l3MakeProjectionToScreenMat44(w, h, ps);
 
         l3Type* mats[] = {ps, cp, wc};
-        l3MulMat44s44(3, (l3Mat44**)mats, wcps);
+        l3MulMat44s44(3, mats, wcps);
 
         // ラスタライザマップとバッファーを作る
         l3PixelInfo* map = l3CreateRasterMap(w, h);
