@@ -1,12 +1,13 @@
 #include "lib3d.h"
 
-void l3SetOuterRectPoligon(int c, l3Poligon* _poligon) {
-    int maxx = _poligon->vertices[0]->coordinate2d[0],
-        maxy = _poligon->vertices[0]->coordinate2d[1],
-        minx = _poligon->vertices[0]->coordinate2d[0],
-        miny = _poligon->vertices[0]->coordinate2d[1];
+// 画面の端を越えたら・・・
+void l3SetOuterRectPoligon(l3Poligon* _poligon) {
+    l3Type maxx = _poligon->vertices[0]->coordinate2d[0],
+           maxy = _poligon->vertices[0]->coordinate2d[1],
+           minx = _poligon->vertices[0]->coordinate2d[0],
+           miny = _poligon->vertices[0]->coordinate2d[1];
 
-    for (int i = 1; i < c; i++) {
+    for (int i = 1; i < 3; i++) {
         if (_poligon->vertices[i]->coordinate2d[0] > maxx) maxx = _poligon->vertices[i]->coordinate2d[0];
         if (_poligon->vertices[i]->coordinate2d[1] > maxy) maxy = _poligon->vertices[i]->coordinate2d[1];
         if (_poligon->vertices[i]->coordinate2d[0] < minx) minx = _poligon->vertices[i]->coordinate2d[0];

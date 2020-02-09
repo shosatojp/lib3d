@@ -14,13 +14,11 @@ void l3WriteBuffer(unsigned char* buffer, int w, int h, const char* name) {
 /**
  * freeする必要あり
  */
-unsigned char* l3CreateBuffer(int w, int h, char c) {
+unsigned char* l3CreateBuffer(int w, int h) {
     int size = w * h * sizeof(char) * 3;
-    unsigned char* buffer = (unsigned char*)malloc(size);
-    memset(buffer, c, size);
-    return buffer;
+    return (unsigned char*)malloc(size);
 }
 
-void l3ClearBuffer(unsigned char* buf, int w, int h) {
-    memset(buf, 0, w * h * sizeof(char) * 3);
+void l3ClearBuffer(unsigned char* buf, int w, int h, char c) {
+    memset(buf, c, w * h * sizeof(char) * 3);
 }

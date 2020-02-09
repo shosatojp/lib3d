@@ -13,5 +13,5 @@ void l3MakeScaleMat44(l3Type sx, l3Type sy, l3Type sz, l3Mat44 r);
 void l3MakeLocalToWorldMat44(l3Type dx, l3Type dy, l3Type dz,
                              l3Type sx, l3Type sy, l3Type sz,
                              l3Type theta_x, l3Type theta_y, l3Type theta_z, l3Mat44 r);
-void l3AppendPoligonsFromObject(l3Object* _object, l3Mat44 wcp, l3Mat44 ps, int w, int h, array* poligons);
+void l3AppendPoligonsFromObject(l3Object* _object, l3Mat44 wcps, int w, int h, array* poligons);
 void l3ClearVertices(int count, l3Vertex* vs[]);

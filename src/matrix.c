@@ -120,7 +120,8 @@ l3Type l3InnerProductVec(l3Mat a, l3Mat b, int n) {
     return sum;
 }
 
-void l3MulMat44s44(int c, l3Mat44* as, l3Mat44 r) {
+void l3MulMat44s44(int c, l3Mat44* _as[], l3Mat44 r) {
+    l3Type*** as = (l3Type***)_as;
     if (c <= 1) {
         fprintf(stderr, "invalid matrix count\n");
     }

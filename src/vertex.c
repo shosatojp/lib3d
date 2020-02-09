@@ -54,7 +54,7 @@ void l3MakeLocalToWorldMat44(l3Type dx, l3Type dy, l3Type dz,
     l3Type rx[16] = {0};
     l3Type ry[16] = {0};
     l3Type rz[16] = {0};
-    l3MakeTransposeMat44(-dx, -dy, -dz, d);
+    l3MakeTransposeMat44(dx, dy, dz, d);
     l3MakeScaleMat44(sx, sy, sz, s);
     l3MakeRoundXMat44(-theta_x, rx);
     l3MakeRoundYMat44(-theta_y, ry);
@@ -117,38 +117,33 @@ void l3MakeProjectionToScreenMat44(l3Type width, l3Type height, l3Mat44 r) {
     r[15] = 1;
 }
 
-void l3AppendPoligonsFromObject(l3Object* _object, l3Mat44 wcp, l3Mat44 ps, int w, int h, array* poligons) {
+void l3AppendPoligonsFromObject(l3Object* _object, l3Mat44 wcps, int w, int h, array* poligons) {
     l3Type lw[16] = {0};
     l3MakeLocalToWorldMat44(_object->dx, _object->dy, _object->dz,
                             _object->sx, _object->sy, _object->sz,
                             _object->theta_x, _object->theta_y, _object->theta_z, lw);
-    l3Type lp[16] = {0};
-    l3MulMat4444(wcp, lw, lp);
+    l3Type lwcps[16] = {0};
+    l3MulMat4444(wcps, lw, lwcps);
 
-    l3Type r[4] = {0},
-           r2[4] = {0};
+    l3Type r[4] = {0};
     for (int i = 0; i < _object->poligon_count; i++) {
         l3Poligon* _poligon = _object->poligons[i];
         for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
             l3Vertex* _vertex = _poligon->vertices[j];
             if (!_vertex->converted) {
                 l3InitMat(r, 4, 1);
-                // ローカル->ワールド->プロジェクション座標変換
-                l3MulMat4441(lp, _vertex->coordinate, r);
-
+                // ローカル->ワールド->プロジェクション->スクリーン座標変換
+                l3MulMat4441(lwcps, _vertex->coordinate, r);
                 l3DivMat(r, r[3], r, 4);
 
-                l3InitMat(r2, 4, 1);
-                // スクリーン座標変換
-                l3MulMat4441(ps, r, r2);
-
                 // 結果格納
-                memcpy(_vertex->coordinate2d, r2, sizeof(_vertex->coordinate2d));
+                memcpy(_vertex->coordinate2d, r, sizeof(_vertex->coordinate2d));
                 _vertex->converted = true;
             }
         }
+        // ポリゴンに対する諸設定はここで済ます
         l3SetMaxZofPoligon(_poligon);
-        l3SetOuterRectPoligon(l3POLIGON_VERTEX_COUNT, _poligon);
+        l3SetOuterRectPoligon(_poligon);
         array_push(poligons, _poligon);
     }
 }
