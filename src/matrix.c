@@ -388,7 +388,7 @@ int main() {
     raster_map_to_buffer(map, buf, w, h);
     write_buffer(buf, w, h, "test.ppm");
 
-    exit(0);
+    // exit(0);
     
     vtype r[4] = {0};
     vtype r2[4] = {0};
