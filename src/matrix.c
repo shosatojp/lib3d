@@ -2,12 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "io.h"
 #include "lib3d.h"
+
+void init_mat(mat a, int x, int y) {
+    memset(a, 0, sizeof(vtype) * x * y);
+}
 
 /**
  * a    4*4
  * b    4*1
  * r    4*1
+ * 
+ * a != r, b != r
+ * must initialize r : true
  */
 void mul44(mat44 a, mat41 b, mat41 r) {
     for (int i = 0; i < 4; ++i) {
@@ -21,6 +29,10 @@ void mul44(mat44 a, mat41 b, mat41 r) {
  * a    4*4
  * b    4*4
  * r    4*1
+ * 
+ * a != r, b != r
+ * must initialize r : true
+ * 
  */
 void mul4444(mat44 a, mat44 b, mat41 r) {
     for (int i = 0; i < 4; ++i) {
@@ -32,9 +44,23 @@ void mul4444(mat44 a, mat44 b, mat41 r) {
     }
 }
 
+/**
+ * a = r, b = r
+ * must initialize r : false
+ */
 void vector_sub(mat a, mat b, mat r, int n) {
     for (int i = 0; i < n; ++i) {
         r[i] = a[i] - b[i];
+    }
+}
+
+/**
+ * a = r
+ * must initialize r : false
+ */
+void vector_div(mat a, vtype d, mat r, int n) {
+    for (int i = 0; i < n; ++i) {
+        r[i] = a[i] / d;
     }
 }
 
@@ -47,7 +73,7 @@ void mat_print(mat a, int x, int y) {
         else
             printf("│ ");
         for (int j = 0; j < y; ++j) {
-            printf("%4.g ", a[j * 4 + i]);
+            printf("%5.2f ", a[j * 4 + i]);
         }
         if (i == 0)
             printf("┐");
@@ -59,10 +85,13 @@ void mat_print(mat a, int x, int y) {
     }
 }
 
+/**
+ * a = r
+ */
 void normarize_vector(mat a, mat r, int n) {
     vtype sum = 0.0;
     for (int i = 0; i < n; ++i) {
-        sum += pow(a[i], 2);
+        sum += a[i] * a[i];
     }
     vtype s = sqrt(sum);
     for (int i = 0; i < n; ++i) {
@@ -70,6 +99,9 @@ void normarize_vector(mat a, mat r, int n) {
     }
 }
 
+/**
+ * a = r, b = r
+ */
 void vector_product3(mat41 a, mat41 b, mat41 r) {
     r[0] = a[1] * b[2] - a[2] * b[1];
     r[1] = a[2] * b[0] - a[0] * b[2];
@@ -104,6 +136,9 @@ vtype inner_product_1d(mat a, mat b, int n) {
 //     cy[3] = 1;
 // }
 
+/**
+ * camera = target = upper = r
+ */
 void world_to_camera_mat44(mat41 camera, mat41 target, mat41 upper, mat44 r) {
     vtype tmp[4] = {0};
     vtype cx[4] = {0};
@@ -112,7 +147,6 @@ void world_to_camera_mat44(mat41 camera, mat41 target, mat41 upper, mat44 r) {
     // cz
     vector_sub(target, camera, tmp, 3);
     normarize_vector(tmp, cz, 3);
-    mat_print(cz, 4, 1);
     // cx
     vector_product3(cz, upper, tmp);
     normarize_vector(tmp, cx, 3);
@@ -138,20 +172,20 @@ void world_to_camera_mat44(mat41 camera, mat41 target, mat41 upper, mat44 r) {
 void camera_to_projection_mat44(vtype angle, vtype aspect, vtype near, vtype far, mat44 r) {
     vtype tan_angle_2 = tan(angle / 2);
     r[0] = 1 / tan_angle_2;
-    r[5] = 1 / tan_angle_2 / aspect;
-    r[10] = 1 / (far - near) * far;
-    r[11] = -near * r[10];
-    r[14] = 1;
+    r[5] = 1 / (tan_angle_2 * aspect);
+    r[10] = far / (far - near);
+    r[11] = 1;
+    r[14] = -near * r[10];
 }
 
 void projection_to_screen_mat44(vtype width, vtype height, mat44 r) {
     vtype width_2 = width / 2.0;
     vtype height_2 = height / 2.0;
     r[0] = width_2;
-    r[3] = width_2;
     r[5] = -height_2;
-    r[7] = height_2;
     r[10] = 1;
+    r[12] = width_2;
+    r[13] = height_2;
     r[15] = 1;
 }
 
@@ -205,10 +239,20 @@ int main() {
     vtype a[] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
     // vtype b[] = {1, 2, 3, 1};
     vtype r[4] = {0};
-
+    vtype r2[4] = {0};
+    int w = 400, h = 200;
     // mul44(a, b, r);
 
-    vtype p_local[] = {0, 0, 0, 1};
+    vtype p_local[] = {10, 10, 10, 1};
+    vtype locals[] = {10, 10, 10, 1,
+                      10, 20, 10, 1,
+                      20, 20, 10, 1,
+                      20, 10, 10, 1,
+                      10, 10, 20, 1,
+                      10, 20, 20, 1,
+                      20, 20, 20, 1,
+                      20, 10, 20, 1
+                      };
     vtype p_global[] = {0};
 
     vtype s[16] = {0};
@@ -217,14 +261,35 @@ int main() {
     vtype rz[16] = {0};
 
     // make_matrix_scale(2, 2, 4, s);
-    vtype camera[4] = {-1, -1, -1, 1};
-    vtype target[4] = {0, 0, 0, 1};
+    vtype camera[4] = {14, 20, -10, 1};
+    vtype target[4] = {20, 20, 20, 1};
     vtype upper[4] = {0, 1, 0, 1};
     vtype wc[16] = {0};
     world_to_camera_mat44(camera, target, upper, wc);
-    mat_print(wc, 4, 4);
+    vtype cp[16] = {0};
+    camera_to_projection_mat44(90, 0.5, 10, 100, cp);
+    vtype ps[16] = {0};
+    projection_to_screen_mat44(w, h, ps);
 
-    mul44(wc, p_local, r);
+    unsigned char* buf = make_buffer(w, h, 255);
+    for (int i = 0; i < 8; i++) {
+        vtype* p_local = locals + i * 4;
+        init_mat(r2, 4, 1);
+        init_mat(r, 4, 1);
+        mul44(wc, p_local, r2);
+        // mat_print(r2, 4, 1);
+        mat_print(r2, 4, 1);
+        mul44(cp, r2, r);
+        // mat_print(r, 4, 1);
 
-    mat_print(r, 4, 1);
+        vector_div(r, r[3], r, 4);
+        // mat_print(r, 4, 1);
+        // mat_print(ps, 4, 4);
+        init_mat(r2, 4, 1);
+        mul44(ps, r, r2);
+
+        int white[3] = {0, 0, 0};
+        SET_BUFFER_RGB(buf, w, h, (int)r2[0], (int)r2[1], white);
+    }
+    write_buffer(buf, w, h, "hoge.ppm");
 }

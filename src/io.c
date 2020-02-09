@@ -21,15 +21,15 @@ unsigned char* make_buffer(int __w, int __h, char __c) {
     return buffer;
 }
 
-int main() {
-    int w = 1920,
-        h = 1080;
-    unsigned char* buf = make_buffer(w, h, 255);
-    unsigned char white[] = {0, 0, 0};
-    for (int i = 10; i < 11; i++) {
-        for (int j = 50; j < 51; j++) {
-            SET_BUFFER_RGB(buf, w, h, i, j, white);
-        }
-    }
-    write_buffer(buf, w, h, "out.ppm");
-}
+// int main() {
+//     int w = 1920,
+//         h = 1080;
+//     unsigned char* buf = make_buffer(w, h, 255);
+//     unsigned char white[] = {0, 0, 0};
+//     for (int i = 10; i < 11; i++) {
+//         for (int j = 50; j < 51; j++) {
+//             SET_BUFFER_RGB(buf, w, h, i, j, white);
+//         }
+//     }
+//     write_buffer(buf, w, h, "out.ppm");
+// }
