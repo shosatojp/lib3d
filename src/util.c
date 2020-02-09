@@ -35,10 +35,20 @@ vertex* l3CreateVertex(vtype x, vtype y, vtype z, rgb* color) {
     return _v;
 }
 
+void l3DestructVertices(int vc, vertex* vs[]) {
+    while (vc)
+        free((void*)vs[--vc]);
+}
+
 poligon* l3CreatePoligon(vertex* v1, vertex* v2, vertex* v3) {
     poligon* _p = (poligon*)calloc(sizeof(poligon), 1);
     _p->vertices[0] = v1;
     _p->vertices[1] = v2;
     _p->vertices[2] = v3;
     return _p;
+}
+
+void l3DestructPoligons(int pc, poligon* ps[]) {
+    while (pc)
+        free((void*)ps[--pc]);
 }

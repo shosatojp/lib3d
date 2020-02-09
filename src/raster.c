@@ -4,6 +4,9 @@ void l3ClearRasterMap(pixel_info* map, int w, int h) {
     memset(map, 0, w * h * sizeof(pixel_info));
 }
 
+/**
+ * freeする必要あり
+ */
 pixel_info* l3CreateRasterMap(int w, int h) {
     return (pixel_info*)calloc(sizeof(pixel_info), w * h);
 }

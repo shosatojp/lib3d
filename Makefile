@@ -7,14 +7,19 @@ SRC := $(shell find $(SRCDIR) -name *.c)
 OBJ := $(addsuffix .o, $(basename $(SRC)))
 
 $(TARGET):$(OBJ)
+	mkdir -p bin
 	$(CC) $^ $(CCOPT) -o $@
+
+run: $(TARGET) FORCE
 
 %.o: %.c
 	$(CC) $^ $(CCOPT) -c -o $@
 
 gif:
-	convert -delay 10 *.ppm anim.gif
+	convert -delay 1 bin/*.ppm anim.gif
 
 clean:
 	-rm *.ppm *.out *.exe *.gif $(TARGET)
 	-rm src/*.o *.o
+
+FORCE:;

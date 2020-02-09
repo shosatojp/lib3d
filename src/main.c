@@ -1,11 +1,11 @@
 #include "lib3d.h"
 
 int main() {
-    int w = 400, h = 200;
+    int w = 1920, h = 1080;
     rgb red = {255, 0, 0};
     rgb green = {0, 255, 0};
     rgb blue = {0, 0, 255};
-    rgb black = {0, 0, 0};
+    rgb white = {255, 255, 255};
     {
         object _object;
         memset(&_object, 0, sizeof(object));
@@ -13,7 +13,7 @@ int main() {
             l3CreateVertex(5, 5, 5, &red),
             l3CreateVertex(-5, -5, 5, &green),
             l3CreateVertex(5, -5, -5, &blue),
-            l3CreateVertex(-5, 5, -5, &black),
+            l3CreateVertex(-5, 5, -5, &white),
         };
 
         _object.dx = -15;
@@ -37,15 +37,15 @@ int main() {
         vtype wc[16] = {0};
         vtype cp[16] = {0};
         vtype ps[16] = {0};
+        vtype wcp[16] = {0};
         l3MakeWorldToCameraMat44(camera, target, upper, wc);
         l3MakeCameraToProjectionMat44(120, (double)w / h, 10, 100, cp);
         l3MakeProjectionToScreenMat44(w, h, ps);
-        vtype wcp[16] = {0};
         l3MulMat4444(cp, wc, wcp);
 
         pixel_info* map = l3CreateRasterMap(w, h);
         unsigned char* buf = l3MakeBuffer(w, h, 255);
-        for (int i = 0; i < 300; i++) {
+        for (int i = 0; i < 50; i++) {
             for (int j = 0; j < 4; j++) {
                 vs[j]->converted = false;
             }
@@ -55,9 +55,14 @@ int main() {
             l3ConvertObject(&_object, wcp, ps, map, w, h);
 
             l3ConvertRasterMapToBuffer(map, buf, w, h);
-            char name[16] = {0};
-            sprintf(name, "hoge-%03d.ppm", i);
+            char name[20] = {0};
+            sprintf(name, "bin/hoge-%03d.ppm", i);
             l3WriteBuffer(buf, w, h, name);
         }
+
+        free(buf);
+        free(map);
+        l3DestructVertices(sizeof(vs) / sizeof(vertex*), vs);
+        l3DestructPoligons(sizeof(poligons) / sizeof(poligon*), poligons);
     }
 }
