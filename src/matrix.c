@@ -110,6 +110,10 @@ void vector_product3(mat41 a, mat41 b, mat41 r) {
     r[3] = 1;
 }
 
+vtype vector_product2(mat21 a, mat21 b) {
+    return a[0] * b[1] - a[1] * b[0];
+}
+
 vtype inner_product_1d(mat a, mat b, int n) {
     vtype sum = 0.0;
     for (int i = 0; i < n; ++i) {
@@ -266,11 +270,104 @@ void make_local_to_world_mat44(vtype dx, vtype dy, vtype dz,
     vtype* mat44s[] = {rx, ry, rz, d, s};
     mul44s(5, (mat44*)mat44s, r);
 }
+bool is_in_2d_poligon(int c, vertex* _poligon[], mat21 a) {
+    for (int i = 0; i < c; i++) {
+        int next = i == c - 1 ? 0 : i + 1;
+        vtype d[2] = {0};
+        vector_sub(_poligon[next]->coordinate, _poligon[i]->coordinate, d, 2);
+
+        vtype d2[2] = {0};
+        vector_sub(a, _poligon[i]->coordinate, d2, 2);
+
+        if (vector_product2(d, d2) < 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+point** make_raster_map(int w, int h) {
+    return (point**)calloc(sizeof(point*), w * h);
+}
+
+void poligon_rect(int c, vertex* _poligon[], mat21 min, mat21 max) {
+    int maxx = _poligon[0]->coordinate[0],
+        maxy = _poligon[0]->coordinate[1],
+        minx = _poligon[0]->coordinate[0],
+        miny = _poligon[0]->coordinate[1];
+
+    for (int i = 1; i < c; i++) {
+        if (_poligon[i]->coordinate[0] > maxx) maxx = _poligon[i]->coordinate[0];
+        if (_poligon[i]->coordinate[1] > maxy) maxy = _poligon[i]->coordinate[1];
+        if (_poligon[i]->coordinate[0] < minx) minx = _poligon[i]->coordinate[0];
+        if (_poligon[i]->coordinate[1] < miny) miny = _poligon[i]->coordinate[1];
+    }
+
+    max[0] = maxx;
+    max[1] = maxy;
+    min[0] = minx;
+    min[1] = miny;
+}
+
+#define SET_POINT_RASTER_MAP(__map, w, h, x, y, _point) \
+    if (0 <= x && x < w && 0 <= y && y < h) {           \
+        __map[x + y * w] = _point;                      \
+    }
+
+void write_raster_map(point** __map, int w, int h, int c, vertex* _poligon[]) {
+    vtype min[2] = {0};
+    vtype max[2] = {0};
+    poligon_rect(c, _poligon, min, max);
+
+    for (int i = min[0]; i < max[0]; ++i) {
+        for (int j = min[1]; j < max[1]; ++j) {
+            vtype v[2] = {i, j};
+            if (is_in_2d_poligon(c, _poligon, v)) {
+                point* p = (point*)calloc(sizeof(point), 1);
+                p->color[0] = 0;
+                p->color[1] = 0;
+                p->color[2] = 0;
+                SET_POINT_RASTER_MAP(__map, w, h, i, j, p)
+            }
+        }
+    }
+}
+
+void raster_map_to_buffer(point** __map, unsigned char* __buf, int w, int h) {
+    for (int i = 0, len = w * h; i < len; i++) {
+        if (__map[i]) {
+            __buf[i * 3] = __map[i]->color[0];
+            __buf[i * 3 + 1] = __map[i]->color[1];
+            __buf[i * 3 + 2] = __map[i]->color[2];
+        }
+    }
+}
 
 int main() {
+    int w = 400, h = 200;
+    vtype a[] = {100, 100};
+    vtype b[] = {200, 100};
+    vtype c[] = {100, 200};
+
+    vertex va;
+    vertex vb;
+    vertex vc;
+
+    va.coordinate = a;
+    vb.coordinate = b;
+    vc.coordinate = c;
+
+    vertex* p[] = {&va, &vb, &vc};
+    vertex** map = make_raster_map(w, h);
+    write_raster_map(map, w, h, 3, p);
+
+    unsigned char* buf = make_buffer(w, h, 255);
+    raster_map_to_buffer(map, buf, w, h);
+    write_buffer(buf, w, h, "test.ppm");
+
+    exit(0);
     vtype r[4] = {0};
     vtype r2[4] = {0};
-    int w = 400, h = 200;
 
     vtype p_local[] = {10, 10, 10, 1};
     vtype locals[] = {5, 5, 5, 1,
@@ -317,7 +414,7 @@ int main() {
 
             SET_BUFFER_RGB(buf, w, h, (int)r2[0], (int)r2[1], white);
         }
-        const char name[16] = {0};
+        char name[16] = {0};
         sprintf(name, "hoge-%d.ppm", i);
         write_buffer(buf, w, h, name);
     }
