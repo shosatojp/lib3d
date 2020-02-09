@@ -1,26 +1,26 @@
 #include "lib3d.h"
 
-void l3ClearRasterMap(pixel_info* map, int w, int h) {
-    memset(map, 0, w * h * sizeof(pixel_info));
+void l3ClearRasterMap(l3PixelInfo* map, int w, int h) {
+    memset(map, 0, w * h * sizeof(l3PixelInfo));
 }
 
 /**
  * freeする必要あり
  */
-pixel_info* l3CreateRasterMap(int w, int h) {
-    return (pixel_info*)calloc(sizeof(pixel_info), w * h);
+l3PixelInfo* l3CreateRasterMap(int w, int h) {
+    return (l3PixelInfo*)calloc(sizeof(l3PixelInfo), w * h);
 }
 
-void l3WriteRasterMap(pixel_info* map, int w, int h, poligon* _poligon) {
-    vtype min[2] = {0};
-    vtype max[2] = {0};
+void l3WriteRasterMap(l3PixelInfo* map, int w, int h, l3Poligon* _poligon) {
+    l3Type min[2] = {0};
+    l3Type max[2] = {0};
     l3GetPoligonOuterRect(l3POLIGON_VERTEX_COUNT, _poligon->vertices, min, max);
 
     for (int i = min[0]; i < max[0]; ++i) {
         for (int j = min[1]; j < max[1]; ++j) {
-            vtype v[2] = {i, j};
+            l3Type v[2] = {i, j};
             if (l3InsideOfPoligon2D(l3POLIGON_VERTEX_COUNT, _poligon->vertices, v)) {
-                pixel_info* p = &l3RasterMapAt(map, w, h, i, j);
+                l3PixelInfo* p = &l3RasterMapAt(map, w, h, i, j);
                 p->_poligon = _poligon;
                 p->activated = true;
                 l3FragmentShader(p, v);
@@ -29,7 +29,7 @@ void l3WriteRasterMap(pixel_info* map, int w, int h, poligon* _poligon) {
     }
 }
 
-void l3ConvertRasterMapToBuffer(pixel_info* map, unsigned char* buf, int w, int h) {
+void l3ConvertRasterMapToBuffer(l3PixelInfo* map, unsigned char* buf, int w, int h) {
     for (int i = 0, len = w * h; i < len; i++) {
         if (map[i].activated) {
             buf[i * 3] = map[i].color.r;
@@ -39,16 +39,16 @@ void l3ConvertRasterMapToBuffer(pixel_info* map, unsigned char* buf, int w, int 
     }
 }
 
-void l3SetMaxZofPoligon(poligon* _poligon) {
+void l3SetMaxZofPoligon(l3Poligon* _poligon) {
     _poligon->max_z = max(max(_poligon->vertices[0]->coordinate2d[2],
                               _poligon->vertices[1]->coordinate2d[2]),
                           _poligon->vertices[2]->coordinate2d[2]);
 }
 
 int l3ComparePoligons(const void* p, const void* q) {
-    return -((poligon*)p)->max_z + ((poligon*)q)->max_z;
+    return -((l3Poligon*)p)->max_z + ((l3Poligon*)q)->max_z;
 }
 
-void l3SortPoligonsByZ(int c, poligon* _poligons[]) {
-    qsort(_poligons, c, sizeof(poligon*), l3ComparePoligons);
+void l3SortPoligonsByZ(int c, l3Poligon* _poligons[]) {
+    qsort(_poligons, c, sizeof(l3Poligon*), l3ComparePoligons);
 }

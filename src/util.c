@@ -1,6 +1,6 @@
 #include "lib3d.h"
 
-void l3GetPoligonOuterRect(int c, vertex* _vertices[], mat21 min, mat21 max) {
+void l3GetPoligonOuterRect(int c, l3Vertex* _vertices[], l3Mat21 min, l3Mat21 max) {
     int maxx = _vertices[0]->coordinate2d[0],
         maxy = _vertices[0]->coordinate2d[1],
         minx = _vertices[0]->coordinate2d[0],
@@ -19,12 +19,12 @@ void l3GetPoligonOuterRect(int c, vertex* _vertices[], mat21 min, mat21 max) {
     min[1] = miny;
 }
 
-vtype l3GetTriangleArea(mat21 p, mat21 a, mat21 b) {
+l3Type l3GetTriangleArea(l3Mat21 p, l3Mat21 a, l3Mat21 b) {
     return fabs((a[0] - p[0]) * (b[1] - p[1]) - (a[1] - p[1]) * (b[0] - p[0])) / 2;
 }
 
-vertex* l3CreateVertex(vtype x, vtype y, vtype z, rgb* color) {
-    vertex* _v = (vertex*)calloc(sizeof(vertex), 1);
+l3Vertex* l3CreateVertex(l3Type x, l3Type y, l3Type z, l3RGB* color) {
+    l3Vertex* _v = (l3Vertex*)calloc(sizeof(l3Vertex), 1);
     _v->coordinate[0] = x;
     _v->coordinate[1] = y;
     _v->coordinate[2] = z;
@@ -35,20 +35,20 @@ vertex* l3CreateVertex(vtype x, vtype y, vtype z, rgb* color) {
     return _v;
 }
 
-void l3DestructVertices(int vc, vertex* vs[]) {
+void l3DestructVertices(int vc, l3Vertex* vs[]) {
     while (vc)
         free((void*)vs[--vc]);
 }
 
-poligon* l3CreatePoligon(vertex* v1, vertex* v2, vertex* v3) {
-    poligon* _p = (poligon*)calloc(sizeof(poligon), 1);
+l3Poligon* l3CreatePoligon(l3Vertex* v1, l3Vertex* v2, l3Vertex* v3) {
+    l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
     _p->vertices[0] = v1;
     _p->vertices[1] = v2;
     _p->vertices[2] = v3;
     return _p;
 }
 
-void l3DestructPoligons(int pc, poligon* ps[]) {
+void l3DestructPoligons(int pc, l3Poligon* ps[]) {
     while (pc)
         free((void*)ps[--pc]);
 }

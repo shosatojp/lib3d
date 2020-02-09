@@ -9,61 +9,61 @@
 
 #define l3POLIGON_VERTEX_COUNT 3
 
-typedef double vtype;
-typedef vtype* mat;
-typedef vtype* mat44;
-typedef vtype* mat41;  // 3次元座標、インデックス3は1
-typedef vtype* mat21;
+typedef double l3Type;
+typedef l3Type* l3Mat;
+typedef l3Type* l3Mat44;
+typedef l3Type* l3Mat41;  // 3次元座標、インデックス3は1
+typedef l3Type* l3Mat21;
 
 typedef struct {
-    vtype r, g, b;
-} rgb;
+    l3Type r, g, b;
+} l3RGB;
 
 typedef struct {
     /**
      * ローカル座標空間の座標
      */
-    vtype coordinate[4];
+    l3Type coordinate[4];
     /**
      * スクリーン座標空間の座標
      */
-    vtype coordinate2d[4];
+    l3Type coordinate2d[4];
     /**
      * RGB値
      */
-    rgb color;
+    l3RGB color;
     /**
      * 複数ポリゴンで重複して使用している場合に無駄に計算しないように
      * 変換行列が変わったときはリセットする必要あり
      */
     bool converted;
-} vertex;
+} l3Vertex;
 
 // textureもここで
 typedef struct {
     /**
      * ポリゴンに属する頂点、ポリゴンは必ず三角形
      */
-    vertex* vertices[3];
+    l3Vertex* vertices[3];
     /**
      * ソート用（裏は描画されないからいらなかったりして）
      */
-    vtype max_z;
-} poligon;
+    l3Type max_z;
+} l3Poligon;
 
 typedef struct {
-    poligon** poligons;  // poligonの配列
+    l3Poligon** poligons;  // poligonの配列
     int poligon_count;
-    vtype dx, dy, dz;
-    vtype sx, sy, sz;
-    vtype theta_x, theta_y, theta_z;
-} object;
+    l3Type dx, dy, dz;
+    l3Type sx, sy, sz;
+    l3Type theta_x, theta_y, theta_z;
+} l3Object;
 
 typedef struct {
     // ピクセルの色
-    rgb color;
+    l3RGB color;
     // ポリゴンへのポインタ
-    poligon* _poligon;
+    l3Poligon* _poligon;
     // 変更したか
     bool activated;
-} pixel_info;
+} l3PixelInfo;

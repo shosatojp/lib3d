@@ -5,7 +5,7 @@
 /**
  * 行列を零行列に初期化する
  */
-void l3InitMat(mat a, int x, int y);
+void l3InitMat(l3Mat a, int x, int y);
 
 /**
  * a    4*4
@@ -15,7 +15,7 @@ void l3InitMat(mat a, int x, int y);
  * a != r, b != r
  * must initialize r : true
  */
-void l3MulMat4441(mat44 a, mat41 b, mat41 r);
+void l3MulMat4441(l3Mat44 a, l3Mat41 b, l3Mat41 r);
 
 /**
  * a    4*4
@@ -26,29 +26,29 @@ void l3MulMat4441(mat44 a, mat41 b, mat41 r);
  * must initialize r : true
  * 
  */
-void l3MulMat4444(mat44 a, mat44 b, mat44 r);
+void l3MulMat4444(l3Mat44 a, l3Mat44 b, l3Mat44 r);
 
 /**
  * a = r, b = r
  * must initialize r : false
  */
-void l3SubMat(mat a, mat b, mat r, int n);
+void l3SubMat(l3Mat a, l3Mat b, l3Mat r, int n);
 
 /**
  * a = r
  * must initialize r : false
  */
-void l3DivMat(mat a, vtype d, mat r, int n);
-void l3PrintMat(mat a, int x, int y);
+void l3DivMat(l3Mat a, l3Type d, l3Mat r, int n);
+void l3PrintMat(l3Mat a, int x, int y);
 /**
  * a = r
  */
-void l3NormarizeVec(mat a, mat r, int n);
+void l3NormarizeVec(l3Mat a, l3Mat r, int n);
 /**
  * a = r, b = r
  */
-void l3CrossProductVec3(mat41 a, mat41 b, mat41 r);
-vtype l3CrossProductVec2(mat21 a, mat21 b);
-vtype l3InnerProductVec(mat a, mat b, int n);
-void l3MulMat44s44(int c, mat44* as, mat44 r);
-bool l3InsideOfPoligon2D(int c, vertex* _poligon[], mat21 a);
+void l3CrossProductVec3(l3Mat41 a, l3Mat41 b, l3Mat41 r);
+l3Type l3CrossProductVec2(l3Mat21 a, l3Mat21 b);
+l3Type l3InnerProductVec(l3Mat a, l3Mat b, int n);
+void l3MulMat44s44(int c, l3Mat44* as, l3Mat44 r);
+bool l3InsideOfPoligon2D(int c, l3Vertex* _poligon[], l3Mat21 a);
