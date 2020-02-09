@@ -1,6 +1,5 @@
 #include "lib3d.h"
 
-// 画面の端を越えたら・・・
 void l3SetOuterRectPoligon(l3Poligon* _poligon) {
     l3Type maxx = _poligon->vertices[0]->coordinate2d[0],
            maxy = _poligon->vertices[0]->coordinate2d[1],

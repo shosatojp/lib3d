@@ -2,6 +2,7 @@
 #include "common.h"
 
 #define max(a, b) (((a) > (b)) ? (a) : (b))
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 void l3SetOuterRectPoligon(l3Poligon* poligon);
 l3Type l3GetTriangleArea(l3Mat21 p, l3Mat21 a, l3Mat21 b);
