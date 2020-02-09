@@ -263,7 +263,7 @@ void make_local_to_world_mat44(vtype dx, vtype dy, vtype dz,
     make_matrix_round_y(-theta_y, ry);
     make_matrix_round_z(-theta_z, rz);
 
-    vtype* mat44s[] = {s, d, rz, ry, rx};
+    vtype* mat44s[] = {rx, ry, rz, d, s};
     mul44s(5, (mat44*)mat44s, r);
 }
 
@@ -282,38 +282,43 @@ int main() {
                       -5, -5, -5, 1,
                       -5, 5, -5, 1};
 
-    vtype camera[4] = {14, 20, -10, 1};
+    vtype camera[4] = {14, 0, -10, 1};
     vtype target[4] = {20, 20, 20, 1};
     vtype upper[4] = {0, 1, 0, 1};
     vtype lw[16] = {0};
     vtype wc[16] = {0};
     vtype cp[16] = {0};
     vtype ps[16] = {0};
-    make_local_to_world_mat44(-15, -15, -15, 1, 1, 1, 0, 0, 0, lw);
     make_world_to_camera_mat44(camera, target, upper, wc);
-    make_camera_to_projection_mat44(90, (double)w / h, 10, 100, cp);
+    make_camera_to_projection_mat44(120, (double)w / h, 10, 100, cp);
     make_projection_to_screen_mat44(w, h, ps);
 
-    vtype lp[16] = {0};
-    vtype* mat44s[] = {lw, wc, cp};
-    mul44s(3, (mat44*)mat44s, lp);
-    int white[3] = {0, 0, 0};
+    for (int i = 0; i < 100; i++) {
+        init_mat(lw, 4, 4);
+        make_local_to_world_mat44(-15, -15, -15, 1, 1, 1, 0, i * 5 * 3.14 / 180.0, 0, lw);
+        vtype lp[16] = {0};
+        vtype* mat44s[] = {lw, wc, cp};
+        mul44s(3, (mat44*)mat44s, lp);
+        int white[3] = {0, 0, 0};
 
-    unsigned char* buf = make_buffer(w, h, 255);
-    for (int i = 0; i < 8; i++) {
-        vtype* p_local = locals + i * 4;
+        unsigned char* buf = make_buffer(w, h, 255);
+        for (int i = 0; i < 8; i++) {
+            vtype* p_local = locals + i * 4;
 
-        init_mat(r, 4, 1);
-        mul44(lp, p_local, r);
+            init_mat(r, 4, 1);
+            mul44(lp, p_local, r);
 
-        vector_div(r, r[3], r, 4);
+            vector_div(r, r[3], r, 4);
 
-        init_mat(r2, 4, 1);
-        mul44(ps, r, r2);
+            init_mat(r2, 4, 1);
+            mul44(ps, r, r2);
 
-        mat_print(r2, 4, 1);
+            // mat_print(r2, 4, 1);
 
-        SET_BUFFER_RGB(buf, w, h, (int)r2[0], (int)r2[1], white);
+            SET_BUFFER_RGB(buf, w, h, (int)r2[0], (int)r2[1], white);
+        }
+        const char name[16] = {0};
+        sprintf(name, "hoge-%d.ppm", i);
+        write_buffer(buf, w, h, name);
     }
-    write_buffer(buf, w, h, "hoge.ppm");
 }
