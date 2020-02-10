@@ -2,14 +2,6 @@
 #include "lib3d.h"
 
 int main() {
-    {
-        l3Mat32A texture_vertices = {0, 0, 1, 0, 0, 1};
-        l3Type scale[4] = {200, 0, 0, 100};
-        l3Mat32A out;
-        l3MulMat(scale, texture_vertices, out, 2, 2, 3);
-        l3PrintMat(out, 2, 3);
-        // exit(0);
-    }
     int w = 1920, h = 1080;
     l3RGB red = {255, 0, 0};
     l3RGB green = {0, 255, 0};
@@ -17,7 +9,7 @@ int main() {
     l3RGB white = {255, 255, 255};
     {
         l3Texture texture;
-        l3Load2DTexture("tex.ppm", &texture);
+        l3Load2DTexture("tex3.ppm", &texture);
 
         // オブジェクト構築
         l3Object _object;
@@ -38,7 +30,7 @@ int main() {
         };
         poligons[0]->color.r = 255;
         poligons[0]->material = l3PoligonMaterialColor;
-        l3Mat32A texture_vertices = {0.5, 0.5, 1,1,0,1};
+        l3Mat32A texture_vertices = {0.5, 0.5, 0,1,1,1};
         l3SetTexturePoligon(poligons[1], &texture, texture_vertices);
         l3SetPoligonsObject(&_object,
                             sizeof(poligons) / sizeof(l3Poligon*), poligons);

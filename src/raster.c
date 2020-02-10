@@ -32,9 +32,9 @@ void l3WriteRasterMap(l3PixelInfo* map, int w, int h, l3Poligon* _poligon) {
 void l3ConvertRasterMapToBuffer(l3PixelInfo* map, unsigned char* buf, int w, int h) {
     for (int i = 0, len = w * h; i < len; i++) {
         if (map[i].activated) {
-            buf[i * 3] = map[i].color.r;
-            buf[i * 3 + 1] = map[i].color.g;
-            buf[i * 3 + 2] = map[i].color.b;
+            buf[i * 3] = (unsigned char)map[i].color.r;
+            buf[i * 3 + 1] = (unsigned char)map[i].color.g;
+            buf[i * 3 + 2] = (unsigned char)map[i].color.b;
         }
     }
 }

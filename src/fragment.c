@@ -28,17 +28,16 @@ void l3FragmentShader(l3PixelInfo* p, l3Mat31 v) {
             l3Mat31A src = {0};
             l3MulMat(_poligon->textureAffineMatInv, v, src, 3, 3, 1);
             l3RGB white = {255, 255, 0};
-            // l3PrintMat(_poligon->textureAffineMatInv,3,3);
-            // l3PrintMat(src, 3, 1);
-            memcpy(&p->color, l3GetColorAtTexture(_poligon->texture, (int)src[0], (int)src[1], &white), sizeof(l3RGB));
+            unsigned char* tc = l3GetColorAtTexture(_poligon->texture, (int)src[0], (int)src[1], &white);
+            l3RGB c = {tc[0], tc[1], tc[2]};
+            memcpy(&p->color, &c, sizeof(l3RGB));
         } break;
     }
 }
 
-l3RGB* l3GetColorAtTexture(l3Texture* texture, int x, int y, l3RGB* _default) {
-    // printf("%d %d\n", x, y);
+unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y, l3RGB* _default) {
     if (0 <= x && x < texture->w && 0 <= y && y < texture->h) {
-        return (l3RGB*)&texture->buffer[(x + y * texture->w) * sizeof(unsigned char) * 3];
+        return (char*)texture->buffer + (x + y * texture->w) * 3;
     } else {
         return _default;
     }
@@ -63,7 +62,7 @@ void l3SetTextureMatInv(l3Poligon* poligon) {
         poligon->vertices[2]->coordinate2d,
     };
     l3GetAffineTransformMat33(src, dst, affinemat);
-    
+
     l3Mat33 affinematinv = (l3Mat33)calloc(sizeof(l3Type), 3 * 3);
     l3InverseMat(3, affinemat, affinematinv);
     poligon->textureAffineMatInv = affinematinv;

@@ -188,9 +188,7 @@ void l3GetAffineTransformMat33(l3Mat21 src[3], l3Mat21 dst[3], l3Mat33 r) {
         l3MatAt(b, 6, i * 2, 0) = dst[i][0];
         l3MatAt(b, 6, i * 2 + 1, 0) = dst[i][1];
     }
-    l3PrintMat(a,6,7);
     l3SimplificateMat(a, 6, 7);
-    l3PrintMat(a,6,7);
 
     l3MatAt(r, 3, 0, 0) = b[0];
     l3MatAt(r, 3, 0, 1) = b[1];
@@ -234,13 +232,11 @@ void l3SwapRows(l3Mat a, int h, int w) {
     }
 }
 
-// これがバグってる
 void l3SimplificateMat(l3Mat a, int h, int w) {
     l3Type piv, t;
     int i, j, k;
 
     l3SwapRows(a, h, w);
-    l3PrintMat(a,h,w);
 
     for (k = 0; k < h; k++) {
         piv = l3MatAt(a, h, k, k);
