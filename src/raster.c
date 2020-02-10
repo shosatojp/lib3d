@@ -12,6 +12,10 @@ l3PixelInfo* l3CreateRasterMap(int w, int h) {
 }
 
 void l3WriteRasterMap(l3PixelInfo* map, int w, int h, l3Poligon* _poligon) {
+    if (_poligon->material == l3PoligonMaterialTexture) {
+        // 変換行列の逆行列を生成
+        l3SetTextureMatInv(_poligon);
+    }
     for (int i = max(0, _poligon->min[0]); i < min(w, _poligon->max[0]); ++i) {
         for (int j = max(0, _poligon->min[1]); j < min(h, _poligon->max[1]); ++j) {
             l3Type v[2] = {i, j};

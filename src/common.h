@@ -17,25 +17,40 @@ typedef l3Type* l3Mat41;  // 3次元座標、インデックス3は1
 typedef l3Type* l3Mat21;
 typedef l3Type* l3Mat33;  // Affine
 typedef l3Type* l3Mat32;
+typedef l3Type* l3Mat31;
+typedef l3Type* l3Mat23;
 typedef l3Type l3Mat44A[16];
 typedef l3Type l3Mat41A[4];
 typedef l3Type l3Mat21A[2];
 typedef l3Type l3Mat33A[9];
 typedef l3Type l3Mat32A[6];
+typedef l3Type l3Mat31A[3];
+typedef l3Type l3Mat23A[6];
+
+typedef enum {
+    l3PoligonMaterialVertex = 0,  // default
+    l3PoligonMaterialColor,
+    l3PoligonMaterialTexture,
+} l3PoligonMaterial;
 
 typedef struct {
     l3Type r, g, b;
 } l3RGB;
 
 typedef struct {
+    unsigned char* buffer;
+    int w, h;
+} l3Texture;
+
+typedef struct {
     /**
      * ローカル座標空間の座標
      */
-    l3Type coordinate[4];
+    l3Mat41A coordinate;
     /**
      * スクリーン座標空間の座標
      */
-    l3Type coordinate2d[4];
+    l3Mat41A coordinate2d;
     /**
      * RGB値
      */
@@ -60,8 +75,21 @@ typedef struct {
     /**
      * ポリゴンを囲う四角形の左上と右下
      */
-    l3Type min[2];
-    l3Type max[2];
+    l3Mat21A min;
+    l3Mat21A max;
+    /**
+     * テクスチャマッピング用。verticesに対応する順番で
+     */
+    l3Mat23 textureVertices;
+    l3Texture* texture;
+    l3Mat33 textureAffineMatInv;
+
+    l3RGB color;
+
+    /**
+     * このポリゴンにどのマテリアルを使うか
+     */
+    l3PoligonMaterial material;
 } l3Poligon;
 
 typedef struct {

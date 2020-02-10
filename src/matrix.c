@@ -43,6 +43,16 @@ void l3MulMat4444(l3Mat44 a, l3Mat44 b, l3Mat44 r) {
     }
 }
 
+void l3MulMat(l3Mat a, l3Mat b, l3Mat r, int s, int t, int u) {
+    for (int i = 0; i < s; ++i) {
+        for (int j = 0; j < u; ++j) {
+            for (int k = 0; k < t; ++k) {
+                r[i + j * s] += a[i + k * s] * b[k + j * t];
+            }
+        }
+    }
+}
+
 /**
  * a = r, b = r
  * must initialize r : false
@@ -179,10 +189,7 @@ void l3GetAffineTransformMat33(l3Mat21 src[3], l3Mat21 dst[3], l3Mat33 r) {
         l3MatAt(b, 6, i * 2, 0) = dst[i][0];
         l3MatAt(b, 6, i * 2 + 1, 0) = dst[i][1];
     }
-    l3PrintMat(a, 6, 7);
-
     l3SimplificateMat(a, 6, 7);
-    l3PrintMat(a, 6, 7);
 
     l3MatAt(r, 3, 0, 0) = b[0];
     l3MatAt(r, 3, 0, 1) = b[1];
@@ -200,7 +207,6 @@ void l3InverseMat(int n, l3Mat a, l3Mat r) {
     memcpy(tmp, a, sizeof(l3Type) * n * n);
     for (int k = 0; k < n; k++)
         l3MatAt(tmp, n, k, n + k) = 1.0;
-    l3PrintMat(tmp, n, n * 2);
     l3SimplificateMat(tmp, n, n * 2);
     memcpy(r, tmp + n * n, sizeof(l3Type) * n * n);
     free(tmp);

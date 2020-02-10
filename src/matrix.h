@@ -29,6 +29,7 @@ void l3MulMat4441(l3Mat44 a, l3Mat41 b, l3Mat41 r);
  * 
  */
 void l3MulMat4444(l3Mat44 a, l3Mat44 b, l3Mat44 r);
+void l3MulMat(l3Mat a, l3Mat b, l3Mat r, int s, int t, int u);
 
 /**
  * a = r, b = r

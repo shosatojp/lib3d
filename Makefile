@@ -20,7 +20,7 @@ gif:
 	convert -delay 2 bin/*.ppm anim.gif
 
 clean:
-	-rm *.ppm *.out *.exe *.gif $(TARGET)
+	-rm bin/*.ppm *.out *.exe *.gif $(TARGET)
 	-rm src/*.o *.o
 	-rm -rf bin
 

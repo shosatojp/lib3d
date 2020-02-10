@@ -3,32 +3,22 @@
 
 int main() {
     {
-
-        l3Type a[] = {0, 0, 1};
-        l3Type b[] = {1, 0, 1};
-        l3Type c[] = {0, 1, 1};
-        l3Mat33 src[] = {a, b, c};
-        l3Type d[] = {0, 0, 1};
-        l3Type e[] = {2, 0, 1};
-        l3Type f[] = {0, 2, 1};
-        l3Mat33 dst[] = {d, e, f};
-        l3Type r[9] = {0};
-        l3GetAffineTransformMat33(src, dst, r);
-        l3PrintMat(r, 3, 3);
-
-        l3Mat33A r2 = {0};
-        l3InverseMat(3, r, r2);
-        l3PrintMat(r2, 3, 3);
-
-        exit(0);
+        l3Mat32A texture_vertices = {0, 0, 1, 0, 0, 1};
+        l3Type scale[4] = {200, 0, 0, 100};
+        l3Mat32A out;
+        l3MulMat(scale, texture_vertices, out, 2, 2, 3);
+        l3PrintMat(out, 2, 3);
+        // exit(0);
     }
-
     int w = 1920, h = 1080;
     l3RGB red = {255, 0, 0};
     l3RGB green = {0, 255, 0};
     l3RGB blue = {0, 0, 255};
     l3RGB white = {255, 255, 255};
     {
+        l3Texture texture;
+        l3Load2DTexture("texture.ppm", &texture);
+
         // オブジェクト構築
         l3Object _object;
         l3InitializeObject(&_object);
@@ -46,6 +36,10 @@ int main() {
             l3CreatePoligon(vs[1], vs[2], vs[3]),
             l3CreatePoligon(vs[0], vs[1], vs[3]),
         };
+        poligons[0]->color.r = 255;
+        poligons[0]->material = l3PoligonMaterialColor;
+        l3Mat32A texture_vertices = {0, 0, 0,1, 1, 0};
+        l3SetTexturePoligon(poligons[1], &texture, texture_vertices);
         l3SetPoligonsObject(&_object,
                             sizeof(poligons) / sizeof(l3Poligon*), poligons);
 
