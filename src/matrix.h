@@ -56,3 +56,6 @@ void l3MulMat44s44(int c, l3Mat44* as, l3Mat44 r);
 bool l3InsideOfPoligon2D(int c, l3Vertex* _poligon[], l3Mat21 a);
 void l3InverseMat(int n, l3Mat44 a, l3Mat44 r);
 void l3SimplificateMat(l3Mat a, int h, int w);
+void l3GetAffineTransformMat33(l3Mat21 src[3], l3Mat21 dst[3], l3Mat33 r);
+void l3SwapRow(l3Mat a, int h, int w, int p, int q);
+void l3SwapRows(l3Mat a, int h, int w);

@@ -15,6 +15,7 @@ typedef l3Type* l3Mat;
 typedef l3Type* l3Mat44;
 typedef l3Type* l3Mat41;  // 3次元座標、インデックス3は1
 typedef l3Type* l3Mat21;
+typedef l3Type* l3Mat33;  // Affine
 
 typedef struct {
     l3Type r, g, b;

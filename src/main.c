@@ -3,16 +3,28 @@
 
 int main() {
     {
-        l3Type d[] = {4, 2, -1,
-                      1, 3, 2,
-                      -3, 1, 2,
-                      -2, 4, 2};
-        l3Type camera[4] = {14, 0, -10, 1};
-        l3Type r[12] = {0};
-        l3PrintMat(d, 3, 4);
-        l3SimplificateMat(d, 3, 4);
-        l3PrintMat(d, 3, 4);
 
+        // {
+        //     l3Type a[] = {0, 0, 1,
+        //                   0, 1, 0,
+        //                   1, 0, 0,
+        //                   1, 2, 3};
+        //     l3SimplificateMat(a, 3, 4);
+        //     l3PrintMat(a, 3, 4);
+        //     exit(0);
+        // }
+
+        l3Type a[] = {0, 0, 1};
+        l3Type b[] = {1, 0, 1};
+        l3Type c[] = {0, 1, 1};
+        l3Mat33 src[] = {a, b, c};
+        l3Type d[] = {0, 0, 1};
+        l3Type e[] = {2, 0, 1};
+        l3Type f[] = {0, 2, 1};
+        l3Mat33 dst[] = {d, e, f};
+        l3Type r[9] = {0};
+        l3GetAffineTransformMat33(src, dst, r);
+        l3PrintMat(r, 3, 3);
         exit(0);
     }
 
