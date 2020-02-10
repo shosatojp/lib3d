@@ -9,7 +9,7 @@ int main() {
     l3RGB white = {255, 255, 255};
     {
         l3Texture texture;
-        l3Load2DTexture("tex3.ppm", &texture);
+        l3Load2DTexture("tex4.ppm", &texture);
 
         // オブジェクト構築
         l3Object _object;
@@ -30,7 +30,7 @@ int main() {
         };
         poligons[0]->color.r = 255;
         poligons[0]->material = l3PoligonMaterialColor;
-        l3Mat32A texture_vertices = {0.5, 0.5, 0,1,1,1};
+        l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
         l3SetTexturePoligon(poligons[1], &texture, texture_vertices);
         l3SetPoligonsObject(&_object,
                             sizeof(poligons) / sizeof(l3Poligon*), poligons);
@@ -71,7 +71,7 @@ int main() {
             array_each_i(poligons_all, l3WriteRasterMap(map, w, h, array_ei));
 
             array_clear(poligons_all);
-            free(poligons_all);
+            safe_free(poligons_all);
 
             // 出力
             l3ConvertRasterMapToBuffer(map, buf, w, h);
@@ -81,8 +81,8 @@ int main() {
         }
 
         // 片付け
-        free(buf);
-        free(map);
+        safe_free(buf);
+        safe_free(map);
         l3DestructVertices(sizeof(vs) / sizeof(l3Vertex*), vs);
         l3DestructPoligons(sizeof(poligons) / sizeof(l3Poligon*), poligons);
     }

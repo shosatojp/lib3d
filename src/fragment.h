@@ -10,4 +10,4 @@ int l3Load2DTexture(const char* path, l3Texture* texture);
 void l3DestructTexture(l3Texture* texture);
 void l3SetTextureMatInv(l3Poligon* poligon);
 void l3SetTexturePoligon(l3Poligon* poligon, l3Texture* texture,l3Mat23 texture_vertices);
-unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y, l3RGB* _default);
+unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y);

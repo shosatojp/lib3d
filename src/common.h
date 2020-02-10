@@ -93,7 +93,7 @@ typedef struct {
 } l3Poligon;
 
 typedef struct {
-    l3Poligon** poligons;  // poligonの配列
+    l3Poligon** poligons;  // poligonのポインタの配列
     int poligon_count;
     l3Type dx, dy, dz;
     l3Type sx, sy, sz;
@@ -108,3 +108,20 @@ typedef struct {
     // 変更したか
     bool activated;
 } l3PixelInfo;
+
+// マルチスレッド時にこれを持ってく
+typedef struct {
+    int w, h;
+    // オブジェクトのポインタの配列
+    // Deep
+    l3Object** objects;  
+    
+
+    // Textureは状態を保持しないのでそのままでおｋ
+    // カメラ情報
+    // 変換行列？
+
+    int frame_begin;
+    int frame_end;
+    // time
+} l3Environment;

@@ -1,9 +1,9 @@
 TARGET := lib3d
 CC := gcc
-CCOPT := -g -lm -O3 -std=c99
+CCOPT := -g -lm -O3 -std=c99 -pthread
 SRCDIR := src
 
-SRC := $(shell find $(SRCDIR) -name *.c)
+SRC := $(shell find $(SRCDIR) -name "*.c")
 OBJ := $(addsuffix .o, $(basename $(SRC)))
 
 $(TARGET):$(OBJ)

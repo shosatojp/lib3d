@@ -4,6 +4,9 @@
 
 #define l3MatAt(a, h, i, j) (a)[(j) * (h) + (i)]
 
+l3Mat l3CloneMat(l3Mat a, int h, int w);
+
+
 /**
  * 行列を零行列に初期化する
  */

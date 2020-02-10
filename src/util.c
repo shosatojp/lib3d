@@ -40,6 +40,12 @@ void l3DestructVertices(int vc, l3Vertex* vs[]) {
         free((void*)vs[--vc]);
 }
 
+l3Vertex* l3CloneVertex(l3Vertex* v) {
+    l3Vertex* _v = (l3Vertex*)malloc(sizeof(l3Vertex));
+    memcpy(_v, v, sizeof(l3Vertex));
+    return _v;
+}
+
 l3Poligon* l3CreatePoligon(l3Vertex* v1, l3Vertex* v2, l3Vertex* v3) {
     l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
     _p->vertices[0] = v1;
@@ -48,13 +54,41 @@ l3Poligon* l3CreatePoligon(l3Vertex* v1, l3Vertex* v2, l3Vertex* v3) {
     return _p;
 }
 
+l3Poligon* l3ClonePoligon(l3Poligon* p) {
+    l3Poligon* _p = (l3Poligon*)malloc(sizeof(l3Poligon));
+    memcpy(_p, p, sizeof(l3Poligon));
+    _p->vertices[0] = l3CloneVertex(p->vertices[0]);
+    _p->vertices[1] = l3CloneVertex(p->vertices[1]);
+    _p->vertices[2] = l3CloneVertex(p->vertices[2]);
+    _p->textureVertices = l3CloneMat(p->textureVertices, 2, 3);
+    _p->textureAffineMatInv = l3CloneMat(p->textureAffineMatInv, 3, 3);
+    // textureは放置
+    return _p;
+}
+
+// destructはVertexごと、Poligonごとにやる？
+void l3DestructPoligon(l3Poligon* p) {
+    safe_free(p->textureVertices);
+    safe_free(p->textureAffineMatInv);
+}
+
 void l3DestructPoligons(int pc, l3Poligon* ps[]) {
-    while (pc)
+    while (pc) {
         free((void*)ps[--pc]);
+    }
 }
 
 void l3InitializeObject(l3Object* o) {
     memset(o, 0, sizeof(l3Object));
+}
+
+l3Object* l3CloneObject(l3Object* o) {
+    l3Object* _o = (l3Object*)malloc(sizeof(l3Object));
+    memcpy(_o, o, sizeof(l3Object));
+    _o->poligons = (l3Poligon**)malloc(sizeof(l3Poligon*) * o->poligon_count);
+    for (int i = 0; i < o->poligon_count; i++) {
+        _o->poligons[i] = l3ClonePoligon(o->poligons[i]);
+    }
 }
 
 void l3SetTransposeObject(l3Object* o, l3Type dx, l3Type dy, l3Type dz) {

@@ -27,19 +27,20 @@ void l3FragmentShader(l3PixelInfo* p, l3Mat31 v) {
         case l3PoligonMaterialTexture: {
             l3Mat31A src = {0};
             l3MulMat(_poligon->textureAffineMatInv, v, src, 3, 3, 1);
-            l3RGB white = {255, 255, 0};
-            unsigned char* tc = l3GetColorAtTexture(_poligon->texture, (int)src[0], (int)src[1], &white);
-            l3RGB c = {tc[0], tc[1], tc[2]};
-            memcpy(&p->color, &c, sizeof(l3RGB));
+            unsigned char* tc = l3GetColorAtTexture(_poligon->texture, (int)src[0], (int)src[1]);
+            if (tc) {
+                l3RGB c = {tc[0], tc[1], tc[2]};
+                memcpy(&p->color, &c, sizeof(l3RGB));
+            }
         } break;
     }
 }
 
-unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y, l3RGB* _default) {
+unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y) {
     if (0 <= x && x < texture->w && 0 <= y && y < texture->h) {
         return (char*)texture->buffer + (x + y * texture->w) * 3;
     } else {
-        return _default;
+        return NULL;
     }
 }
 

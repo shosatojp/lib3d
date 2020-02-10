@@ -1,5 +1,12 @@
 #include "lib3d.h"
 
+l3Mat l3CloneMat(l3Mat a, int h, int w) {
+    int size = sizeof(l3Type) * h * w;
+    l3Mat _a = (l3Mat)malloc(size);
+    memcpy(_a, a, size);
+    return _a;
+}
+
 /**
  * 行列を零行列に初期化する
  */
@@ -240,7 +247,7 @@ void l3SimplificateMat(l3Mat a, int h, int w) {
 
     for (k = 0; k < h; k++) {
         piv = l3MatAt(a, h, k, k);
-        if(piv==0)continue;
+        if (piv == 0) continue;
         for (j = k; j < w; j++) {
             l3MatAt(a, h, k, j) /= piv;
         }
