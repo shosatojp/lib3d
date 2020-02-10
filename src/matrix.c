@@ -168,30 +168,15 @@ bool l3InsideOfPoligon2D(int c, l3Vertex* _poligon[], l3Mat21 a) {
     return true;
 }
 
-void l3InverseMat(int n, l3Mat44 a, l3Mat44 r) {
-    //単位行列を作る
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            r[j * n + i] = (i == j) ? 1.0 : 0.0;
-        }
-    }
-    //掃き出し法
-    for (int i = 0; i < n; i++) {
-        double buf = 1 / a[i * n + i];
-        for (int j = 0; j < n; j++) {
-            a[j * n + i] *= buf;
-            r[j * n + i] *= buf;
-        }
-        for (int j = 0; j < n; j++) {
-            if (i != j) {
-                double buf = a[i * n + j];
-                for (int k = 0; k < n; k++) {
-                    a[k * n + j] -= a[k * n + i] * buf;
-                    r[k * n + j] -= r[k * n + i] * buf;
-                }
-            }
-        }
-    }
+void l3InverseMat(int n, l3Mat a, l3Mat r) {
+    l3Mat tmp = (l3Mat)malloc(sizeof(l3Type) * n * n * 2);
+    memcpy(tmp, a, sizeof(l3Type) * n * n);
+    for (int k = 0; k < n; k++)
+        l3MatAt(tmp, n, n + k, k) = 1.0;
+    l3PrintMat(tmp, n, n * 2);
+    l3SimplificateMat(tmp, n, n * 2);
+    memcpy(r, tmp + n * n, sizeof(l3Type) * n * n);
+    free(tmp);
 }
 
 void l3SimplificateMat(l3Mat a, int h, int w) {
