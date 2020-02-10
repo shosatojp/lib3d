@@ -2,6 +2,8 @@
 
 #include "common.h"
 
+#define l3MatAt(a, h, x, y) (a)[(x) * (h) + (y)]
+
 /**
  * 行列を零行列に初期化する
  */
@@ -53,3 +55,4 @@ l3Type l3InnerProductVec(l3Mat a, l3Mat b, int n);
 void l3MulMat44s44(int c, l3Mat44* as, l3Mat44 r);
 bool l3InsideOfPoligon2D(int c, l3Vertex* _poligon[], l3Mat21 a);
 void l3InverseMat(int n, l3Mat44 a, l3Mat44 r);
+void l3SimplificateMat(l3Mat a, int h, int w);

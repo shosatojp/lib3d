@@ -63,20 +63,20 @@ void l3DivMat(l3Mat a, l3Type d, l3Mat r, int n) {
     }
 }
 
-void l3PrintMat(l3Mat a, int x, int y) {
-    for (int i = 0; i < x; ++i) {
+void l3PrintMat(l3Mat a, int h, int w) {
+    for (int i = 0; i < h; ++i) {
         if (i == 0)
             printf("┌ ");
-        else if (i == x - 1)
+        else if (i == h - 1)
             printf("└ ");
         else
             printf("│ ");
-        for (int j = 0; j < y; ++j) {
-            printf("%5.2f ", a[j * 4 + i]);
+        for (int j = 0; j < w; ++j) {
+            printf("%5.2f ", l3MatAt(a, h, j, i));
         }
         if (i == 0)
             printf("┐");
-        else if (i == x - 1)
+        else if (i == h - 1)
             printf("┘");
         else
             printf("│");
@@ -188,6 +188,26 @@ void l3InverseMat(int n, l3Mat44 a, l3Mat44 r) {
                 for (int k = 0; k < n; k++) {
                     a[k * n + j] -= a[k * n + i] * buf;
                     r[k * n + j] -= r[k * n + i] * buf;
+                }
+            }
+        }
+    }
+}
+
+void l3SimplificateMat(l3Mat a, int h, int w) {
+    l3Type piv, t;
+    int i, j, k;
+
+    for (k = 0; k < h; k++) {
+        piv = l3MatAt(a, h, k, k);
+        for (j = k; j < w; j++) {
+            l3MatAt(a, h, j, k) = l3MatAt(a, h, j, k) / piv;
+        }
+        for (i = 0; i < h; i++) {
+            if (i != k) {
+                t = l3MatAt(a, h, k, i);
+                for (j = k; j < w; j++) {
+                    l3MatAt(a, h, j, i) = l3MatAt(a, h, j, i) - t * l3MatAt(a, h, j, k);
                 }
             }
         }

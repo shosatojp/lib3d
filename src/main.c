@@ -3,16 +3,17 @@
 
 int main() {
     {
-        l3Type a[16] = {0};
-        l3Type b[16] = {0};
-        l3Type c[16] = {0};
-        l3MakeRoundXMat44(1, a);
-        l3PrintMat(a, 4, 4);
-        l3InverseMat(4, a, b);
-        l3PrintMat(b, 4, 4);
-        l3MulMat4444(a, b, c);
-        l3PrintMat(c, 4, 4);
-        // exit(0);
+        l3Type d[] = {4, 2, -1,
+                      1, 3, 2,
+                      -3, 1, 2,
+                      -2, 4, 2};
+        l3Type camera[4] = {14, 0, -10, 1};
+        l3Type r[12] = {0};
+        l3PrintMat(d, 3, 4);
+        l3SimplificateMat(d, 3, 4);
+        l3PrintMat(d, 3, 4);
+
+        exit(0);
     }
 
     int w = 1920, h = 1080;
