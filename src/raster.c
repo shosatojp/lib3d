@@ -18,7 +18,7 @@ void l3WriteRasterMap(l3PixelInfo* map, int w, int h, l3Poligon* _poligon) {
     }
     for (int i = max(0, _poligon->min[0]); i < min(w, _poligon->max[0]); ++i) {
         for (int j = max(0, _poligon->min[1]); j < min(h, _poligon->max[1]); ++j) {
-            l3Type v[2] = {i, j};
+            l3Mat31A v = {i, j, 1};
             if (l3InsideOfPoligon2D(l3POLIGON_VERTEX_COUNT, _poligon->vertices, v)) {
                 l3PixelInfo* p = &l3RasterMapAt(map, w, h, i, j);
                 p->_poligon = _poligon;

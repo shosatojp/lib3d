@@ -17,7 +17,7 @@ int main() {
     l3RGB white = {255, 255, 255};
     {
         l3Texture texture;
-        l3Load2DTexture("texture.ppm", &texture);
+        l3Load2DTexture("tex.ppm", &texture);
 
         // オブジェクト構築
         l3Object _object;
@@ -38,7 +38,7 @@ int main() {
         };
         poligons[0]->color.r = 255;
         poligons[0]->material = l3PoligonMaterialColor;
-        l3Mat32A texture_vertices = {0, 0, 0,1, 1, 0};
+        l3Mat32A texture_vertices = {0.5, 0.5, 1,1,0,1};
         l3SetTexturePoligon(poligons[1], &texture, texture_vertices);
         l3SetPoligonsObject(&_object,
                             sizeof(poligons) / sizeof(l3Poligon*), poligons);

@@ -19,7 +19,6 @@ void l3MulMat4441(l3Mat44 a, l3Mat41 b, l3Mat41 r) {
     for (int i = 0; i < 4; ++i) {
         for (int k = 0; k < 4; ++k) {
             r[i] += a[i + 4 * k] * b[k];
-            // printf("%f  =  %f  *  %f\n", r[i], a[i + 4 * k], b[k]);
         }
     }
 }
@@ -189,7 +188,9 @@ void l3GetAffineTransformMat33(l3Mat21 src[3], l3Mat21 dst[3], l3Mat33 r) {
         l3MatAt(b, 6, i * 2, 0) = dst[i][0];
         l3MatAt(b, 6, i * 2 + 1, 0) = dst[i][1];
     }
+    l3PrintMat(a,6,7);
     l3SimplificateMat(a, 6, 7);
+    l3PrintMat(a,6,7);
 
     l3MatAt(r, 3, 0, 0) = b[0];
     l3MatAt(r, 3, 0, 1) = b[1];
@@ -197,13 +198,13 @@ void l3GetAffineTransformMat33(l3Mat21 src[3], l3Mat21 dst[3], l3Mat33 r) {
     l3MatAt(r, 3, 1, 0) = b[3];
     l3MatAt(r, 3, 1, 1) = b[4];
     l3MatAt(r, 3, 1, 2) = b[5];
-    l3MatAt(r, 3, 2, 0) = 1;
-    l3MatAt(r, 3, 2, 1) = 1;
+    l3MatAt(r, 3, 2, 0) = 0;
+    l3MatAt(r, 3, 2, 1) = 0;
     l3MatAt(r, 3, 2, 2) = 1;
 }
 
 void l3InverseMat(int n, l3Mat a, l3Mat r) {
-    l3Mat tmp = (l3Mat)malloc(sizeof(l3Type) * n * n * 2);
+    l3Mat tmp = (l3Mat)calloc(sizeof(l3Type), n * n * 2);
     memcpy(tmp, a, sizeof(l3Type) * n * n);
     for (int k = 0; k < n; k++)
         l3MatAt(tmp, n, k, n + k) = 1.0;
@@ -233,14 +234,17 @@ void l3SwapRows(l3Mat a, int h, int w) {
     }
 }
 
+// これがバグってる
 void l3SimplificateMat(l3Mat a, int h, int w) {
     l3Type piv, t;
     int i, j, k;
 
     l3SwapRows(a, h, w);
+    l3PrintMat(a,h,w);
 
     for (k = 0; k < h; k++) {
         piv = l3MatAt(a, h, k, k);
+        if(piv==0)continue;
         for (j = k; j < w; j++) {
             l3MatAt(a, h, k, j) /= piv;
         }
