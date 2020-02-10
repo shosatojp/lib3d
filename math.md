@@ -168,6 +168,7 @@ $$
 # 並列処理
 
 * pthread
+* Environment構造体
 
 # アンチエイリアス？
 

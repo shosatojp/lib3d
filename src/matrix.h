@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-#define l3MatAt(a, h, x, y) (a)[(x) * (h) + (y)]
+#define l3MatAt(a, h, i, j) (a)[(j) * (h) + (i)]
 
 /**
  * 行列を零行列に初期化する
@@ -41,7 +41,8 @@ void l3SubMat(l3Mat a, l3Mat b, l3Mat r, int n);
  * must initialize r : false
  */
 void l3DivMat(l3Mat a, l3Type d, l3Mat r, int n);
-void l3PrintMat(l3Mat a, int x, int y);
+void l3PrintMat(l3Mat a, int h, int w);
+
 /**
  * a = r
  */

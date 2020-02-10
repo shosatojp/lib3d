@@ -4,16 +4,6 @@
 int main() {
     {
 
-        // {
-        //     l3Type a[] = {0, 0, 1,
-        //                   0, 1, 0,
-        //                   1, 0, 0,
-        //                   1, 2, 3};
-        //     l3SimplificateMat(a, 3, 4);
-        //     l3PrintMat(a, 3, 4);
-        //     exit(0);
-        // }
-
         l3Type a[] = {0, 0, 1};
         l3Type b[] = {1, 0, 1};
         l3Type c[] = {0, 1, 1};
@@ -25,6 +15,11 @@ int main() {
         l3Type r[9] = {0};
         l3GetAffineTransformMat33(src, dst, r);
         l3PrintMat(r, 3, 3);
+
+        l3Mat33A r2 = {0};
+        l3InverseMat(3, r, r2);
+        l3PrintMat(r2, 3, 3);
+
         exit(0);
     }
 
@@ -63,7 +58,7 @@ int main() {
         l3MakeCameraToProjectionMat44(120, (double)w / h, 10, 100, cp);
         l3MakeProjectionToScreenMat44(w, h, ps);
 
-        l3Type* mats[] = {ps, cp, wc};
+        l3Mat44 mats[] = {ps, cp, wc};
         l3MulMat44s44(3, mats, wcps);
 
         // ラスタマップとバッファーを作る

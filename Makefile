@@ -11,6 +11,7 @@ $(TARGET):$(OBJ)
 	$(CC) $^ $(CCOPT) -o $@
 
 run: $(TARGET) FORCE
+	./$(TARGET)
 
 %.o: %.c
 	$(CC) $^ $(CCOPT) -c -o $@
