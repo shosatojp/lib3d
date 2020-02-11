@@ -43,7 +43,7 @@ int main() {
 
         // テクスチャ読み込み・貼り付け
         l3Texture texture;
-        l3Load2DTexture("tex4.ppm", &texture);
+        l3Load2DTexture("assets/tex4.ppm", &texture);
         l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
         l3SetTexturePoligon(poligons[1],
                             &texture, texture_vertices);

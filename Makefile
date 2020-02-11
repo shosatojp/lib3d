@@ -20,7 +20,7 @@ gif:
 	convert -delay 2 bin/*.ppm out.gif
 
 mp4:
-	ffmpeg -pattern_type glob -framerate 30 -i "bin/*.ppm" out.mp4 -y
+	ffmpeg -pattern_type glob -framerate 30 -i "bin/*.ppm" bin/out.mp4 -y
 
 clean:
 	-rm bin/*.ppm *.out *.exe *.gif *.mp4 $(TARGET)

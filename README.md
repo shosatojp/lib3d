@@ -6,18 +6,24 @@
 #include "lib3d.h"
 ```
 
-## コンパイル
+## サンプル動画
+### コンパイル
 ```sh
 make
 make -j8
 ```
 
-## gif生成
+### gif生成
 ```sh
 make gif
 ```
 
-## 片付け
+### mp4生成
+```sh
+make mp4
+```
+
+### 片付け
 ```sh
 make clean
 ```
