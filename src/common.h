@@ -12,7 +12,7 @@
 
 #define l3POLIGON_VERTEX_COUNT 3
 
-typedef double l3Type;
+typedef float l3Type;  // floatのが速い
 typedef l3Type* l3Mat;
 typedef l3Type* l3Mat44;
 typedef l3Type* l3Mat41;  // 3次元座標、インデックス3は1
