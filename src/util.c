@@ -229,7 +229,6 @@ void l3InitializeEnvironment(l3Environment* env) {
 void l3ClearEnvironment(l3Environment* env) {
     for (int i = 0; i < env->objects.length; i++) {
         l3Object* object = array_at(&env->objects, i);
-
         l3ClearObject(object);
     }
 }
@@ -239,6 +238,7 @@ void l3DestructEnvironment(l3Environment* env) {
         if (array_ei) {
             l3DestructObject(array_ei);
             free(array_ei);
+            array_ei = NULL;
         }
     });
     array_clear(&env->objects);

@@ -116,7 +116,7 @@ int array_empty(array* _array) {
  * you need to **destruct** object pointed by ptrs
  */
 int array_clear(array* _array) {
-    if (_array->data) {
+    if (_array && _array->data) {
         free(_array->data);
         _array->data = NULL;
         return 0;

@@ -1,12 +1,38 @@
 #include "lib3d.h"
 
+void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transitionFn, int frames, int thread_count) {
+    printf("starting multithreaded rendering...\n");
+    printf("thread count : %d\n", thread_count);
+    printf("frame count  : %d\n", frames);
+
+    int frame_per_thread = frames / thread_count;
+    int current_frame = 0;
+    pthread_t** threads = (pthread_t**)malloc(sizeof(pthread_t*) * thread_count);
+
+    for (int i = 0; i < thread_count; i++) {
+        pthread_t thread;
+        l3Environment* _env = l3CloneEnvironment(env);
+        _env->frame_begin = current_frame;
+        _env->frame_end = current_frame + min(frame_per_thread, frames - current_frame);
+        _env->transitionFn = transitionFn;
+        current_frame += frame_per_thread;
+        pthread_create(&thread, NULL, l3RenderEnvironment, _env);
+        threads[i] = &thread;
+    }
+
+    // 片付け
+    while (thread_count) pthread_join(*threads[--thread_count], NULL);
+    free(threads);
+    printf("rendering finished successfully\n");
+}
+
 void l3RenderEnvironment(l3Environment* env) {
     // ラスタマップとバッファーを作る
     l3PixelInfo* map = l3CreateRasterMap(env->w, env->h);
     unsigned char* buf = l3CreateBuffer(env->w, env->h);
 
     for (int f = env->frame_begin; f < env->frame_end; f++) {
-        printf("frame = %d\n", f);
+        printf("rendering frame %d\n", f);
         l3ClearRasterMap(map, env->w, env->h);
         l3ClearBuffer(buf, env->w, env->h, 255);
 
@@ -51,4 +77,6 @@ void l3RenderEnvironment(l3Environment* env) {
     }
     safe_free(buf);
     safe_free(map);
+    l3DestructEnvironment(env);
+    safe_free(env);
 }
