@@ -64,3 +64,4 @@ void l3SimplificateMat(l3Mat a, int h, int w);
 void l3GetAffineTransformMat33(l3Mat21 src[3], l3Mat21 dst[3], l3Mat33 r);
 void l3SwapRow(l3Mat a, int h, int w, int p, int q);
 void l3SwapRows(l3Mat a, int h, int w);
+l3Type l3VecAbs(l3Mat a, int n);

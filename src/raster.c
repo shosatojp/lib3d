@@ -24,11 +24,11 @@ bool l3BackCulling(l3Poligon* _poligon, l3Mat41 camera) {
     l3Mat41A norm = {0};
     l3CrossProductVec3(ab, bc, norm);
     l3Type ip = l3InnerProductVec(norm, camera, 3);
-    return ip > 0;
+    return ip < 0;
 }
 
 void l3WriteRasterMap(l3Environment* env, int w, int h, l3Poligon* _poligon) {
-    if (l3BackCulling(_poligon, &env->camera.cameraZ)) {
+    if (!l3BackCulling(_poligon, env->camera.cameraZ)) {
         return;
     }
     if (_poligon->material == l3PoligonMaterialTexture) {

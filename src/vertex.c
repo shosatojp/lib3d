@@ -1,5 +1,10 @@
 #include "lib3d.h"
 
+l3Mat41A origin = {0, 0, 0, 1};
+l3Mat41A e1 = {1, 0, 0, 1};
+l3Mat41A e2 = {0, 1, 0, 1};
+l3Mat41A e3 = {0, 0, 1, 1};
+
 void l3MakeRoundXMat44(l3Type theta, l3Mat44 r) {
     r[0] = 1;
     l3Type cos_theta = cos(theta),
@@ -130,9 +135,14 @@ void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, in
         l3Type lwcps[16] = {0};
         l3MulMat4444(wcps, lw, lwcps);
 
+        if (!l3FrustumCulling(_object, lwcps, w, h)) {
+            continue;
+        }
+
         l3Type r[4] = {0};
         for (int i = 0; i < _object->poligon_count; i++) {
             l3Poligon* _poligon = _object->poligons[i];
+
             for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
                 l3Vertex* _vertex = _poligon->vertices[j];
                 if (!_vertex->converted) {
@@ -145,10 +155,45 @@ void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, in
                     _vertex->converted = true;
                 }
             }
+
             // ポリゴンに対する諸設定はここで済ます
             l3SetMaxZofPoligon(_poligon);
             l3SetOuterRectPoligon(_poligon);
             array_push(all_poligons, _poligon);
         }
     }
+}
+
+/**
+ * 視錐台カリング
+ */
+bool l3FrustumCulling(l3Object* _object, l3Mat44 lwcps, int w, int h) {
+    /**
+         * オブジェクトが視錐台に入っていなければカリング
+         * オブジェクトに当たり判定用球を作る
+         * xyは-1~1, zは0~1
+         * 
+         * (1,0,0)と(0,0,0)の距離でスケールを適用する
+         */
+    l3Mat41A center = {0};
+    l3MulMat4441(lwcps, origin, center);
+    l3DivMat(center, center[3], center, 4);
+    l3Mat41A center_1 = {0};
+    l3MulMat4441(lwcps, e1, center_1);
+    l3DivMat(center_1, center_1[3], center_1, 4);
+    l3Mat41A sub;
+    l3SubMat(center_1, center, sub, 3);
+    l3Type scale = l3VecAbs(sub, 3);
+    l3Type r = _object->bounding_radius * scale;
+    return (-r < center[0] && center[0] < w + r) &&
+           (-r < center[1] && center[1] < h + r) &&
+           (-r < center[2] && center[2] < 1 + r);
+}
+
+l3Type l3GetBoundingRadius(l3Object* _object) {
+    l3Type r = 0;
+    for (int i = 0; i < _object->vertices.length; i++) {
+        r = max(r, l3VecAbs(array_at(&_object->vertices, i), 3));
+    }
+    return r;
 }

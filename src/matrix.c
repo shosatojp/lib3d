@@ -136,6 +136,10 @@ l3Type l3InnerProductVec(l3Mat a, l3Mat b, int n) {
     return sum;
 }
 
+l3Type l3VecAbs(l3Mat a, int n) {
+    return sqrt(l3InnerProductVec(a, a, n));
+}
+
 void l3MulMat44s44(int c, l3Mat44 as[], l3Mat44 r) {
     if (c <= 1) {
         fprintf(stderr, "invalid matrix count\n");

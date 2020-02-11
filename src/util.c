@@ -186,8 +186,10 @@ void l3SetCameraInfoToEnvironment(l3Environment* env,
 
 /**
  * オブジェクトを追加、インデックスを返却
+ * バウンディング半径を計算（原点からの距離の最大値）
  */
 int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj) {
+    obj->bounding_radius = l3GetBoundingRadius(obj);
     return array_push(&env->objects, obj);
 }
 

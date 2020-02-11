@@ -5,6 +5,7 @@ void transition(l3Environment* env, int frame) {
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y = frame * 5 * 3.14 / 180.0;
     obj->theta_x = frame * 5 * 3.14 / 180.0;
+    obj->dx = frame * 2;
 }
 
 int main() {
@@ -17,7 +18,7 @@ int main() {
         l3InitializeEnvironment(&env);
         env.w = 1920;
         env.h = 1080;
-        env.outdir = "bin";
+        env.outdir = "/mnt/f/hoge";
 
         // オブジェクト構築
         l3Object* _object = l3CreateObject();
@@ -56,7 +57,7 @@ int main() {
                                      120, 10, 100);
     }
 
-    l3MultithreadRenderer(&env, transition, 20, 16);
+    l3MultithreadRenderer(&env, transition, 40, 16);
 
     l3DestructEnvironment(&env);
 }
