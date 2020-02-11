@@ -65,9 +65,9 @@ typedef struct {
 // textureもここで
 typedef struct {
     /**
-     * ポリゴンに属する頂点、ポリゴンは必ず三角形
+     * ポリゴンに属する頂点のインデックス（基準はEnv）、ポリゴンは必ず三角形
      */
-    l3Vertex* vertices[3];
+    int vertices[3];
     /**
      * ソート用（裏は描画されないからいらなかったりして）
      */
@@ -109,16 +109,23 @@ typedef struct {
     bool activated;
 } l3PixelInfo;
 
+typedef struct {
+    l3Mat41A coordinate;
+    l3Mat41A target;
+    l3Mat41A upper;
+} l3CameraInfo;
+
 // マルチスレッド時にこれを持ってく
 typedef struct {
     int w, h;
     // オブジェクトのポインタの配列
-    // Deep
-    l3Object** objects;  
-    
+    array objects;
+    array poligons;
+    array vertices;
 
     // Textureは状態を保持しないのでそのままでおｋ
     // カメラ情報
+    l3CameraInfo camera;
     // 変換行列？
 
     int frame_begin;

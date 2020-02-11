@@ -46,7 +46,7 @@ l3Vertex* l3CloneVertex(l3Vertex* v) {
     return _v;
 }
 
-l3Poligon* l3CreatePoligon(l3Vertex* v1, l3Vertex* v2, l3Vertex* v3) {
+l3Poligon* l3CreatePoligon(int v1, int v2, int v3) {
     l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
     _p->vertices[0] = v1;
     _p->vertices[1] = v2;
@@ -57,9 +57,9 @@ l3Poligon* l3CreatePoligon(l3Vertex* v1, l3Vertex* v2, l3Vertex* v3) {
 l3Poligon* l3ClonePoligon(l3Poligon* p) {
     l3Poligon* _p = (l3Poligon*)malloc(sizeof(l3Poligon));
     memcpy(_p, p, sizeof(l3Poligon));
-    _p->vertices[0] = l3CloneVertex(p->vertices[0]);
-    _p->vertices[1] = l3CloneVertex(p->vertices[1]);
-    _p->vertices[2] = l3CloneVertex(p->vertices[2]);
+    // _p->vertices[0] = l3CloneVertex(p->vertices[0]);
+    // _p->vertices[1] = l3CloneVertex(p->vertices[1]);
+    // _p->vertices[2] = l3CloneVertex(p->vertices[2]);
     _p->textureVertices = l3CloneMat(p->textureVertices, 2, 3);
     _p->textureAffineMatInv = l3CloneMat(p->textureAffineMatInv, 3, 3);
     // textureは放置
@@ -106,4 +106,55 @@ void l3SetScaleObject(l3Object* o, l3Type sx, l3Type sy, l3Type sz) {
 void l3SetPoligonsObject(l3Object* o, int count, l3Poligon* ps[]) {
     o->poligons = ps;
     o->poligon_count = count;
+}
+
+void l3MakeCameraInfo(l3Type cx, l3Type cy, l3Type cz,
+                      l3Type tx, l3Type ty, l3Type tz,
+                      l3Type ux, l3Type uy, l3Type uz, l3CameraInfo* camerainfo) {
+    camerainfo->coordinate[0] = cx;
+    camerainfo->coordinate[1] = cy;
+    camerainfo->coordinate[2] = cz;
+    camerainfo->target[0] = tx;
+    camerainfo->target[1] = ty;
+    camerainfo->target[2] = tz;
+    camerainfo->upper[0] = tx;
+    camerainfo->upper[1] = ty;
+    camerainfo->upper[2] = tz;
+}
+
+void l3InitializeEnvironment(l3Environment* env) {
+    env->objects = array_new(sizeof(l3Object*), true, 10);
+    env->poligons = array_new(sizeof(l3Poligon*), true, 10);
+    env->vertices = array_new(sizeof(l3Vertex*), true, 10);
+}
+
+/**
+ * オブジェクトを追加、インデックスを返却
+ */
+int l3AddObjectEnvironment(l3Environment* env, l3Object* obj) {
+    return array_push(env->objects, obj);
+}
+
+/**
+ * ポリゴンを追加、インデックスを返却
+ */
+int l3AddPoligonEnvironment(l3Environment* env, l3Poligon* p) {
+    return array_push(env->poligons, p);
+}
+
+/**
+ * 頂点を追加、インデックスを返却
+ */
+int l3AddVertexEnvironment(l3Environment* env, l3Vertex* v) {
+    return array_push(env->vertices, v);
+}
+
+l3Object* l3GetObjectPtrEnvironment(l3Environment* env, int index) {
+    return array_at(env->objects, index);
+}
+l3Poligon* l3GetPoligonPtrEnvironment(l3Environment* env, int index) {
+    return array_at(env->poligons, index);
+}
+l3Vertex* l3GetVertexPtrEnvironment(l3Environment* env, int index) {
+    return array_at(env->vertices, index);
 }

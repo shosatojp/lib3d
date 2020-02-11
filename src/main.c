@@ -8,30 +8,36 @@ int main() {
     l3RGB blue = {0, 0, 255};
     l3RGB white = {255, 255, 255};
     {
+        l3Environment env;
+
         l3Texture texture;
         l3Load2DTexture("tex4.ppm", &texture);
 
         // オブジェクト構築
         l3Object _object;
         l3InitializeObject(&_object);
-        l3Vertex* vs[] = {
-            l3CreateVertex(5, 5, 5, &red),
-            l3CreateVertex(-5, -5, 5, &green),
-            l3CreateVertex(5, -5, -5, &blue),
-            l3CreateVertex(-5, 5, -5, &white),
+        int vs[] = {
+            l3AddVertexEnvironment(&env, l3CreateVertex(5, 5, 5, &red)),
+            l3AddVertexEnvironment(&env, l3CreateVertex(-5, -5, 5, &green)),
+            l3AddVertexEnvironment(&env, l3CreateVertex(5, -5, -5, &blue)),
+            l3AddVertexEnvironment(&env, l3CreateVertex(-5, 5, -5, &white)),
         };
         l3SetTransposeObject(&_object, 15, 15, 15);
         l3SetScaleObject(&_object, 1, 1, 1);
-        l3Poligon* poligons[] = {
-            l3CreatePoligon(vs[0], vs[2], vs[1]),
-            l3CreatePoligon(vs[0], vs[3], vs[2]),
-            l3CreatePoligon(vs[1], vs[2], vs[3]),
-            l3CreatePoligon(vs[0], vs[1], vs[3]),
+        int poligons[] = {
+            l3AddPoligonEnvironment(&env, l3CreatePoligon(vs[0], vs[2], vs[1])),
+            l3AddPoligonEnvironment(&env, l3CreatePoligon(vs[0], vs[3], vs[2])),
+            l3AddPoligonEnvironment(&env, l3CreatePoligon(vs[1], vs[2], vs[3])),
+            l3AddPoligonEnvironment(&env, l3CreatePoligon(vs[0], vs[1], vs[3])),
         };
-        poligons[0]->color.r = 255;
-        poligons[0]->material = l3PoligonMaterialColor;
+
+        l3GetPoligonPtrEnvironment(&env, 0)->color.r = 255;
+        l3GetPoligonPtrEnvironment(&env, 0)->material = l3PoligonMaterialColor;
+
         l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
-        l3SetTexturePoligon(poligons[1], &texture, texture_vertices);
+        l3SetTexturePoligon(l3GetPoligonPtrEnvironment(&env, 1),
+                            &texture, texture_vertices);
+
         l3SetPoligonsObject(&_object,
                             sizeof(poligons) / sizeof(l3Poligon*), poligons);
 

@@ -73,7 +73,7 @@ int _array_ins(array* _array, indextype index, ...) {
             *(ptr + i) = *((char*)&elem_ptr + i);
         }
         _array->length++;
-        return 0;
+        return index;
     }
 }
 
