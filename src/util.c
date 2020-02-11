@@ -91,8 +91,7 @@ void l3ClearPoligon(l3Poligon* p) {
  * Object
  * ===========================================
  */
-void l3InitializeObject(l3Object* o){
-
+void l3InitializeObject(l3Object* o) {
     o->sx = 1;
     o->sy = 1;
     o->sz = 1;
@@ -163,9 +162,10 @@ void l3SetPoligonsToObject(l3Object* o, int count, l3Poligon* ps[]) {
 }
 
 void l3SetCameraInfoToEnvironment(l3Environment* env,
-                      l3Type cx, l3Type cy, l3Type cz,
-                      l3Type tx, l3Type ty, l3Type tz,
-                      l3Type ux, l3Type uy, l3Type uz) {
+                                  l3Type cx, l3Type cy, l3Type cz,
+                                  l3Type tx, l3Type ty, l3Type tz,
+                                  l3Type ux, l3Type uy, l3Type uz,
+                                  l3Type angle, l3Type near, l3Type far) {
     env->camera.coordinate[0] = cx;
     env->camera.coordinate[1] = cy;
     env->camera.coordinate[2] = cz;
@@ -178,6 +178,9 @@ void l3SetCameraInfoToEnvironment(l3Environment* env,
     env->camera.upper[1] = uy;
     env->camera.upper[2] = uz;
     env->camera.upper[3] = 1;
+    env->camera.angle = angle;
+    env->camera.near = near;
+    env->camera.far = far;
 }
 
 /**

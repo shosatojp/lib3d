@@ -5,10 +5,7 @@ void transition(l3Environment* env, int frame) {
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y = frame * 5 * 3.14 / 180.0;
     obj->theta_x = frame * 5 * 3.14 / 180.0;
-    // obj->dx = frame / 2.0;
-
     obj->poligons[0]->color.r = 0;
-    // printf("%f\n", obj->poligons[0]->color.r);
 }
 
 int main() {
@@ -53,7 +50,10 @@ int main() {
         l3SetTransposeObject(_object, 15, 15, 15);
         l3AddObjectToEnvironment(&env, _object);
 
-        l3SetCameraInfoToEnvironment(&env, 14, 0, -10, 20, 20, 20, 0, 1, 0);
+        l3SetCameraInfoToEnvironment(&env, 14, 0, -10,
+                                     20, 20, 20,
+                                     0, 1, 0,
+                                     120, 10, 100);
     }
 
     l3MultithreadRenderer(&env, transition, 360, 10);

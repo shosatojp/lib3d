@@ -57,7 +57,8 @@ void l3RenderEnvironment(l3Environment* env) {
         l3Type wc[16] = {0}, cp[16] = {0}, ps[16] = {0}, wcps[16] = {0};
         l3MakeWorldToCameraMat44(&env->camera, wc);
 
-        l3MakeCameraToProjectionMat44(120, (double)env->w / env->h, 10, 100, cp);
+        l3MakeCameraToProjectionMat44(env->camera.angle, (double)env->w / env->h,
+                                      env->camera.near, env->camera.far, cp);
         l3MakeProjectionToScreenMat44(env->w, env->h, ps);
 
         l3Mat44 mats[] = {ps, cp, wc};

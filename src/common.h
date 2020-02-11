@@ -125,6 +125,9 @@ typedef struct _l3CameraInfo {
     l3Mat41A coordinate;
     l3Mat41A target;
     l3Mat41A upper;
+    l3Type angle;
+    l3Type near;
+    l3Type far;
 } l3CameraInfo;
 
 struct _l3Environment;
