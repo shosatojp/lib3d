@@ -4,6 +4,8 @@
  */
 void l3FragmentShader(l3PixelInfo* p, l3Mat31 v) {
     l3Poligon* _poligon = p->_poligon;
+    l3RGB prev_color;
+    memcpy(&prev_color, &p->color, sizeof(l3RGB));
 
     switch (_poligon->material) {
         case l3PoligonMaterialVertex: {
@@ -34,6 +36,9 @@ void l3FragmentShader(l3PixelInfo* p, l3Mat31 v) {
             }
         } break;
     }
+    p->color.r = prev_color.r * _poligon->transparency + p->color.r * (1 - _poligon->transparency);
+    p->color.g = prev_color.g * _poligon->transparency + p->color.g * (1 - _poligon->transparency);
+    p->color.b = prev_color.b * _poligon->transparency + p->color.b * (1 - _poligon->transparency);
 }
 
 unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y) {

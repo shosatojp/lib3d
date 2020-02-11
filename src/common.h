@@ -93,6 +93,9 @@ typedef struct _l3Poligon {
      * このポリゴンにどのマテリアルを使うか
      */
     l3PoligonMaterial material;
+
+    // ポリゴンの透明度0.0-1.0
+    l3Type transparency;
 } l3Poligon;
 
 /**

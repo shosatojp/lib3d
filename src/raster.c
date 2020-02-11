@@ -65,7 +65,7 @@ void l3SetMaxZofPoligon(l3Poligon* _poligon) {
 }
 
 int l3ComparePoligons(const void* p, const void* q) {
-    return -((l3Poligon*)p)->max_z + ((l3Poligon*)q)->max_z;
+    return (((l3Poligon*)p)->max_z - ((l3Poligon*)q)->max_z) < 0 ? -1 : 1;
 }
 
 void l3SortPoligonsByMaxZ(int c, l3Poligon* _poligons[]) {

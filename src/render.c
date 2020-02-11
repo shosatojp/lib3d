@@ -75,7 +75,6 @@ void l3RenderEnvironment(l3Environment* env) {
         array_each_i(poligons_all, l3WriteRasterMap(env, env->w, env->h, array_ei));
         array_clear(poligons_all);
         safe_free(poligons_all);
-        // printf("=====%s\n", env->outdir);
 
         // 出力
         l3ConvertRasterMapToBuffer(map, buf, env->w, env->h);
