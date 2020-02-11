@@ -16,31 +16,29 @@ int main() {
 
         // オブジェクト構築
         l3Object* _object = l3CreateObject();
-        l3ClearObject(_object);
         int vs[] = {
-            l3AddVertexEnvironment(&env, l3CreateVertex(5, 5, 5, &red)),
-            l3AddVertexEnvironment(&env, l3CreateVertex(-5, -5, 5, &green)),
-            l3AddVertexEnvironment(&env, l3CreateVertex(5, -5, -5, &blue)),
-            l3AddVertexEnvironment(&env, l3CreateVertex(-5, 5, -5, &white)),
+            l3AddVertexToObject(_object, l3CreateVertex(5, 5, 5, &red)),
+            l3AddVertexToObject(_object, l3CreateVertex(-5, -5, 5, &green)),
+            l3AddVertexToObject(_object, l3CreateVertex(5, -5, -5, &blue)),
+            l3AddVertexToObject(_object, l3CreateVertex(-5, 5, -5, &white)),
         };
-        l3SetTransposeObject(_object, 15, 15, 15);
-        l3SetScaleObject(_object, 1, 1, 1);
-        int poligons[] = {
-            l3AddPoligonEnvironment(&env, l3CreatePoligon(vs[0], vs[2], vs[1])),
-            l3AddPoligonEnvironment(&env, l3CreatePoligon(vs[0], vs[3], vs[2])),
-            l3AddPoligonEnvironment(&env, l3CreatePoligon(vs[1], vs[2], vs[3])),
-            l3AddPoligonEnvironment(&env, l3CreatePoligon(vs[0], vs[1], vs[3])),
+        l3Poligon* poligons[] = {
+            l3CreatePoligon(0, 2, 1),
+            l3CreatePoligon(0, 3, 2),
+            l3CreatePoligon(1, 2, 3),
+            l3CreatePoligon(0, 1, 3),
         };
 
-        l3GetPoligonPtrEnvironment(&env, 0)->material = l3PoligonMaterialColor;
-        l3GetPoligonPtrEnvironment(&env, 0)->color.r = 255;
+        poligons[0]->material = l3PoligonMaterialColor;
+        poligons[0]->color.r = 255;
 
         l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
-        l3SetTexturePoligon(l3GetPoligonPtrEnvironment(&env, 1),
+        l3SetTexturePoligon(poligons[1],
                             &texture, texture_vertices);
-        l3SetPoligonsObject(_object,
-                            sizeof(poligons) / sizeof(int), poligons);
-        l3AddObjectEnvironment(&env, _object);
+        l3SetPoligonsToObject(_object,
+                              sizeof(poligons) / sizeof(l3Poligon*), poligons);
+        l3SetTransposeObject(_object, 15, 15, 15);
+        l3AddObjectToEnvironment(&env, _object);
 
         // 変換行列作成
         l3Type wc[16] = {0}, cp[16] = {0}, ps[16] = {0}, wcps[16] = {0};
@@ -73,6 +71,8 @@ int main() {
 
             /* 座標変換のあと、ここにポリゴンを集めて・・・ */
             array* poligons_all = array_new(sizeof(l3Poligon*), true, 10);
+
+
 
             /* Environmentに入ってるオブジェクトをすべて描画 */
             l3AppendPoligonsFromEnvironment(_env, wcps, w, h, poligons_all);

@@ -93,10 +93,22 @@ typedef struct _l3Poligon {
     l3PoligonMaterial material;
 } l3Poligon;
 
+/**
+ * オブジェクトごとに頂点とポリゴンを管理する
+ * -> オブジェクトのDestructと同時にどちらも解放して良い
+ * ポリゴンは直接ポインタ格納、
+ * 頂点はリストを格納
+ */
 typedef struct _l3Object {
-    int* poligon_indices;  // poligonのポインタの配列のインデックスの配列 // heap
-    l3Poligon** poligons;  // poligonのポインタの配列のインデックスの配列 // heap 中身は開放しない
+    // int* poligon_indices;  // poligonのポインタの配列のインデックスの配列 // heap
+    l3Poligon** poligons;  // poligonのポインタの配列のインデックスの配列 // heap 中身開放する
     int poligon_count;
+
+    // array poligons;  // 中身はheap
+    // l3Vertex** vertices;  // 中身はheap
+    // int vertex_count;
+    array vertices;
+
     l3Type dx, dy, dz;
     l3Type sx, sy, sz;
     l3Type theta_x, theta_y, theta_z;
@@ -122,8 +134,6 @@ typedef struct _l3Environment {
     int w, h;
     // オブジェクトのポインタの配列
     array objects;   // 中身はheap
-    array poligons;  // 中身はheap
-    array vertices;  // 中身はheap
 
     // Textureは状態を保持しないのでそのままでおｋ
     // カメラ情報

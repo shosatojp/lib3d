@@ -68,10 +68,10 @@ l3Poligon* l3CreatePoligon(int v1, int v2, int v3) {
 l3Poligon* l3ClonePoligon(l3Poligon* p) {
     l3Poligon* _p = (l3Poligon*)malloc(sizeof(l3Poligon));
     memcpy(_p, p, sizeof(l3Poligon));
-    if(p->textureVertices)
-    _p->textureVertices = l3CloneMat(p->textureVertices, 2, 3);
-    if(p->textureAffineMatInv)
-    _p->textureAffineMatInv = l3CloneMat(p->textureAffineMatInv, 3, 3);
+    if (p->textureVertices)
+        _p->textureVertices = l3CloneMat(p->textureVertices, 2, 3);
+    if (p->textureAffineMatInv)
+        _p->textureAffineMatInv = l3CloneMat(p->textureAffineMatInv, 3, 3);
     // textureは放置
     return _p;
 }
@@ -91,26 +91,46 @@ void l3ClearPoligon(l3Poligon* p) {
  * Object
  * ===========================================
  */
-
 l3Object* l3CreateObject() {
     l3Object* _o = (l3Object*)calloc(sizeof(l3Object), 1);
+    l3ClearObject(_o);
     return _o;
 }
 
 void l3ClearObject(l3Object* o) {
-    memset(o->poligons, 0, sizeof(l3Poligon*) * o->poligon_count);
+    array_init(&o->vertices, sizeof(l3Vertex*), true);
+    o->sx = 1;
+    o->sy = 1;
+    o->sz = 1;
 }
 
 l3Object* l3CloneObject(l3Object* o) {
     l3Object* _o = (l3Object*)malloc(sizeof(l3Object));
     memcpy(_o, o, sizeof(l3Object));
-    // poligon indices
-    _o->poligon_indices = (int*)malloc(sizeof(int) * _o->poligon_count);
-    memcpy(_o->poligon_indices, o->poligon_indices, sizeof(int) * _o->poligon_count);
+
+    // poligons
+    _o->poligons = (l3Poligon**)malloc(sizeof(l3Poligon*) * o->poligon_count);
+    for (int i = 0; i < o->poligon_count; i++) {
+        _o->poligons[i] = l3ClonePoligon(o->poligons[i]);
+    }
+
+    // vertices (array)
+    _o->vertices.data = malloc(sizeof(l3Vertex*) * o->vertices.capacity);
+    for (int i = 0; i < o->vertices.length; i++) {
+        array_set(&_o->vertices, l3CloneVertex(array_at(&o->vertices, i)), i);
+    }
     return _o;
 }
 void l3DestructObject(l3Object* o) {
-    safe_free(o->poligon_indices);
+    // vertices (array)
+    array_each_i(&o->vertices, {
+        if (array_ei) {
+            free(array_ei);
+        }
+    });
+    array_clear(&o->vertices);
+
+    // poligon
     safe_free(o->poligons);
 }
 
@@ -126,9 +146,9 @@ void l3SetScaleObject(l3Object* o, l3Type sx, l3Type sy, l3Type sz) {
     o->sz = sz;
 }
 
-void l3SetPoligonsObject(l3Object* o, int count, int ps[]) {
-    o->poligon_indices = (int*)malloc(sizeof(int) * count);
-    memcpy(o->poligon_indices, ps, sizeof(int) * count);
+void l3SetPoligonsToObject(l3Object* o, int count, l3Poligon* ps[]) {
+    o->poligons = (l3Poligon**)malloc(sizeof(l3Poligon*) * count);
+    memcpy(o->poligons, ps, sizeof(l3Poligon*) * count);
     o->poligon_count = count;
 }
 
@@ -153,43 +173,34 @@ void l3MakeCameraInfo(l3CameraInfo* camerainfo,
 /**
  * オブジェクトを追加、インデックスを返却
  */
-int l3AddObjectEnvironment(l3Environment* env, l3Object* obj) {
+int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj) {
     return array_push(&env->objects, obj);
-}
-
-/**
- * ポリゴンを追加、インデックスを返却
- */
-int l3AddPoligonEnvironment(l3Environment* env, l3Poligon* p) {
-    return array_push(&env->poligons, p);
 }
 
 /**
  * 頂点を追加、インデックスを返却
  */
-int l3AddVertexEnvironment(l3Environment* env, l3Vertex* v) {
-    return array_push(&env->vertices, v);
+int l3AddVertexToObject(l3Object* obj, l3Vertex* v) {
+    return array_push(&obj->vertices, v);
 }
 
 l3Object* l3GetObjectPtrEnvironment(l3Environment* env, int index) {
     return array_at(&env->objects, index);
 }
-l3Poligon* l3GetPoligonPtrEnvironment(l3Environment* env, int index) {
-    l3Poligon* ptr = array_at(&env->poligons, index);
-    return ptr;  //array_at(&env->poligons, index);
-}
-l3Vertex* l3GetVertexPtrEnvironment(l3Environment* env, int index) {
-    return array_at(&env->vertices, index);
+l3Vertex* l3GetVertexPtrObject(l3Object* obj, int index) {
+    return array_at(&obj->vertices, index);
 }
 
+/**
+ * すべてのオブジェクトに対して、すべてのポリゴンに格納された頂点のインデックスから実ポインタを算出する
+ */
 void l3SolvePtrsEnvironment(l3Environment* env) {
     for (int i = 0; i < env->objects.length; i++) {
         l3Object* object = array_at(&env->objects, i);
-        object->poligons = (l3Poligon**)malloc(sizeof(l3Poligon*) * object->poligon_count);
         for (int j = 0; j < object->poligon_count; j++) {
-            l3Poligon* poligon = object->poligons[j] = l3GetPoligonPtrEnvironment(env, object->poligon_indices[j]);
+            l3Poligon* poligon = object->poligons[j];
             for (int k = 0; k < l3POLIGON_VERTEX_COUNT; k++) {
-                poligon->vertices[k] = l3GetVertexPtrEnvironment(env, poligon->vertex_indices[k]);
+                poligon->vertices[k] = l3GetVertexPtrObject(object, poligon->vertex_indices[k]);
             }
         }
     }
@@ -203,19 +214,16 @@ void l3SolvePtrsEnvironment(l3Environment* env) {
 void l3InitializeEnvironment(l3Environment* env) {
     memset(env, 0, sizeof(l3Environment));
     array_init(&env->objects, sizeof(l3Object*), true);
-    array_init(&env->poligons, sizeof(l3Poligon*), true);
-    array_init(&env->vertices, sizeof(l3Vertex*), true);
 }
 
 void l3ClearEnvironment(l3Environment* env) {
     for (int i = 0; i < env->objects.length; i++) {
         l3Object* object = array_at(&env->objects, i);
         for (int j = 0; j < object->poligon_count; j++) {
-            l3Poligon* poligon = object->poligons[j];
-            for (int k = 0; k < l3POLIGON_VERTEX_COUNT; k++) {
-                l3ClearVertex(poligon->vertices[k]);
-            }
-            l3ClearPoligon(poligon);
+            l3ClearPoligon(object->poligons[j]);
+        }
+        for (int j = 0; j < object->vertices.length; j++) {
+            l3ClearVertex(array_at(&object->vertices, j));
         }
         l3ClearObject(object);
     }
@@ -228,42 +236,19 @@ void l3DestructEnvironment(l3Environment* env) {
             free(array_ei);
         }
     });
-    array_each_i(&env->poligons, {
-        if (array_ei) {
-            l3DestructPoligon(array_ei);
-            free(array_ei);
-        }
-    });
-    array_each_i(&env->vertices, {
-        if (array_ei) {
-            // l3DestructVertex(array_ei);
-            free(array_ei);
-        }
-    });
     array_clear(&env->objects);
-    array_clear(&env->poligons);
-    array_clear(&env->vertices);
 }
 
-void array_clone(array* dst,array * src){
-
+void array_clone(array* dst, array* src) {
 }
 
 l3Environment* l3CloneEnvironment(l3Environment* env) {
     l3Environment* _env = (l3Environment*)malloc(sizeof(l3Environment));
     memcpy(_env, env, sizeof(l3Environment));
 
-    _env->poligons.data = malloc(sizeof(l3Poligon*)* _env->poligons.capacity);
-    for (int i = 0; i < env->poligons.length; i++) {
-        array_set(&_env->poligons, l3ClonePoligon((l3Poligon*)array_at(&env->poligons, i)), i);
-    }
-    _env->objects.data = malloc(sizeof(l3Object*)* _env->objects.capacity);
+    _env->objects.data = malloc(sizeof(l3Object*) * _env->objects.capacity);
     for (int i = 0; i < env->objects.length; i++) {
         array_set(&_env->objects, l3CloneObject(array_at(&env->objects, i)), i);
-    }
-    _env->vertices.data = malloc(sizeof(l3Vertex*)* _env->vertices.capacity);
-    for (int i = 0; i < env->vertices.length; i++) {
-        array_set(&_env->vertices, l3CloneVertex(array_at(&env->vertices, i)), i);
     }
     return _env;
 }

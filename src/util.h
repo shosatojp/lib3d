@@ -23,7 +23,7 @@ void l3DestructPoligons(int pc, l3Poligon* ps[]);
 void l3ClearObject(l3Object* o);
 void l3SetTransposeObject(l3Object* o, l3Type dx, l3Type dy, l3Type dz);
 void l3SetScaleObject(l3Object* o, l3Type sx, l3Type sy, l3Type sz);
-void l3SetPoligonsObject(l3Object* o, int count, int ps[]);
+void l3SetPoligonsToObject(l3Object* o, int count, l3Poligon* ps[]);
 
 void l3MakeCameraInfo(l3CameraInfo* camerainfo,
                       l3Type cx, l3Type cy, l3Type cz,
@@ -33,7 +33,7 @@ void l3InitializeEnvironment(l3Environment* env);
 /**
  * オブジェクトを追加、インデックスを返却
  */
-int l3AddObjectEnvironment(l3Environment* env, l3Object* obj);
+int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj);
 /**
  * ポリゴンを追加、インデックスを返却
  */
@@ -41,7 +41,8 @@ int l3AddPoligonEnvironment(l3Environment* env, l3Poligon* p);
 /**
  * 頂点を追加、インデックスを返却
  */
-int l3AddVertexEnvironment(l3Environment* env, l3Vertex* v);
+int l3AddVertexToObject(l3Object* obj, l3Vertex* v);
+
 l3Object* l3GetObjectPtrEnvironment(l3Environment* env, int index);
 l3Poligon* l3GetPoligonPtrEnvironment(l3Environment* env, int index);
 l3Vertex* l3GetVertexPtrEnvironment(l3Environment* env, int index);

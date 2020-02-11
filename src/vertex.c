@@ -150,4 +150,3 @@ void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, in
         }
     }
 }
-
