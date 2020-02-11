@@ -1,6 +1,6 @@
 TARGET := lib3d
 CC := gcc
-CCOPT := -g -lm -O3 -std=c99 -pthread
+CCOPT := -g -lm -O3 -std=c11 -pthread
 SRCDIR := src
 
 SRC := $(shell find $(SRCDIR) -name "*.c")
@@ -17,7 +17,7 @@ run: $(TARGET) FORCE
 	$(CC) $^ $(CCOPT) -c -o $@
 
 gif:
-	convert -delay 2 bin/*.ppm anim.gif
+	convert -delay 10 bin/*.ppm anim.gif
 
 clean:
 	-rm bin/*.ppm *.out *.exe *.gif $(TARGET)

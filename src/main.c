@@ -51,7 +51,7 @@ int main() {
         l3SetCameraInfoToEnvironment(&env, 14, 0, -10, 20, 20, 20, 0, 1, 0);
     }
 
-    l3MultithreadRenderer(&env, transition, 100, 16);
+    l3MultithreadRenderer(&env, transition, 1000, 16);
 
     l3DestructEnvironment(&env);
 }

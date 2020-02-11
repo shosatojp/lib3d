@@ -5,6 +5,9 @@ void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transi
     printf("thread count : %d\n", thread_count);
     printf("frame count  : %d\n", frames);
 
+    struct timespec f, t;
+    timespec_get(&f, TIME_UTC);
+
     int frame_per_thread = frames / thread_count;
     int current_frame = 0;
     pthread_t** threads = (pthread_t**)malloc(sizeof(pthread_t*) * thread_count);
@@ -16,14 +19,16 @@ void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transi
         _env->frame_end = current_frame + min(frame_per_thread, frames - current_frame);
         _env->transitionFn = transitionFn;
         current_frame += frame_per_thread;
-        pthread_create(&thread, NULL, l3RenderEnvironment, _env);
+        pthread_create(&thread, NULL, (void* (*)(void*))l3RenderEnvironment, _env);
         threads[i] = &thread;
     }
 
     // 片付け
     while (thread_count) pthread_join(*threads[--thread_count], NULL);
     free(threads);
-    printf("rendering finished successfully\n");
+
+    timespec_get(&t, TIME_UTC);
+    printf("rendering finished successfully. %ld sec\n", t.tv_sec - f.tv_sec);
 }
 
 void l3RenderEnvironment(l3Environment* env) {
