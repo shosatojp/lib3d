@@ -100,6 +100,7 @@ void l3InitializeObject(l3Object* o) {
 l3Object* l3CreateObject() {
     l3Object* _o = (l3Object*)calloc(sizeof(l3Object), 1);
     array_init(&_o->vertices, sizeof(l3Vertex*), true);
+    array_expand(&_o->vertices, 10);
     l3InitializeObject(_o);
     return _o;
 }
@@ -227,6 +228,7 @@ void l3SolvePtrsEnvironment(l3Environment* env) {
 void l3InitializeEnvironment(l3Environment* env) {
     memset(env, 0, sizeof(l3Environment));
     array_init(&env->objects, sizeof(l3Object*), true);
+    array_expand(&env->objects, 10);
 }
 
 void l3ClearEnvironment(l3Environment* env) {
@@ -251,12 +253,13 @@ void array_clone(array* dst, array* src) {
 }
 
 l3Environment* l3CloneEnvironment(l3Environment* env) {
-    l3Environment* _env = (l3Environment*)malloc(sizeof(l3Environment));
+    l3Environment* _env = (l3Environment*)calloc(sizeof(l3Environment),1);
     memcpy(_env, env, sizeof(l3Environment));
 
     _env->objects.data = malloc(sizeof(l3Object*) * _env->objects.capacity);
     for (int i = 0; i < env->objects.length; i++) {
         array_set(&_env->objects, l3CloneObject(array_at(&env->objects, i)), i);
     }
+
     return _env;
 }
