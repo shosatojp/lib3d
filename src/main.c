@@ -16,7 +16,7 @@ int main() {
         l3InitializeEnvironment(&env);
         env.w = 1920;
         env.h = 1080;
-        env.outdir = "/tmp/renderout/bin";
+        env.outdir = "bin";
 
         // オブジェクト構築
         l3Object* _object = l3CreateObject();
