@@ -137,7 +137,6 @@ void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, in
                     // ローカル->ワールド->プロジェクション->スクリーン座標変換
                     l3MulMat4441(lwcps, _vertex->coordinate, r);
                     l3DivMat(r, r[3], r, 4);
-
                     // 結果格納
                     memcpy(_vertex->coordinate2d, r, sizeof(_vertex->coordinate2d));
                     _vertex->converted = true;

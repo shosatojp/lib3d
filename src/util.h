@@ -25,7 +25,7 @@ void l3SetTransposeObject(l3Object* o, l3Type dx, l3Type dy, l3Type dz);
 void l3SetScaleObject(l3Object* o, l3Type sx, l3Type sy, l3Type sz);
 void l3SetPoligonsToObject(l3Object* o, int count, l3Poligon* ps[]);
 
-void l3MakeCameraInfo(l3CameraInfo* camerainfo,
+void l3SetCameraInfoToEnvironment(l3Environment* env,
                       l3Type cx, l3Type cy, l3Type cz,
                       l3Type tx, l3Type ty, l3Type tz,
                       l3Type ux, l3Type uy, l3Type uz);

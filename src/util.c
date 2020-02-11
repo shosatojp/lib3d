@@ -91,17 +91,27 @@ void l3ClearPoligon(l3Poligon* p) {
  * Object
  * ===========================================
  */
+void l3InitializeObject(l3Object* o){
+
+    o->sx = 1;
+    o->sy = 1;
+    o->sz = 1;
+}
+
 l3Object* l3CreateObject() {
     l3Object* _o = (l3Object*)calloc(sizeof(l3Object), 1);
-    l3ClearObject(_o);
+    array_init(&_o->vertices, sizeof(l3Vertex*), true);
+    l3InitializeObject(_o);
     return _o;
 }
 
 void l3ClearObject(l3Object* o) {
-    array_init(&o->vertices, sizeof(l3Vertex*), true);
-    o->sx = 1;
-    o->sy = 1;
-    o->sz = 1;
+    for (int j = 0; j < o->poligon_count; j++) {
+        l3ClearPoligon(o->poligons[j]);
+    }
+    for (int j = 0; j < o->vertices.length; j++) {
+        l3ClearVertex(array_at(&o->vertices, j));
+    }
 }
 
 l3Object* l3CloneObject(l3Object* o) {
@@ -152,22 +162,22 @@ void l3SetPoligonsToObject(l3Object* o, int count, l3Poligon* ps[]) {
     o->poligon_count = count;
 }
 
-void l3MakeCameraInfo(l3CameraInfo* camerainfo,
+void l3SetCameraInfoToEnvironment(l3Environment* env,
                       l3Type cx, l3Type cy, l3Type cz,
                       l3Type tx, l3Type ty, l3Type tz,
                       l3Type ux, l3Type uy, l3Type uz) {
-    camerainfo->coordinate[0] = cx;
-    camerainfo->coordinate[1] = cy;
-    camerainfo->coordinate[2] = cz;
-    camerainfo->coordinate[3] = 1;
-    camerainfo->target[0] = tx;
-    camerainfo->target[1] = ty;
-    camerainfo->target[2] = tz;
-    camerainfo->target[3] = 1;
-    camerainfo->upper[0] = ux;
-    camerainfo->upper[1] = uy;
-    camerainfo->upper[2] = uz;
-    camerainfo->upper[3] = 1;
+    env->camera.coordinate[0] = cx;
+    env->camera.coordinate[1] = cy;
+    env->camera.coordinate[2] = cz;
+    env->camera.coordinate[3] = 1;
+    env->camera.target[0] = tx;
+    env->camera.target[1] = ty;
+    env->camera.target[2] = tz;
+    env->camera.target[3] = 1;
+    env->camera.upper[0] = ux;
+    env->camera.upper[1] = uy;
+    env->camera.upper[2] = uz;
+    env->camera.upper[3] = 1;
 }
 
 /**
@@ -219,12 +229,7 @@ void l3InitializeEnvironment(l3Environment* env) {
 void l3ClearEnvironment(l3Environment* env) {
     for (int i = 0; i < env->objects.length; i++) {
         l3Object* object = array_at(&env->objects, i);
-        for (int j = 0; j < object->poligon_count; j++) {
-            l3ClearPoligon(object->poligons[j]);
-        }
-        for (int j = 0; j < object->vertices.length; j++) {
-            l3ClearVertex(array_at(&object->vertices, j));
-        }
+
         l3ClearObject(object);
     }
 }

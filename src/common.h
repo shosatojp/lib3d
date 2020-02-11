@@ -100,13 +100,9 @@ typedef struct _l3Poligon {
  * 頂点はリストを格納
  */
 typedef struct _l3Object {
-    // int* poligon_indices;  // poligonのポインタの配列のインデックスの配列 // heap
     l3Poligon** poligons;  // poligonのポインタの配列のインデックスの配列 // heap 中身開放する
     int poligon_count;
 
-    // array poligons;  // 中身はheap
-    // l3Vertex** vertices;  // 中身はheap
-    // int vertex_count;
     array vertices;
 
     l3Type dx, dy, dz;
@@ -129,11 +125,15 @@ typedef struct _l3CameraInfo {
     l3Mat41A upper;
 } l3CameraInfo;
 
+struct _l3Environment;
+typedef struct _l3Environment l3Environment;
+typedef void l3FrameTransitionFunction(l3Environment* env, int frame);
+
 // マルチスレッド時にこれを持ってく
-typedef struct _l3Environment {
+struct _l3Environment {
     int w, h;
     // オブジェクトのポインタの配列
-    array objects;   // 中身はheap
+    array objects;  // 中身はheap
 
     // Textureは状態を保持しないのでそのままでおｋ
     // カメラ情報
@@ -143,4 +143,5 @@ typedef struct _l3Environment {
     int frame_begin;
     int frame_end;
     // time
-} l3Environment;
+    l3FrameTransitionFunction* transitionFn;
+};

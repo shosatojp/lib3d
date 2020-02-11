@@ -6,3 +6,4 @@
 #include "raster.h"
 #include "util.h"
 #include "vertex.h"
+#include "render.h"
