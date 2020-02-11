@@ -43,7 +43,7 @@ void l3RenderEnvironment(l3Environment* env) {
         // 出力
         l3ConvertRasterMapToBuffer(map, buf, env->w, env->h);
         char name[20] = {0};
-        sprintf(name, "bin/hoge-%03d.ppm", f);
+        sprintf(name, "bin/hoge-%06d.ppm", f);
         l3WriteBuffer(buf, env->w, env->h, name);
 
         // 初期化

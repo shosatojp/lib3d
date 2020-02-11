@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include "array.h"
 
 #define l3POLIGON_VERTEX_COUNT 3

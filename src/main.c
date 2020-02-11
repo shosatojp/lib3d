@@ -49,18 +49,24 @@ int main() {
 
     l3SetCameraInfoToEnvironment(&env, 14, 0, -10, 20, 20, 20, 0, 1, 0);
 
-    int frame_sum = 1000;
-    int frame_per_thread = 50;
+    int frame_sum = 100;
+    int frame_per_thread = 10;
+    array* threads = array_new(sizeof(pthread_t), false, frame_sum / frame_per_thread);
     for (int i = 0; i < frame_sum / frame_per_thread; i++) {
+        pthread_t thread;
         l3Environment* _env = l3CloneEnvironment(&env);
         _env->frame_begin = i * frame_per_thread;
         _env->frame_end = i * frame_per_thread + frame_per_thread;
         _env->transitionFn = transition;
+        pthread_create(&thread, NULL, l3RenderEnvironment, _env);
+        array_push(threads, thread);
 
-        l3RenderEnvironment(_env);
-        l3DestructEnvironment(_env);
+        // l3RenderEnvironment(_env);
+        // l3DestructEnvironment(_env);
     }
 
     // 片付け
+    array_each_i(threads, pthread_join(*(pthread_t*)array_ei, NULL));
+    array_clear(threads);
     l3DestructEnvironment(&env);
 }
