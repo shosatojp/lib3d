@@ -13,7 +13,3 @@ jobs:
       run: make
     - name: make run
       run: make run
-    - name: make gif
-      run: make gif
-    - name: make mp4
-      run: make mp4
