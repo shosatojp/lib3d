@@ -82,6 +82,9 @@ void l3MakeWorldToCameraMat44(l3CameraInfo* camerainfo, l3Mat44 r) {
     l3CrossProductVec3(cx, cz, tmp);
     l3NormarizeVec(tmp, cy, 3);
 
+    // 後から使うから入れとく
+    memcpy(&camerainfo->cameraZ, cz, sizeof(l3Type) * 4);
+
     r[0] = cx[0];
     r[4] = cx[1];
     r[8] = cx[2];

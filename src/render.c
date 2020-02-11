@@ -38,6 +38,7 @@ void l3RenderEnvironment(l3Environment* env) {
     l3PixelInfo* map = l3CreateRasterMap(env->w, env->h);
     unsigned char* buf = l3CreateBuffer(env->w, env->h);
 
+    env->map = map;
     for (int f = env->frame_begin; f < env->frame_end; f++) {
         printf("rendering frame %d\n", f);
         fflush(stdout);
@@ -71,9 +72,10 @@ void l3RenderEnvironment(l3Environment* env) {
         l3SortPoligonsByMaxZ(poligons_all->length, (l3Poligon**)poligons_all->data);
 
         /* まとめて描画 */
-        array_each_i(poligons_all, l3WriteRasterMap(map, env->w, env->h, array_ei));
+        array_each_i(poligons_all, l3WriteRasterMap(env, env->w, env->h, array_ei));
         array_clear(poligons_all);
         safe_free(poligons_all);
+        // printf("=====%s\n", env->outdir);
 
         // 出力
         l3ConvertRasterMapToBuffer(map, buf, env->w, env->h);

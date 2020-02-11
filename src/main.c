@@ -5,7 +5,6 @@ void transition(l3Environment* env, int frame) {
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y = frame * 5 * 3.14 / 180.0;
     obj->theta_x = frame * 5 * 3.14 / 180.0;
-    obj->poligons[0]->color.r = 0;
 }
 
 int main() {
@@ -28,6 +27,7 @@ int main() {
             l3AddVertexToObject(_object, l3CreateVertex(5, -5, -5, &blue)),
             l3AddVertexToObject(_object, l3CreateVertex(-5, 5, -5, &white)),
         };
+        // 右回りが表、数字はオブジェクトごとの頂点のインデックス
         l3Poligon* poligons[] = {
             l3CreatePoligon(0, 2, 1),
             l3CreatePoligon(0, 3, 2),
@@ -56,7 +56,7 @@ int main() {
                                      120, 10, 100);
     }
 
-    l3MultithreadRenderer(&env, transition, 360, 10);
+    l3MultithreadRenderer(&env, transition, 20, 16);
 
     l3DestructEnvironment(&env);
 }

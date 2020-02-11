@@ -128,6 +128,7 @@ typedef struct _l3CameraInfo {
     l3Type angle;
     l3Type near;
     l3Type far;
+    l3Mat41A cameraZ;
 } l3CameraInfo;
 
 struct _l3Environment;
@@ -148,6 +149,7 @@ struct _l3Environment {
     int frame_begin;
     int frame_end;
     // time
+    l3PixelInfo* map;
     const char* outdir;
     l3FrameTransitionFunction* transitionFn;
 };
