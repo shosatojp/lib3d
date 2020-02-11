@@ -67,16 +67,16 @@ void l3MakeLocalToWorldMat44(l3Type dx, l3Type dy, l3Type dz,
 /**
  * camera = target = upper = r
  */
-void l3MakeWorldToCameraMat44(l3Mat41 camera, l3Mat41 target, l3Mat41 upper, l3Mat44 r) {
+void l3MakeWorldToCameraMat44(l3CameraInfo* camerainfo, l3Mat44 r) {
     l3Type tmp[4] = {0},
            cx[4] = {0},
            cy[4] = {0},
            cz[4] = {0};
     // cz
-    l3SubMat(target, camera, tmp, 3);
+    l3SubMat(camerainfo->target, camerainfo->coordinate, tmp, 3);
     l3NormarizeVec(tmp, cz, 3);
     // cx
-    l3CrossProductVec3(cz, upper, tmp);
+    l3CrossProductVec3(cz, camerainfo->upper, tmp);
     l3NormarizeVec(tmp, cx, 3);
     // cy
     l3CrossProductVec3(cx, cz, tmp);
@@ -91,9 +91,9 @@ void l3MakeWorldToCameraMat44(l3Mat41 camera, l3Mat41 target, l3Mat41 upper, l3M
     r[2] = cz[0];
     r[6] = cz[1];
     r[10] = cz[2];
-    r[12] = -l3InnerProductVec(camera, cx, 3);
-    r[13] = -l3InnerProductVec(camera, cy, 3);
-    r[14] = -l3InnerProductVec(camera, cz, 3);
+    r[12] = -l3InnerProductVec(camerainfo->coordinate, cx, 3);
+    r[13] = -l3InnerProductVec(camerainfo->coordinate, cy, 3);
+    r[14] = -l3InnerProductVec(camerainfo->coordinate, cz, 3);
     r[15] = 1;
 }
 
@@ -117,37 +117,37 @@ void l3MakeProjectionToScreenMat44(l3Type width, l3Type height, l3Mat44 r) {
     r[15] = 1;
 }
 
-void l3AppendPoligonsFromObject(l3Object* _object, l3Mat44 wcps, int w, int h, array* poligons) {
-    l3Type lw[16] = {0};
-    l3MakeLocalToWorldMat44(_object->dx, _object->dy, _object->dz,
-                            _object->sx, _object->sy, _object->sz,
-                            _object->theta_x, _object->theta_y, _object->theta_z, lw);
-    l3Type lwcps[16] = {0};
-    l3MulMat4444(wcps, lw, lwcps);
+void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, int h, array* all_poligons) {
+    for (int i = 0; i < env->objects.length; ++i) {
+        l3Object* _object = array_at(&env->objects, i);
+        l3Type lw[16] = {0};
+        l3MakeLocalToWorldMat44(_object->dx, _object->dy, _object->dz,
+                                _object->sx, _object->sy, _object->sz,
+                                _object->theta_x, _object->theta_y, _object->theta_z, lw);
+        l3Type lwcps[16] = {0};
+        l3MulMat4444(wcps, lw, lwcps);
 
-    l3Type r[4] = {0};
-    for (int i = 0; i < _object->poligon_count; i++) {
-        l3Poligon* _poligon = _object->poligons[i];
-        for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
-            l3Vertex* _vertex = _poligon->vertices[j];
-            if (!_vertex->converted) {
-                l3InitMat(r, 4, 1);
-                // ローカル->ワールド->プロジェクション->スクリーン座標変換
-                l3MulMat4441(lwcps, _vertex->coordinate, r);
-                l3DivMat(r, r[3], r, 4);
+        l3Type r[4] = {0};
+        for (int i = 0; i < _object->poligon_count; i++) {
+            l3Poligon* _poligon = _object->poligons[i];
+            for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
+                l3Vertex* _vertex = _poligon->vertices[j];
+                if (!_vertex->converted) {
+                    l3InitMat(r, 4, 1);
+                    // ローカル->ワールド->プロジェクション->スクリーン座標変換
+                    l3MulMat4441(lwcps, _vertex->coordinate, r);
+                    l3DivMat(r, r[3], r, 4);
 
-                // 結果格納
-                memcpy(_vertex->coordinate2d, r, sizeof(_vertex->coordinate2d));
-                _vertex->converted = true;
+                    // 結果格納
+                    memcpy(_vertex->coordinate2d, r, sizeof(_vertex->coordinate2d));
+                    _vertex->converted = true;
+                }
             }
+            // ポリゴンに対する諸設定はここで済ます
+            l3SetMaxZofPoligon(_poligon);
+            l3SetOuterRectPoligon(_poligon);
+            array_push(all_poligons, _poligon);
         }
-        // ポリゴンに対する諸設定はここで済ます
-        l3SetMaxZofPoligon(_poligon);
-        l3SetOuterRectPoligon(_poligon);
-        array_push(poligons, _poligon);
     }
 }
 
-void l3ClearVertices(int count, l3Vertex* vs[]) {
-    while (count) vs[--count]->converted = false;
-}

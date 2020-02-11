@@ -27,22 +27,22 @@ typedef l3Type l3Mat32A[6];
 typedef l3Type l3Mat31A[3];
 typedef l3Type l3Mat23A[6];
 
-typedef enum {
+typedef enum _l3PoligonMaterial {
     l3PoligonMaterialVertex = 0,  // default
     l3PoligonMaterialColor,
     l3PoligonMaterialTexture,
 } l3PoligonMaterial;
 
-typedef struct {
+typedef struct _l3RGB {
     l3Type r, g, b;
 } l3RGB;
 
-typedef struct {
+typedef struct _l3Texture {
     unsigned char* buffer;
     int w, h;
 } l3Texture;
 
-typedef struct {
+typedef struct _l3Vertex {
     /**
      * ローカル座標空間の座標
      */
@@ -63,11 +63,12 @@ typedef struct {
 } l3Vertex;
 
 // textureもここで
-typedef struct {
+typedef struct _l3Poligon {
     /**
      * ポリゴンに属する頂点のインデックス（基準はEnv）、ポリゴンは必ず三角形
      */
-    int vertices[3];
+    l3Vertex* vertices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
+    int vertex_indices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
     /**
      * ソート用（裏は描画されないからいらなかったりして）
      */
@@ -80,9 +81,9 @@ typedef struct {
     /**
      * テクスチャマッピング用。verticesに対応する順番で
      */
-    l3Mat23 textureVertices;
+    l3Mat23 textureVertices;  // heap 解放
     l3Texture* texture;
-    l3Mat33 textureAffineMatInv;
+    l3Mat33 textureAffineMatInv;  // heap 解放
 
     l3RGB color;
 
@@ -92,15 +93,16 @@ typedef struct {
     l3PoligonMaterial material;
 } l3Poligon;
 
-typedef struct {
-    l3Poligon** poligons;  // poligonのポインタの配列
+typedef struct _l3Object {
+    int* poligon_indices;  // poligonのポインタの配列のインデックスの配列 // heap
+    l3Poligon** poligons;  // poligonのポインタの配列のインデックスの配列 // heap 中身は開放しない
     int poligon_count;
     l3Type dx, dy, dz;
     l3Type sx, sy, sz;
     l3Type theta_x, theta_y, theta_z;
 } l3Object;
 
-typedef struct {
+typedef struct _l3PixelInfo {
     // ピクセルの色
     l3RGB color;
     // ポリゴンへのポインタ
@@ -109,19 +111,19 @@ typedef struct {
     bool activated;
 } l3PixelInfo;
 
-typedef struct {
+typedef struct _l3CameraInfo {
     l3Mat41A coordinate;
     l3Mat41A target;
     l3Mat41A upper;
 } l3CameraInfo;
 
 // マルチスレッド時にこれを持ってく
-typedef struct {
+typedef struct _l3Environment {
     int w, h;
     // オブジェクトのポインタの配列
-    array objects;
-    array poligons;
-    array vertices;
+    array objects;   // 中身はheap
+    array poligons;  // 中身はheap
+    array vertices;  // 中身はheap
 
     // Textureは状態を保持しないのでそのままでおｋ
     // カメラ情報
