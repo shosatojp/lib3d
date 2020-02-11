@@ -17,10 +17,13 @@ run: $(TARGET) FORCE
 	$(CC) $^ $(CCOPT) -c -o $@
 
 gif:
-	convert -delay 10 bin/*.ppm anim.gif
+	convert -delay 2 bin/*.ppm out.gif
+
+mp4:
+	ffmpeg -pattern_type glob -framerate 30 -i "bin/*.ppm" out.mp4 -y
 
 clean:
-	-rm bin/*.ppm *.out *.exe *.gif $(TARGET)
+	-rm bin/*.ppm *.out *.exe *.gif *.mp4 $(TARGET)
 	-rm src/*.o *.o
 	-rm -rf bin
 

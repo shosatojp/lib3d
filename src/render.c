@@ -10,7 +10,6 @@ void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transi
 
     int frame_per_thread = frames / thread_count;
     int amari = frames % thread_count;
-    printf("frame/thread %d\n", frame_per_thread);
     int current_frame = 0;
     pthread_t** threads = (pthread_t**)malloc(sizeof(pthread_t*) * thread_count);
 
@@ -40,7 +39,8 @@ void l3RenderEnvironment(l3Environment* env) {
     unsigned char* buf = l3CreateBuffer(env->w, env->h);
 
     for (int f = env->frame_begin; f < env->frame_end; f++) {
-        // printf("rendering frame %d\n", f);
+        printf("rendering frame %d\n", f);
+        fflush(stdout);
         l3ClearRasterMap(map, env->w, env->h);
         l3ClearBuffer(buf, env->w, env->h, 255);
 
