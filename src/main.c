@@ -16,6 +16,7 @@ int main() {
     l3InitializeEnvironment(&env);
     env.w = 1920;
     env.h = 1080;
+    env.outdir = "/tmp/renderout/bin";
 
     // オブジェクト構築
     l3Object* _object = l3CreateObject();
@@ -49,8 +50,8 @@ int main() {
 
     l3SetCameraInfoToEnvironment(&env, 14, 0, -10, 20, 20, 20, 0, 1, 0);
 
-    int frame_sum = 100;
-    int frame_per_thread = 10;
+    int frame_sum = 1000;
+    int frame_per_thread = 100;
     array* threads = array_new(sizeof(pthread_t), false, frame_sum / frame_per_thread);
     for (int i = 0; i < frame_sum / frame_per_thread; i++) {
         pthread_t thread;

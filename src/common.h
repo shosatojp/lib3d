@@ -144,5 +144,6 @@ struct _l3Environment {
     int frame_begin;
     int frame_end;
     // time
+    const char* outdir;
     l3FrameTransitionFunction* transitionFn;
 };
