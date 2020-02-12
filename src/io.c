@@ -4,7 +4,7 @@ void l3WriteBuffer(unsigned char* buffer, int w, int h, const char* name) {
     FILE* fp = fopen(name, "w");
     if (fp) {
         fprintf(fp, "P6\n%d %d\n255\n", w, h);
-        // fwrite(buffer, w * h * 3, 1, fp);
+        fwrite(buffer, w * h * 3, 1, fp);
         fclose(fp);
     } else {
         fprintf(stderr, "Error: cannot open file '%s'\n", name);
