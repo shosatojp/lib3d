@@ -77,9 +77,9 @@ int main() {
             l3Mat44A lw = {0};
             l3MakeLocalToWorldMat44(15, 15, 15, 1, 1, 1, 0, 0, 0, lw);
             for (int i = 0; i < l3POLIGON_VERTEX_COUNT; i++) {
-                l3MulMat4441(lw, &poligons[0]->vertices[i]->coordinate,
-                             &poligons[0]->vertices[i]->coordinateWorld);
-                l3PrintMat(&poligons[0]->vertices[i]->coordinateWorld, 4, 1);
+                l3MulMat4441(lw, poligons[0]->vertices[i]->coordinate,
+                             poligons[0]->vertices[i]->coordinateWorld);
+                l3PrintMat(poligons[0]->vertices[i]->coordinateWorld, 4, 1);
             }
             l3Mat31A r = {0};
             l3Mat21A uv = {0};
@@ -90,7 +90,7 @@ int main() {
 
             printf("%d\n", result);
             l3Mat31A norm = {0};
-            l3PoligonNormalWorld(poligons[0], norm);
+            l3PoligonNormal(poligons[0], norm);
             l3PrintMat(norm, 3, 1);
             exit(0);
         }

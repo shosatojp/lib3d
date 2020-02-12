@@ -13,9 +13,9 @@ bool l3IntersectRayPoligon(l3Mat31 ray_origin, l3Mat31 ray_direction, l3Poligon*
     l3Mat31A e1 = {0};
     l3Mat31A e2 = {0};
     l3Mat31A a_v0 = {0};
-    l3SubMat(&poligon->vertices[1]->coordinateWorld, &poligon->vertices[0]->coordinateWorld, e1, 3);
-    l3SubMat(&poligon->vertices[2]->coordinateWorld, &poligon->vertices[0]->coordinateWorld, e2, 3);
-    l3SubMat(ray_origin, &poligon->vertices[0]->coordinateWorld, a_v0, 3);
+    l3SubMat(poligon->vertices[1]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e1, 3);
+    l3SubMat(poligon->vertices[2]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e2, 3);
+    l3SubMat(ray_origin, poligon->vertices[0]->coordinateWorld, a_v0, 3);
 
     l3Type tmp[12] = {0};
     tmp[0] = -ray_direction[0];
@@ -52,8 +52,8 @@ void l3PoligonNormal(l3Poligon* poligon, l3Mat31 normal) {
     l3Mat41A e1 = {0};
     l3Mat41A e2 = {0};
     l3Mat41A prod = {0};
-    l3SubMat(&poligon->vertices[2]->coordinateWorld, &poligon->vertices[0]->coordinateWorld, e1, 3);
-    l3SubMat(&poligon->vertices[1]->coordinateWorld, &poligon->vertices[0]->coordinateWorld, e2, 3);
+    l3SubMat(poligon->vertices[2]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e1, 3);
+    l3SubMat(poligon->vertices[1]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e2, 3);
 
     l3CrossProductVec3(e2, e1, prod);
     l3NormarizeVec(prod, normal, 3);
@@ -87,7 +87,7 @@ bool l3IntersectRaySphere(l3Mat31 ray_origin, l3Mat31 ray_direction, l3Mat31 sph
     l3Mat31A s_pc;
     l3SubMat(ray_origin, sphere_center, s_pc, 3);
     l3Type b = l3InnerProductVec(s_pc, ray_direction, 3);
-    l3Type c = pow2(l3VecAbs(ray_origin)) + pow2(l3VecAbs(sphere_center)) - pow2(r) - 2 * l3InnerProductVec(ray_origin, sphere_center, 3);
+    l3Type c = pow2(l3VecAbs(ray_origin, 3)) + pow2(l3VecAbs(sphere_center, 3)) - pow2(sphere_radius) - 2 * l3InnerProductVec(ray_origin, sphere_center, 3);
     l3Type d = pow2(b) - c;
     if (d > 0) {
         l3Type t = -b - sqrt(d);
