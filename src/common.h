@@ -38,6 +38,11 @@ typedef enum _l3PoligonMaterial {
     l3PoligonMaterialTexture,
 } l3PoligonMaterial;
 
+typedef enum _l3PoligonType {
+    l3PoligonTriangle = 0,
+    l3PoligonShpere,
+} l3PoligonType;
+
 typedef struct _l3RGB {
     l3Type r, g, b;
 } l3RGB;
@@ -78,10 +83,16 @@ typedef struct _l3Poligon {
      */
     l3Vertex* vertices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
     int vertex_indices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
-    /**
-     * ソート用（裏は描画されないからいらなかったりして）
-     */
-    l3Type max_z;
+    union {
+        /**
+         * ソート用
+         */
+        l3Type max_z;
+        /**
+         * l3PoligonType == l3PoligonSphereのとき
+         */
+        l3Type sphere_radius;
+    };
     /**
      * ポリゴンを囲う四角形の左上と右下
      */
@@ -103,6 +114,13 @@ typedef struct _l3Poligon {
 
     // ポリゴンの透明度0.0-1.0
     l3Type transparency;
+
+    /**
+     * ポリゴンの種類
+     * - 三角形ポリゴン
+     * - 球体 (座標(vertices[0])、半径(max_z))
+     */
+    l3PoligonType poligonType;
 } l3Poligon;
 
 /**

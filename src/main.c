@@ -13,7 +13,19 @@ void transition(l3Environment* env, int frame) {
     obj2->dx = frame;
 }
 
+struct Hoge {
+    union {
+        int a;
+        int b;
+    };
+};
+
 int main() {
+    struct Hoge h;
+    h.a = 1234;
+    printf("%ld\n", h.b);
+    exit(0);
+
     l3Environment env;
     {
         l3RGB red = {255, 0, 0};
