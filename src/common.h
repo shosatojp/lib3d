@@ -1,5 +1,8 @@
 #pragma once
 
+#define PI 3.14
+#define pow2(a) ((a) * (a))
+
 #include <math.h>
 #include <pthread.h>
 #include <stdarg.h>
