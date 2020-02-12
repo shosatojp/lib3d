@@ -2,6 +2,12 @@
 
 /**
  * レイとポリゴンの交点判定（ワールド座標）
+ * ray_origin: Rayの始点
+ * ray_direction: Rayの方向ベクトル（単位ベクトル）
+ * poligon: 判定対象のポリゴン
+ * (result) r: return trueの場合、交点。return falseの場合何もしない
+ * (result) uv: return trueの場合、ポリゴン内のuv座標< b - a, c - a >。return falseの場合何もしない
+ * return: 交点がある場合true
  */
 bool l3IntersectRayPoligon(l3Mat31 ray_origin, l3Mat31 ray_direction, l3Poligon* poligon, l3Mat31 r, l3Mat21 uv) {
     l3Mat31A e1 = {0};
@@ -39,6 +45,8 @@ bool l3IntersectRayPoligon(l3Mat31 ray_origin, l3Mat31 ray_direction, l3Poligon*
 
 /**
  * ポリゴンの法線ベクトル（ワールド座標）
+ * poligon: 対象のポリゴン
+ * (result) normal: 法線ベクトル（ワールド座標）
  */
 void l3PoligonNormalWorld(l3Poligon* poligon, l3Mat31 normal) {
     l3Mat41A e1 = {0};
@@ -53,12 +61,15 @@ void l3PoligonNormalWorld(l3Poligon* poligon, l3Mat31 normal) {
 
 /**
  * レイトレーシングでポリゴンの点(u,v)のテクスチャ座標
+ * poligon: 対象のポリゴン
+ * uv: ポリゴン内のuv座標
+ * (result) r: テクスチャ内でのxy座標
  */
 void l3GetRayPoligon2DTextureCoordinate(l3Poligon* poligon, l3Mat21 uv, l3Mat21 r) {
     l3Mat41A e1 = {0};
     l3Mat41A e2 = {0};
     l3SubMat(&poligon->textureVertices[4], &poligon->textureVertices[0], e1, 3);
     l3SubMat(&poligon->textureVertices[2], &poligon->textureVertices[0], e2, 3);
-    r[0] = uv[0] * e1[0] + uv[1] * e2[0];
-    r[1] = uv[0] * e1[1] + uv[1] * e2[1];
+    r[0] = poligon->textureVertices[0] + uv[0] * e1[0] + uv[1] * e2[0];
+    r[1] = poligon->textureVertices[1] + uv[0] * e1[1] + uv[1] * e2[1];
 }
