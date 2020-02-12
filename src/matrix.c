@@ -68,6 +68,16 @@ void l3SubMat(l3Mat a, l3Mat b, l3Mat r, int n) {
         r[i] = a[i] - b[i];
     }
 }
+void l3AddMat(l3Mat a, l3Mat b, l3Mat r, int n) {
+    for (int i = 0; i < n; ++i) {
+        r[i] = a[i] + b[i];
+    }
+}
+void l3ScalarMulMat(l3Mat a, l3Type s, l3Mat r, int n) {
+    for (int i = 0; i < n; ++i) {
+        r[i] = a[i] * s;
+    }
+}
 
 /**
  * a = r

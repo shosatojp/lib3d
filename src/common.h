@@ -1,6 +1,6 @@
 #pragma once
 
-#define PI 3.14
+#define PI 3.14159265359
 #define pow2(a) ((a) * (a))
 
 #include <math.h>

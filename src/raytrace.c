@@ -9,10 +9,10 @@
  * (result) uv: return trueの場合、ポリゴン内のuv座標< b - a, c - a >。return falseの場合何もしない
  * return: 交点がある場合true
  */
-bool l3IntersectRayPoligon(l3Mat31 ray_origin, l3Mat31 ray_direction, l3Poligon* poligon, l3Mat31 r, l3Mat21 uv) {
-    l3Mat31A e1 = {0};
-    l3Mat31A e2 = {0};
-    l3Mat31A a_v0 = {0};
+bool l3IntersectRayPoligon(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Poligon* poligon, l3Mat41 r, l3Mat21 uv) {
+    l3Mat41A e1 = {0};
+    l3Mat41A e2 = {0};
+    l3Mat41A a_v0 = {0};
     l3SubMat(poligon->vertices[1]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e1, 3);
     l3SubMat(poligon->vertices[2]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e2, 3);
     l3SubMat(ray_origin, poligon->vertices[0]->coordinateWorld, a_v0, 3);
@@ -48,13 +48,12 @@ bool l3IntersectRayPoligon(l3Mat31 ray_origin, l3Mat31 ray_direction, l3Poligon*
  * poligon: 対象のポリゴン
  * (result) normal: 法線ベクトル（ワールド座標）
  */
-void l3PoligonNormal(l3Poligon* poligon, l3Mat31 normal) {
+void l3GetPoligonNormal(l3Poligon* poligon, l3Mat41 normal) {
     l3Mat41A e1 = {0};
     l3Mat41A e2 = {0};
     l3Mat41A prod = {0};
     l3SubMat(poligon->vertices[2]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e1, 3);
     l3SubMat(poligon->vertices[1]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e2, 3);
-
     l3CrossProductVec3(e2, e1, prod);
     l3NormarizeVec(prod, normal, 3);
 }
@@ -66,10 +65,10 @@ void l3PoligonNormal(l3Poligon* poligon, l3Mat31 normal) {
  * (result) r: テクスチャ内でのxy座標（0-1）
  */
 void l3GetRayPoligon2DTextureCoordinate(l3Poligon* poligon, l3Mat21 uv, l3Mat21 r) {
-    l3Mat41A e1 = {0};
-    l3Mat41A e2 = {0};
-    l3SubMat(&poligon->textureVertices[4], &poligon->textureVertices[0], e1, 3);
-    l3SubMat(&poligon->textureVertices[2], &poligon->textureVertices[0], e2, 3);
+    l3Mat21A e1 = {0};
+    l3Mat21A e2 = {0};
+    l3SubMat(&poligon->textureVertices[4], &poligon->textureVertices[0], e1, 2);
+    l3SubMat(&poligon->textureVertices[2], &poligon->textureVertices[0], e2, 2);
     r[0] = poligon->textureVertices[0] + uv[0] * e1[0] + uv[1] * e2[0];
     r[1] = poligon->textureVertices[1] + uv[0] * e1[1] + uv[1] * e2[1];
 }
@@ -83,12 +82,14 @@ void l3GetRayPoligon2DTextureCoordinate(l3Poligon* poligon, l3Mat21 uv, l3Mat21 
  * (result) r: return trueの場合、交点。return falseの場合何もしない
  * return: 交点がある場合true
  */
-bool l3IntersectRaySphere(l3Mat31 ray_origin, l3Mat31 ray_direction, l3Mat31 sphere_center, l3Type sphere_radius, l3Mat31 r) {
-    l3Mat31A s_pc;
+bool l3IntersectRaySphere(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Mat41 sphere_center, l3Type sphere_radius, l3Mat41 r) {
+    l3Mat41A s_pc;
     l3SubMat(ray_origin, sphere_center, s_pc, 3);
     l3Type b = l3InnerProductVec(s_pc, ray_direction, 3);
-    l3Type c = pow2(l3VecAbs(ray_origin, 3)) + pow2(l3VecAbs(sphere_center, 3)) - pow2(sphere_radius) - 2 * l3InnerProductVec(ray_origin, sphere_center, 3);
-    l3Type d = pow2(b) - c;
+    l3Type c = l3InnerProductVec(ray_origin, ray_origin, 3) +
+               l3InnerProductVec(sphere_center, sphere_center, 3) -
+               sphere_radius * sphere_radius - 2 * l3InnerProductVec(ray_origin, sphere_center, 3);
+    l3Type d = b * b - c;
     if (d > 0) {
         l3Type t = -b - sqrt(d);
         r[0] = ray_origin[0] + t * ray_direction[0];
@@ -105,7 +106,7 @@ bool l3IntersectRaySphere(l3Mat31 ray_origin, l3Mat31 ray_direction, l3Mat31 sph
  * sphere_local: 球のローカル座標空間での点の位置
  * (result) r: テクスチャ内でのr座標（0-1）
  */
-void l3GetRaySphere2DTextureCoordinate(l3Mat31 sphere_local, l3Mat21 r) {
+void l3GetRaySphere2DTextureCoordinate(l3Mat41 sphere_local, l3Mat21 r) {
     l3Type theta = acos(sphere_local[0] / sqrt(pow2(sphere_local[0]) + pow2(sphere_local[2])));
     l3Type phi = acos(sphere_local[1] / sqrt(pow2(sphere_local[0]) + pow2(sphere_local[1])));
     if (sphere_local[2] < 0) {
@@ -120,6 +121,18 @@ void l3GetRaySphere2DTextureCoordinate(l3Mat31 sphere_local, l3Mat21 r) {
  * sphere_local: 球のローカル座標空間での点の位置
  * (result) normal: 法線ベクトル
  */
-void l3GetSphereNormal(l3Mat31 sphere_local, l3Mat31 r) {
+void l3GetSphereNormal(l3Mat41 sphere_local, l3Mat41 r) {
     l3NormarizeVec(sphere_local, r, 3);
+}
+
+/**
+ * 反射ベクトル
+ * incident_vec: 入射ベクトル
+ * normal: 法線ベクトル
+ * (result) r: 反射ベクトル
+ */
+void l3GetReflectedVec(l3Mat41 incident_vec, l3Mat41 normal, l3Mat41 r) {
+    l3Mat41A tmp;
+    l3ScalarMulMat(normal, -2 * l3InnerProductVec(normal, incident_vec, 3), tmp, 3);
+    l3SubMat(incident_vec, tmp, r, 3);
 }

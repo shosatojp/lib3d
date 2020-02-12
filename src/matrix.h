@@ -39,7 +39,8 @@ void l3MulMat(l3Mat a, l3Mat b, l3Mat r, int s, int t, int u);
  * must initialize r : false
  */
 void l3SubMat(l3Mat a, l3Mat b, l3Mat r, int n);
-
+void l3AddMat(l3Mat a, l3Mat b, l3Mat r, int n);
+void l3ScalarMulMat(l3Mat a, l3Type s, l3Mat r, int n);
 /**
  * a = r
  * must initialize r : false
