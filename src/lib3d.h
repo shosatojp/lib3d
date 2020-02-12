@@ -4,6 +4,7 @@
 #include "io.h"
 #include "matrix.h"
 #include "raster.h"
+#include "raytrace.h"
+#include "render.h"
 #include "util.h"
 #include "vertex.h"
-#include "render.h"

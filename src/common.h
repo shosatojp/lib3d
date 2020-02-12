@@ -50,6 +50,10 @@ typedef struct _l3Vertex {
      */
     l3Mat41A coordinate;
     /**
+     * ワールド座標空間の座標
+     */
+    l3Mat41A coordinateWorld;
+    /**
      * スクリーン座標空間の座標
      */
     l3Mat41A coordinate2d;

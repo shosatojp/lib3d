@@ -102,3 +102,16 @@ void l3RenderEnvironment(l3Environment* env) {
     l3DestructEnvironment(env);
     safe_free(env);
 }
+
+void l3RaytracingRenderer(l3Environment* env) {
+    // バッファーを作る
+
+    // 各フレームについて
+    // solve ptrs
+    // transitionFn
+    // ワールド座標へ変換
+    // 各ピクセルについてレイを飛ばし、色をバッファーに設定
+    // 出力
+    
+    // 初期化
+}
