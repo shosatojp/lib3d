@@ -5,9 +5,12 @@ void transition(l3Environment* env, int frame) {
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y = frame * 5 * 3.14 / 180.0;
     obj->theta_x = frame * 5 * 3.14 / 180.0;
-    // obj->dx = frame * 2;
     l3Object* obj1 = array_at(&env->objects, 1);
     obj1->theta_y = frame * 5 * 3.14 / 180.0;
+
+    l3Object* obj2 = array_at(&env->objects, 2);
+    obj2->theta_z = frame * 5 * 3.14 / 180.0;
+    obj2->dx = frame;
 }
 
 int main() {
@@ -40,10 +43,6 @@ int main() {
 
         poligons[0]->material = l3PoligonMaterialColor;
         poligons[0]->color.r = 255;
-        poligons[0]->transparency = 0.5;
-        poligons[1]->transparency = 0.5;
-        poligons[2]->transparency = 0.5;
-        poligons[3]->transparency = 0.5;
 
         // テクスチャ読み込み・貼り付け
         l3Texture texture;
@@ -55,12 +54,21 @@ int main() {
 
 
         l3Object* o2 = l3CloneObject(_object);
-        l3SetTransposeObject(o2, 15, 20, 30);
+        l3Object* o3 = l3CloneObject(_object);
+        _object->poligons[0]->transparency = 0.5;
+        _object->poligons[1]->transparency = 0.5;
+        _object->poligons[2]->transparency = 0.5;
+        _object->poligons[3]->transparency = 0.5;
+        l3SetTransposeObject(o2, 15, 30, 50);
         o2->poligons[0]->material = l3PoligonMaterialVertex;
         o2->poligons[1]->material = l3PoligonMaterialVertex;
         l3SetTexturePoligon(o2->poligons[1],
                             &texture, texture_vertices);
         l3AddObjectToEnvironment(&env, o2);
+
+        l3SetTransposeObject(o3, 40, 20, 30);
+        l3AddObjectToEnvironment(&env, o3);
+
 
         l3SetCameraInfoToEnvironment(&env, 14, 0, -10,
                                      20, 20, 20,
@@ -68,7 +76,7 @@ int main() {
                                      120, 10, 100);
     }
 
-    l3MultithreadRenderer(&env, transition, 100, 5);
+    l3MultithreadRenderer(&env, transition, 1000, 16);
 
     l3DestructEnvironment(&env);
 }

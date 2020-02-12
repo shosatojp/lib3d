@@ -1,5 +1,8 @@
 #include "lib3d.h"
 
+static int frame_count = 0;
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+
 void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transitionFn, int frames, int thread_count) {
     printf("starting multithreaded rendering...\n");
     printf("thread count : %d\n", thread_count);
@@ -11,7 +14,8 @@ void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transi
     int frame_per_thread = frames / thread_count;
     int amari = frames % thread_count;
     int current_frame = 0;
-    pthread_t** threads = (pthread_t**)malloc(sizeof(pthread_t*) * thread_count);
+    pthread_t* threads = (pthread_t*)malloc(sizeof(pthread_t) * thread_count);
+    // int* threads_status = (int*)malloc(sizeof(int) * thread_count);
 
     for (int i = 0; i < thread_count; i++) {
         pthread_t thread;
@@ -21,16 +25,20 @@ void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transi
         printf("thread %d: %d - %d\n", i, _env->frame_begin, _env->frame_end);
         _env->transitionFn = transitionFn;
         pthread_create(&thread, NULL, (void* (*)(void*))l3RenderEnvironment, _env);
-        threads[i] = &thread;
+        threads[i] = thread;
     }
     // 片付け
     for (int i = 0; i < thread_count; i++) {
-        pthread_join(*threads[i], NULL);
+        pthread_join(threads[i], NULL);
     }
-    free(threads);
+
+    // for (int i = 0; i < thread_count; i++) {
+    //     printf("thread %d (%ld) : %d\n", i, threads[i], threads_status[i]);
+    // }
 
     time(&f);
-    printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frames, f - s, (double)(f - s) / frames);
+    free(threads);
+    printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frame_count, f - s, (double)(f - s) / frames);
 }
 
 void l3RenderEnvironment(l3Environment* env) {
@@ -41,7 +49,11 @@ void l3RenderEnvironment(l3Environment* env) {
     env->map = map;
     for (int f = env->frame_begin; f < env->frame_end; f++) {
         printf("rendering frame %d\n", f);
-        fflush(stdout);
+
+        // ロックしないでも行けそう（遅くなる）
+        frame_count++;
+
+        // fflush(stdout);
         l3ClearRasterMap(map, env->w, env->h);
         l3ClearBuffer(buf, env->w, env->h, 255);
 
