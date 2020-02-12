@@ -39,8 +39,8 @@ typedef enum _l3PoligonMaterial {
 } l3PoligonMaterial;
 
 typedef enum _l3PoligonType {
-    l3PoligonTriangle = 0,
-    l3PoligonShpere,
+    l3PoligonTypeTriangle = 0,
+    l3PoligonTypeShpere,
 } l3PoligonType;
 
 typedef struct _l3RGB {

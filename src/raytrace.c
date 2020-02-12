@@ -136,3 +136,10 @@ void l3GetReflectedVec(l3Mat41 incident_vec, l3Mat41 normal, l3Mat41 r) {
     l3ScalarMulMat(normal, -2 * l3InnerProductVec(normal, incident_vec, 3), tmp, 3);
     l3SubMat(incident_vec, tmp, r, 3);
 }
+
+// rgbもmat31で表すのがいいかも
+void l3MultiplyColor(l3RGB* a, l3RGB* b, l3RGB* r) {
+    r->r = a->r * b->r / 255;
+    r->g = a->g * b->g / 255;
+    r->b = a->b * b->b / 255;
+}
