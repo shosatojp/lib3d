@@ -1,6 +1,6 @@
 TARGET := lib3d
 CC := gcc
-CCOPT := -g -lm -O0 -std=c11 -pthread -mtune=native -march=native -mfpmath=both
+CCOPT := -g -lm -O3 -std=c11 -pthread -mtune=native -march=native -mfpmath=both
 SRCDIR := src
 
 SRC := $(shell find $(SRCDIR) -name "*.c")

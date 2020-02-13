@@ -3,7 +3,7 @@
 
 #define l3RAY_TRACE_MAX_DEPTH 4
 
-void l3GetRayStartPointAndDirection(l3Mat33 p_world_to_camera, l3Mat31 camera_pos, l3Type angle,
+void l3GetRayStartPointAndDirection(l3Mat33 p_world_to_camera, l3Mat31 camera_pos, l3Type near,
                                     l3Type w, l3Type h,
                                     l3Type u, l3Type v, l3Mat31 start_point, l3Mat31 direction);
 

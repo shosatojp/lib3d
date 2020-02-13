@@ -61,7 +61,7 @@ int main() {
         l3SetCameraInfoToEnvironment(&env, 14, 0, -10,
                                      20, 20, 20,
                                      0, 1, 0,
-                                     radians(50), 10, 100);
+                                     radians(50), 2, 100);
     }
 
     l3MultithreadRenderer(&env, l3RaytracingRenderer, transition, 100, 16);

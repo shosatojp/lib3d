@@ -10,26 +10,33 @@
  * return: 交点がある場合true
  */
 bool l3IntersectRayPoligon(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Poligon* poligon, l3Mat41 r, l3Mat21 uv) {
-    l3Mat41A e1 = {0};
-    l3Mat41A e2 = {0};
     l3Mat41A a_v0 = {0};
-    l3SubMat(poligon->vertices[1]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e1, 3);
-    l3SubMat(poligon->vertices[2]->coordinateWorld, poligon->vertices[0]->coordinateWorld, e2, 3);
     l3SubMat(ray_origin, poligon->vertices[0]->coordinateWorld, a_v0, 3);
 
-    l3Type tmp[12] = {0};
-    tmp[0] = -ray_direction[0];
-    tmp[1] = -ray_direction[1];
-    tmp[2] = -ray_direction[2];
-    memcpy(&tmp[3], e1, sizeof(l3Type) * 3);
-    memcpy(&tmp[6], e2, sizeof(l3Type) * 3);
-    memcpy(&tmp[9], a_v0, sizeof(l3Type) * 3);
+    // クラメールの公式利用
+    l3Mat31A cross_prod_r_d;
+    l3CrossProductVec3(a_v0, ray_direction, cross_prod_r_d);
+    l3Type e = -l3InnerProductVec(ray_direction, poligon->cross_prod_e1_e2, 3);
+    l3Type t = l3InnerProductVec(a_v0, poligon->cross_prod_e1_e2, 3) / e;
+    l3Type u = l3InnerProductVec(poligon->e2, cross_prod_r_d, 3) / e;
+    l3Mat31A minus_cross_prod_r_d;
+    l3ScalarMulMat(cross_prod_r_d, -1, minus_cross_prod_r_d, 3);
+    l3Type v = l3InnerProductVec(poligon->e1, minus_cross_prod_r_d, 3) / e;
 
-    l3SimplificateMat(tmp, 3, 4);
+    // 簡約化で解く
+    // l3Type tmp[12] = {0};
+    // tmp[0] = -ray_direction[0];
+    // tmp[1] = -ray_direction[1];
+    // tmp[2] = -ray_direction[2];
+    // memcpy(&tmp[3], poligon->e1, sizeof(l3Type) * 3);
+    // memcpy(&tmp[6], poligon->e2, sizeof(l3Type) * 3);
+    // memcpy(&tmp[9], a_v0, sizeof(l3Type) * 3);
 
-    l3Type t = tmp[9];
-    l3Type u = tmp[10];
-    l3Type v = tmp[11];
+    // l3SimplificateMat(tmp, 3, 4);
+
+    // l3Type t = tmp[9];
+    // l3Type u = tmp[10];
+    // l3Type v = tmp[11];
 
     if (0 <= t && 0 <= u && u <= 1 && 0 <= v && v <= 1 && u + v <= 1) {
         r[0] = ray_origin[0] + t * ray_direction[0];
@@ -172,12 +179,12 @@ void l3MakeWorldToCameraBasisChangeMat33(l3CameraInfo* camerainfo, l3Mat33 r) {
  * Rayの始点
  * Ray始点での方向ベクトル
  */
-void l3GetRayStartPointAndDirection(l3Mat33 p_world_to_camera, l3Mat31 camera_pos, l3Type angle,
+void l3GetRayStartPointAndDirection(l3Mat33 p_world_to_camera, l3Mat31 camera_pos, l3Type near,
                                     l3Type w, l3Type h,
                                     l3Type u, l3Type v, l3Mat31 start_point, l3Mat31 direction) {
-    l3Mat31A ray_pos_c = {(2 * u - w) / (l3Type)h,
-                          1 - 2 * v / (l3Type)h,
-                          1 / tan(angle / (l3Type)2)};
+    l3Mat31A ray_pos_c = {(2 * u - w) / h,
+                          1 - 2 * v / h,
+                          near};
     l3Mat31A ray_pos_w = {0};
     l3MulMat(p_world_to_camera, ray_pos_c, ray_pos_w, 3, 3, 1);
     l3NormarizeVec(ray_pos_w, direction, 3);
@@ -281,13 +288,18 @@ void l3SetWorldCoordinate(l3Environment* env) {
 
             for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
                 l3Vertex* _vertex = _poligon->vertices[j];
-                // if (!_vertex->converted) {
-                // ローカル->ワールド
-                l3InitMat(_vertex->coordinateWorld, 4, 1);
-                l3MulMat4441(lw, _vertex->coordinate, _vertex->coordinateWorld);
-                // _vertex->converted = true;
-                // }
+                if (!_vertex->converted) {
+                    // ローカル->ワールド
+                    l3InitMat(_vertex->coordinateWorld, 4, 1);
+                    l3MulMat4441(lw, _vertex->coordinate, _vertex->coordinateWorld);
+                    _vertex->converted = true;
+                }
             }
+
+            // 前処理
+            l3SubMat(_poligon->vertices[1]->coordinateWorld, _poligon->vertices[0]->coordinateWorld, _poligon->e1, 3);
+            l3SubMat(_poligon->vertices[2]->coordinateWorld, _poligon->vertices[0]->coordinateWorld, _poligon->e2, 3);
+            l3CrossProductVec3(_poligon->e1, _poligon->e2, _poligon->cross_prod_e1_e2);
         }
     }
 }

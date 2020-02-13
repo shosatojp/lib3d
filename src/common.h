@@ -2,7 +2,7 @@
 
 #define PI 3.14159265359
 #define pow2(a) ((a) * (a))
-#define radians(degree) ((degree)*PI/180)
+#define radians(degree) ((degree)*PI / 180)
 
 #include <math.h>
 #include <pthread.h>
@@ -84,6 +84,10 @@ typedef struct _l3Poligon {
      */
     l3Vertex* vertices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
     int vertex_indices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
+    l3Mat31A e1;
+    l3Mat31A e2;
+    l3Mat31A cross_prod_e1_e2;
+
     union {
         /**
          * ソート用
@@ -170,7 +174,7 @@ typedef void l3Renderer(l3Environment* env);
 struct _l3Environment {
     int w, h;
     // オブジェクトのポインタの配列
-    array objects;   // 中身はheap
+    array objects;  // 中身はheap
 
     // Textureは状態を保持しないのでそのままでおｋ
     // カメラ情報

@@ -61,7 +61,7 @@ void l3RaytracingRenderer(l3Environment* env) {
             for (size_t i = 0; i < env->w; i++) {
                 l3Ray ray = {0};
                 l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,
-                                               env->camera.angle, env->w, env->h, i, j,
+                                               env->camera.near, env->w, env->h, i, j,
                                                ray.rayStartPoint, ray.rayDirection);
                 l3TraceRay(&ray, env, 0);
 
