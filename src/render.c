@@ -3,7 +3,7 @@
 static int frame_count = 0;
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 
-void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transitionFn, int frames, int thread_count) {
+void l3MultithreadRenderer(l3Environment* env, l3Renderer* renderer,l3FrameTransitionFunction* transitionFn,  int frames, int thread_count) {
     printf("starting multithreaded rendering...\n");
     printf("thread count : %d\n", thread_count);
     printf("frame count  : %d\n", frames);
@@ -22,7 +22,7 @@ void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transi
         _env->frame_end = frame_per_thread * (i + 1) + min(amari, i + 1);
         printf("thread %d: %d - %d\n", i, _env->frame_begin, _env->frame_end);
         _env->transitionFn = transitionFn;
-        pthread_create(&threads[i], NULL, (void* (*)(void*))l3RenderEnvironment, _env);
+        pthread_create(&threads[i], NULL, (void* (*)(void*))renderer, _env);
     }
     // 片付け
     for (int i = 0; i < thread_count; i++) {
@@ -34,7 +34,55 @@ void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transi
     printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frame_count, f - s, (double)(f - s) / frames);
 }
 
-void l3RenderEnvironment(l3Environment* env) {
+void l3RaytracingRenderer(l3Environment* env) {
+    // バッファーを作る
+    unsigned char* buf = l3CreateBuffer(env->w, env->h);
+
+    // 各フレームについて
+    // solve ptrs
+    l3SolvePtrsEnvironment(env);
+
+    //for begin
+    for (int f = env->frame_begin; f < env->frame_end; f++) {
+        printf("rendering frame %d\n", f);
+        frame_count++;
+        l3ClearBuffer(buf, env->w, env->h, 255);
+        /* 動かす */
+        env->transitionFn(env, f);
+        // ワールド座標を設定
+        l3SetWorldCoordinate(env);
+        // transitionFn
+        // 出力
+        // 初期化
+        l3Mat33A p_wtoc = {0};
+        l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
+
+        for (size_t j = 0; j < env->h; j++) {
+            for (size_t i = 0; i < env->w; i++) {
+                l3Ray ray = {0};
+                l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,
+                                               env->camera.angle, env->w, env->h, i, j,
+                                               ray.rayStartPoint, ray.rayDirection);
+                l3TraceRay(&ray, env, 0);
+
+                // バッファ(i,j)に色を設定
+                l3SET_BUFFER_RGB(buf, env->w, env->h, i, j, ray.color);
+            }
+        }
+
+        // PPMに出力
+        char name[100] = {0};
+        sprintf(name, "%s/%06d.ppm", env->outdir, f);
+        l3WriteBuffer(buf, env->w, env->h, name);
+
+        l3ClearEnvironment(env);
+    }
+    safe_free(buf);
+    l3DestructEnvironment(env);
+    safe_free(env);
+}
+
+void l3RasterizingRenderer(l3Environment* env) {
     // ラスタマップとバッファーを作る
     l3PixelInfo* map = l3CreateRasterMap(env->w, env->h);
     unsigned char* buf = l3CreateBuffer(env->w, env->h);
@@ -55,9 +103,6 @@ void l3RenderEnvironment(l3Environment* env) {
 
         /* 動かす */
         env->transitionFn(env, f);
-
-        /* 座標変換のあと、ここにポリゴンを集めて・・・ */
-        // array* poligons_all = array_new(sizeof(l3Poligon*), true, 10);
 
         // 変換行列作成
         l3Type wc[16] = {0}, cp[16] = {0}, ps[16] = {0}, wcps[16] = {0};
@@ -92,17 +137,4 @@ void l3RenderEnvironment(l3Environment* env) {
     safe_free(map);
     l3DestructEnvironment(env);
     safe_free(env);
-}
-
-void l3RaytracingRenderer(l3Environment* env) {
-    // バッファーを作る
-
-    // 各フレームについて
-    // solve ptrs
-    // transitionFn
-    // ワールド座標へ変換
-    // 各ピクセルについてレイを飛ばし、色をバッファーに設定
-    // 出力
-
-    // 初期化
 }

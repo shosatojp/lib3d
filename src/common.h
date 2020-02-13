@@ -2,6 +2,7 @@
 
 #define PI 3.14159265359
 #define pow2(a) ((a) * (a))
+#define radians(degree) ((degree)*PI/180)
 
 #include <math.h>
 #include <pthread.h>
@@ -163,6 +164,7 @@ typedef struct _l3CameraInfo {
 struct _l3Environment;
 typedef struct _l3Environment l3Environment;
 typedef void l3FrameTransitionFunction(l3Environment* env, int frame);
+typedef void l3Renderer(l3Environment* env);
 
 // マルチスレッド時にこれを持ってく
 struct _l3Environment {
@@ -193,4 +195,5 @@ typedef struct _l3Ray {
     l3Mat21A uv;
     l3Poligon* poligon;
     // 色情報（再帰的に決まる）
+    l3RGB color;
 } l3Ray;
