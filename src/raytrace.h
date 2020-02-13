@@ -1,6 +1,8 @@
 #include "common.h"
 #include "lib3d.h"
 
+#define l3RAY_TRACE_MAX_DEPTH 4
+
 bool l3IntersectRayPoligon(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Poligon* poligon, l3Mat41 r, l3Mat21 uv);
 void l3GetPoligonNormal(l3Poligon* poligon, l3Mat41 normal);
 void l3GetRayPoligon2DTextureCoordinate(l3Poligon* poligon, l3Mat21 uv, l3Mat21 r);

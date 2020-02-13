@@ -143,3 +143,124 @@ void l3MultiplyColor(l3RGB* a, l3RGB* b, l3RGB* r) {
     r->g = a->g * b->g / 255;
     r->b = a->b * b->b / 255;
 }
+
+/**
+ * ワールド座標空間からカメラ座標空間への基底変換行列
+ */
+void l3MakeWorldToCameraBasisChangeMat44(l3CameraInfo* camerainfo, l3Mat33 r) {
+    l3Mat41A tmp = {0};
+    l3Mat41A cx = {0};
+    l3Mat41A cy = {0};
+    l3Mat41A cz = {0};
+
+    // cz
+    l3SubMat(camerainfo->target, camerainfo->coordinate, tmp, 3);
+    l3NormarizeVec(tmp, cz, 3);
+    // cx
+    l3CrossProductVec3(cz, camerainfo->upper, tmp);
+    l3NormarizeVec(tmp, cx, 3);
+    // cy
+    l3CrossProductVec3(cx, cz, tmp);
+    l3NormarizeVec(tmp, cy, 3);
+
+    memcpy(&r[0], cx, sizeof(l3Type) * 3);
+    memcpy(&r[3], cy, sizeof(l3Type) * 3);
+    memcpy(&r[6], cz, sizeof(l3Type) * 3);
+}
+
+/**
+ * Rayの始点
+ */
+void l3GetRayStartPoint(l3Mat33 p_world_to_camera, l3Type angle, l3Type w, l3Type h, l3Type u, l3Type v, l3Mat31 r) {
+    l3Mat31A ray_dir = {(2 * u - w) / h,
+                        1 - 2 * v / h,
+                        1 / tan(angle / 2)};
+    l3MulMat(p_world_to_camera, ray_dir, r, 3, 3, 1);
+}
+
+/**
+ * Ray始点での方向ベクトル
+ */
+void l3GetRayDirection(l3Mat31 ray_start_point, l3Mat31 camera_pos, l3Mat31 r) {
+    l3Mat31A tmp;
+    l3SubMat(ray_start_point, camera_pos, tmp, 3);
+    l3NormarizeVec(tmp, tmp, 3);
+}
+
+/**
+ * Rayの着地点を見つける
+ */
+bool l3FindRayCrossPoint(l3Ray* ray, int poligon_count, l3Poligon* poligons[]) {
+    l3Mat41A min_intersection = {0};
+    l3Mat21A min_uv = {0};
+    l3Poligon* min_poligon = NULL;
+    bool found = false;
+
+    for (size_t i = 0; i < poligon_count; i++) {
+        l3Poligon* p = poligons[i];
+        switch (p->poligonType) {
+            case l3PoligonTypeTriangle: {
+                l3Mat41A intersection;
+                l3Mat21A uv;
+                l3IntersectRayPoligon(ray->rayStartPoint, ray->rayDirection, p, intersection, uv);
+                l3Type distance = l3DistanceVec(ray->rayStartPoint, intersection);
+                if (!found || min_length > distance) {
+                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                    memcpy(min_uv, uv, sizeof(l3Type) * 2);
+                    min_length = distance;
+                    min_poligon = p;
+                    found = true;
+                }
+            } break;
+            case l3PoligonTypeShpere: {
+                l3Mat41A intersection;
+                l3IntersectRaySphere(ray->rayStartPoint, ray->rayDirection,
+                                     p->vertices[0]->coordinateWorld,
+                                     p->sphere_radius, intersection);
+                l3Type distance = l3DistanceVec(ray->rayStartPoint, intersection);
+                if (!found || min_length > distance) {
+                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                    min_length = distance;
+                    min_poligon = p;
+                    found = true;
+                }
+            } break;
+            default:
+                break;
+        }
+    }
+
+    memcpy(ray->uv, min_intersection, sizeof(l3Type) * 4);
+    memcpy(ray->intersection, min_uv, sizeof(l3Type) * 2);
+    ray->poligon = min_poligon;
+    return found;
+}
+
+// void l3TraceRay()
+
+void l3RayIrradiationer(l3Environment* env) {
+    l3Mat33A p_wtoc = {0};
+    l3MakeWorldToCameraBasisChangeMat44(env->camera, p_wtoc);
+
+    // ポリゴンの配列を作る
+    array* poligons = array_new(sizeof(l3Poligon*), true, 100);
+
+    for (size_t j = 0; j < env->h; j++) {
+        for (size_t i = 0; i < env->w; i++) {
+            l3Ray ray;
+            memset(&ray, 0, sizeof(l3Ray));
+            l3GetRayStartPoint(p_wtoc, env->camera.angle, env->w, env->h, i, j, ray.ray_start_point);
+            l3GetRayDirection(ray.ray_start_point, env->camera.coordinate, ray.ray_direction);
+
+            // Rayの交差点を見つける
+            l3FindRayCrossPoint(&ray, poligons->length, poligons->data);
+            
+            // 再帰的にRayをたどる
+
+            // バッファ(i,j)に出力
+        }
+    }
+
+    array_clear(poligons);
+    free(poligons);
+}

@@ -182,3 +182,14 @@ struct _l3Environment {
     const char* outdir;
     l3FrameTransitionFunction* transitionFn;
 };
+
+typedef struct _l3Ray {
+    // 着地前の情報
+    l3Mat31A rayStartPoint;
+    l3Mat31A rayDirection;
+    // 着地地点の情報
+    l3Mat31A intersection;
+    l3Mat21A uv;
+    l3Poligon* poligon;
+    // 色情報（再帰的に決まる）
+} l3Ray;

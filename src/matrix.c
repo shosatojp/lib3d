@@ -79,6 +79,12 @@ void l3ScalarMulMat(l3Mat a, l3Type s, l3Mat r, int n) {
     }
 }
 
+l3Type l3DistanceVec(l3Mat31 a, l3Mat31 b) {
+    l3Mat31A tmp;
+    l3SubMat(b, a, tmp, 3);
+    return l3VecAbs(tmp, 3);
+}
+
 /**
  * a = r
  * must initialize r : false

@@ -41,6 +41,7 @@ void l3MulMat(l3Mat a, l3Mat b, l3Mat r, int s, int t, int u);
 void l3SubMat(l3Mat a, l3Mat b, l3Mat r, int n);
 void l3AddMat(l3Mat a, l3Mat b, l3Mat r, int n);
 void l3ScalarMulMat(l3Mat a, l3Type s, l3Mat r, int n);
+l3Type l3DistanceVec(l3Mat31 a, l3Mat31 b);
 /**
  * a = r
  * must initialize r : false
