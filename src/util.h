@@ -56,3 +56,5 @@ l3Object* l3CreateObject();
 void l3InitializeEnvironment(l3Environment* env);
 l3Environment* l3CloneEnvironment(l3Environment* env);
 l3Object* l3CloneObject(l3Object* o);
+
+// void l3InitializeRay(l3Ray* ray);

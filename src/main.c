@@ -72,33 +72,33 @@ int main() {
                                      20, 20, 20,
                                      0, 1, 0,
                                      120, 10, 100);
-        {
-            // RayTracingDebug
-            l3SolvePtrsEnvironment(&env);
-            l3Mat44A lw = {0};
-            l3MakeLocalToWorldMat44(15, 15, 15, 1, 1, 1, 0, 0, 0, lw);
-            for (int i = 0; i < l3POLIGON_VERTEX_COUNT; i++) {
-                l3MulMat4441(lw, poligons[0]->vertices[i]->coordinate,
-                             poligons[0]->vertices[i]->coordinateWorld);
-            }
-            l3Mat41A r = {0};
-            l3Mat21A uv = {0};
-            l3Mat41A ray_origin = {0, 0, 0};
-            l3Mat41A sphere_center = {20, 20, 20};
-            l3Mat41A ray_direction = {20, 15, 20};
-            l3NormarizeVec(ray_direction, ray_direction, 3);
-            // l3Mat41A ray_direction = {20, 15, 20};
-            bool result = l3IntersectRayPoligon(ray_origin, ray_direction, poligons[0], r, uv);
-            bool result2 = l3IntersectRaySphere(ray_origin, ray_direction, sphere_center, 5, r);
-            printf("%d %d\n", result, result2);
-            l3Mat41A norm = {0};
-            l3GetPoligonNormal(poligons[0], norm);
-            l3PrintMat(norm, 3, 1);
-            exit(0);
-        }
+        // {
+        //     // RayTracingDebug
+        //     l3SolvePtrsEnvironment(&env);
+        //     l3Mat44A lw = {0};
+        //     l3MakeLocalToWorldMat44(15, 15, 15, 1, 1, 1, 0, 0, 0, lw);
+        //     for (int i = 0; i < l3POLIGON_VERTEX_COUNT; i++) {
+        //         l3MulMat4441(lw, poligons[0]->vertices[i]->coordinate,
+        //                      poligons[0]->vertices[i]->coordinateWorld);
+        //     }
+        //     l3Mat41A r = {0};
+        //     l3Mat21A uv = {0};
+        //     l3Mat41A ray_origin = {0, 0, 0};
+        //     l3Mat41A sphere_center = {20, 20, 20};
+        //     l3Mat41A ray_direction = {20, 15, 20};
+        //     l3NormarizeVec(ray_direction, ray_direction, 3);
+        //     // l3Mat41A ray_direction = {20, 15, 20};
+        //     bool result = l3IntersectRayPoligon(ray_origin, ray_direction, poligons[0], r, uv);
+        //     bool result2 = l3IntersectRaySphere(ray_origin, ray_direction, sphere_center, 5, r);
+        //     printf("%d %d\n", result, result2);
+        //     l3Mat41A norm = {0};
+        //     l3GetPoligonNormal(poligons[0], norm);
+        //     l3PrintMat(norm, 3, 1);
+        //     exit(0);
+        // }
     }
 
-    l3MultithreadRenderer(&env, transition, 3000, 16);
+    l3MultithreadRenderer(&env, transition, 30, 8);
 
     l3DestructEnvironment(&env);
 }

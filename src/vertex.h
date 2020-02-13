@@ -13,7 +13,6 @@ void l3MakeScaleMat44(l3Type sx, l3Type sy, l3Type sz, l3Mat44 r);
 void l3MakeLocalToWorldMat44(l3Type dx, l3Type dy, l3Type dz,
                              l3Type sx, l3Type sy, l3Type sz,
                              l3Type theta_x, l3Type theta_y, l3Type theta_z, l3Mat44 r);
-void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, int h, array* all_poligons);
+void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, int h);
 l3Type l3GetBoundingRadius(l3Object* _object);
-// bool l3FrustumCulling(l3Object* _object, l3Mat41 center, l3Type scale, int w, int h);
 bool l3FrustumCulling(l3Object* _object, l3Mat44 lwcps, int w, int h);

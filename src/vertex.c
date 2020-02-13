@@ -125,7 +125,7 @@ void l3MakeProjectionToScreenMat44(l3Type width, l3Type height, l3Mat44 r) {
     r[15] = 1;
 }
 
-void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, int h, array* all_poligons) {
+void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, int h) {
     for (int i = 0; i < env->objects.length; ++i) {
         l3Object* _object = array_at(&env->objects, i);
         l3Type lw[16] = {0};
@@ -159,7 +159,6 @@ void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, in
             // ポリゴンに対する諸設定はここで済ます
             l3SetMaxZofPoligon(_poligon);
             l3SetOuterRectPoligon(_poligon);
-            array_push(all_poligons, _poligon);
         }
     }
 }

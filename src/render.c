@@ -15,26 +15,19 @@ void l3MultithreadRenderer(l3Environment* env, l3FrameTransitionFunction* transi
     int amari = frames % thread_count;
     int current_frame = 0;
     pthread_t* threads = (pthread_t*)malloc(sizeof(pthread_t) * thread_count);
-    // int* threads_status = (int*)malloc(sizeof(int) * thread_count);
 
     for (int i = 0; i < thread_count; i++) {
-        pthread_t thread;
         l3Environment* _env = l3CloneEnvironment(env);
         _env->frame_begin = frame_per_thread * i + min(amari, i);
         _env->frame_end = frame_per_thread * (i + 1) + min(amari, i + 1);
         printf("thread %d: %d - %d\n", i, _env->frame_begin, _env->frame_end);
         _env->transitionFn = transitionFn;
-        pthread_create(&thread, NULL, (void* (*)(void*))l3RenderEnvironment, _env);
-        threads[i] = thread;
+        pthread_create(&threads[i], NULL, (void* (*)(void*))l3RenderEnvironment, _env);
     }
     // 片付け
     for (int i = 0; i < thread_count; i++) {
-        pthread_join(threads[i], NULL);
+        int result = pthread_join(threads[i], NULL);
     }
-
-    // for (int i = 0; i < thread_count; i++) {
-    //     printf("thread %d (%ld) : %d\n", i, threads[i], threads_status[i]);
-    // }
 
     time(&f);
     free(threads);
@@ -45,6 +38,9 @@ void l3RenderEnvironment(l3Environment* env) {
     // ラスタマップとバッファーを作る
     l3PixelInfo* map = l3CreateRasterMap(env->w, env->h);
     unsigned char* buf = l3CreateBuffer(env->w, env->h);
+
+    /* 頂点のインデックスを実ポインタに変換 */
+    l3SolvePtrsEnvironment(env);
 
     env->map = map;
     for (int f = env->frame_begin; f < env->frame_end; f++) {
@@ -57,14 +53,11 @@ void l3RenderEnvironment(l3Environment* env) {
         l3ClearRasterMap(map, env->w, env->h);
         l3ClearBuffer(buf, env->w, env->h, 255);
 
-        /* 頂点のインデックスを実ポインタに変換 */
-        l3SolvePtrsEnvironment(env);
-
         /* 動かす */
         env->transitionFn(env, f);
 
         /* 座標変換のあと、ここにポリゴンを集めて・・・ */
-        array* poligons_all = array_new(sizeof(l3Poligon*), true, 10);
+        // array* poligons_all = array_new(sizeof(l3Poligon*), true, 10);
 
         // 変換行列作成
         l3Type wc[16] = {0}, cp[16] = {0}, ps[16] = {0}, wcps[16] = {0};
@@ -78,15 +71,13 @@ void l3RenderEnvironment(l3Environment* env) {
         l3MulMat44s44(3, mats, wcps);
 
         /* Environmentに入ってるオブジェクトをすべて描画 */
-        l3AppendPoligonsFromEnvironment(env, wcps, env->w, env->h, poligons_all);
+        l3AppendPoligonsFromEnvironment(env, wcps, env->w, env->h);
 
         /* Z座標でソートして・・・ */
-        l3SortPoligonsByMaxZ(poligons_all->length, (l3Poligon**)poligons_all->data);
+        l3SortPoligonsByMaxZ(env->poligons.length, (l3Poligon**)env->poligons.data);
 
         /* まとめて描画 */
-        array_each_i(poligons_all, l3WriteRasterMap(env, env->w, env->h, array_ei));
-        array_clear(poligons_all);
-        safe_free(poligons_all);
+        array_each_i(&env->poligons, l3WriteRasterMap(env, env->w, env->h, array_ei));
 
         // 出力
         l3ConvertRasterMapToBuffer(map, buf, env->w, env->h);
@@ -112,6 +103,6 @@ void l3RaytracingRenderer(l3Environment* env) {
     // ワールド座標へ変換
     // 各ピクセルについてレイを飛ばし、色をバッファーに設定
     // 出力
-    
+
     // 初期化
 }

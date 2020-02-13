@@ -84,7 +84,7 @@ void l3DestructPoligon(l3Poligon* p) {
 
 void l3ClearPoligon(l3Poligon* p) {
     // 実ポインタを初期化
-    memset(p->vertices, 0, l3POLIGON_VERTEX_COUNT * sizeof(l3Vertex*));
+    // memset(p->vertices, 0, l3POLIGON_VERTEX_COUNT * sizeof(l3Vertex*));
 }
 /**
  * ===========================================
@@ -218,6 +218,8 @@ void l3SolvePtrsEnvironment(l3Environment* env) {
             for (int k = 0; k < l3POLIGON_VERTEX_COUNT; k++) {
                 poligon->vertices[k] = l3GetVertexPtrObject(object, poligon->vertex_indices[k]);
             }
+            // ここでポリゴンの一覧を作る
+            array_push(&env->poligons, poligon);  //free(): invalid pointer
         }
     }
 }
@@ -231,6 +233,8 @@ void l3InitializeEnvironment(l3Environment* env) {
     memset(env, 0, sizeof(l3Environment));
     array_init(&env->objects, sizeof(l3Object*), true);
     array_expand(&env->objects, 10);
+    array_init(&env->poligons, sizeof(l3Poligon*), true);
+    array_expand(&env->poligons, 10);
 }
 
 void l3ClearEnvironment(l3Environment* env) {
@@ -249,13 +253,14 @@ void l3DestructEnvironment(l3Environment* env) {
         }
     });
     array_clear(&env->objects);
+    array_clear(&env->poligons);
 }
 
 void array_clone(array* dst, array* src) {
 }
 
 l3Environment* l3CloneEnvironment(l3Environment* env) {
-    l3Environment* _env = (l3Environment*)calloc(sizeof(l3Environment),1);
+    l3Environment* _env = (l3Environment*)calloc(sizeof(l3Environment), 1);
     memcpy(_env, env, sizeof(l3Environment));
 
     _env->objects.data = malloc(sizeof(l3Object*) * _env->objects.capacity);
@@ -263,5 +268,15 @@ l3Environment* l3CloneEnvironment(l3Environment* env) {
         array_set(&_env->objects, l3CloneObject(array_at(&env->objects, i)), i);
     }
 
+    // これをしないと他のスレッドのメモリを開放しようとしてしまう
+    _env->poligons.data = calloc(sizeof(l3Poligon*), _env->poligons.capacity);
+
     return _env;
 }
+
+// =============================================
+// l3Ray
+// =============================================
+// void l3InitializeRay(l3Ray* ray) {
+//     memset(ray, 0, sizeof(l3Ray));
+// }

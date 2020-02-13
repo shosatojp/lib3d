@@ -168,7 +168,7 @@ typedef void l3FrameTransitionFunction(l3Environment* env, int frame);
 struct _l3Environment {
     int w, h;
     // オブジェクトのポインタの配列
-    array objects;  // 中身はheap
+    array objects;   // 中身はheap
 
     // Textureは状態を保持しないのでそのままでおｋ
     // カメラ情報
@@ -181,6 +181,7 @@ struct _l3Environment {
     l3PixelInfo* map;
     const char* outdir;
     l3FrameTransitionFunction* transitionFn;
+    array poligons;  // 描画用のポリゴンリスト solve ptrsで作成
 };
 
 typedef struct _l3Ray {

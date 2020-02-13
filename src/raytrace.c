@@ -147,7 +147,7 @@ void l3MultiplyColor(l3RGB* a, l3RGB* b, l3RGB* r) {
 /**
  * ワールド座標空間からカメラ座標空間への基底変換行列
  */
-void l3MakeWorldToCameraBasisChangeMat44(l3CameraInfo* camerainfo, l3Mat33 r) {
+void l3MakeWorldToCameraBasisChangeMat33(l3CameraInfo* camerainfo, l3Mat33 r) {
     l3Mat41A tmp = {0};
     l3Mat41A cx = {0};
     l3Mat41A cy = {0};
@@ -194,6 +194,7 @@ bool l3FindRayCrossPoint(l3Ray* ray, int poligon_count, l3Poligon* poligons[]) {
     l3Mat41A min_intersection = {0};
     l3Mat21A min_uv = {0};
     l3Poligon* min_poligon = NULL;
+    l3Type min_length = 0;
     bool found = false;
 
     for (size_t i = 0; i < poligon_count; i++) {
@@ -230,37 +231,59 @@ bool l3FindRayCrossPoint(l3Ray* ray, int poligon_count, l3Poligon* poligons[]) {
         }
     }
 
-    memcpy(ray->uv, min_intersection, sizeof(l3Type) * 4);
-    memcpy(ray->intersection, min_uv, sizeof(l3Type) * 2);
-    ray->poligon = min_poligon;
+    if (found) {
+        memcpy(ray->uv, min_intersection, sizeof(l3Type) * 4);
+        memcpy(ray->intersection, min_uv, sizeof(l3Type) * 2);
+        ray->poligon = min_poligon;
+    }
     return found;
 }
 
-// void l3TraceRay()
+/**
+ * 始点と方向が決まっているRayから、
+ * 交点を見つけ、
+ * その地点の色を求める
+ * 交点がなかった場合にはそこで再帰終了、MAXDEPTHを超えた場合にも
+ * Depthの定義：たどる交点の数
+ * 
+ * envにすべてのポリゴンのリスト入れる TODO:
+ */
+void l3TraceRay(l3Ray* ray, l3Environment* env) {
+    static int depth = 0;
+    depth++;
+
+    // if (depth < l3RAY_TRACE_MAX_DEPTH &&
+    //     l3FindRayCrossPoint(ray, env->poligons)) {
+    //     // 拡散反射Ray
+    //     l3Ray diffuse = {0};
+    //     l3TraceRay(&diffuse, env);
+
+    //     // 鏡面反射Ray
+    //     l3Ray specular = {0};
+    //     l3TraceRay(&specular, env);
+
+    //     // 色合算
+    //     // l3SummarizeColor();
+    // }
+
+    depth--;
+}
 
 void l3RayIrradiationer(l3Environment* env) {
     l3Mat33A p_wtoc = {0};
-    l3MakeWorldToCameraBasisChangeMat44(env->camera, p_wtoc);
-
-    // ポリゴンの配列を作る
-    array* poligons = array_new(sizeof(l3Poligon*), true, 100);
+    l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
 
     for (size_t j = 0; j < env->h; j++) {
         for (size_t i = 0; i < env->w; i++) {
-            l3Ray ray;
-            memset(&ray, 0, sizeof(l3Ray));
-            l3GetRayStartPoint(p_wtoc, env->camera.angle, env->w, env->h, i, j, ray.ray_start_point);
-            l3GetRayDirection(ray.ray_start_point, env->camera.coordinate, ray.ray_direction);
+            l3Ray ray = {0};
+            l3GetRayStartPoint(p_wtoc, env->camera.angle, env->w, env->h, i, j, ray.rayStartPoint);
+            l3GetRayDirection(ray.rayStartPoint, env->camera.coordinate, ray.rayDirection);
 
-            // Rayの交差点を見つける
-            l3FindRayCrossPoint(&ray, poligons->length, poligons->data);
-            
-            // 再帰的にRayをたどる
+            l3TraceRay(&ray, env);
 
-            // バッファ(i,j)に出力
+            // バッファ(i,j)に色を設定
         }
     }
 
-    array_clear(poligons);
-    free(poligons);
+    // PPMに出力
 }
