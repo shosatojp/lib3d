@@ -31,8 +31,9 @@ int main(int argc, const char* argv[]) {
         env.h = options.h;
         env.outdir = options.outdir;
 
-        {  // オブジェクト構築
-            l3Object* _object = l3CreateObject();
+        // オブジェクト構築
+        l3Object* _object = l3CreateObject();
+        {
             int vs[] = {
                 l3AddVertexToObject(_object, l3CreateVertex(5, 5, 5, &red)),
                 l3AddVertexToObject(_object, l3CreateVertex(-5, -5, 5, &green)),
@@ -62,11 +63,23 @@ int main(int argc, const char* argv[]) {
             // l3Load2DTexture("assets/tex4.ppm", &texture);
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
             l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3SetTransposeObject(_object, 15, 15, 15);
+            l3SetTransposeObject(_object, -5, 0, 0);
+            l3SetScaleObject(_object, 2, 2, 2);
             l3AddObjectToEnvironment(&env, _object);
         }
+        l3Object* obj2 = l3CloneObject(_object);
         {
-            l3Object* sphere = l3CreateObject();
+            l3SetTransposeObject(obj2, 20, 0, 0);
+            // l3AddObjectToEnvironment(&env, obj2);
+        }
+        l3Object* obj3 = l3CloneObject(_object);
+        {
+            l3SetTransposeObject(obj3, 0, 10, 0);
+            // l3AddObjectToEnvironment(&env, obj3);
+        }
+
+        l3Object* sphere = l3CreateObject();
+        {
             int vs[] = {
                 l3AddVertexToObject(sphere, l3CreateVertex(0, 0, 0, &red)),
                 l3AddVertexToObject(sphere, l3CreateVertex(0, 5, 0, &red)),
@@ -80,12 +93,12 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.b = 55;
             poligons[0]->material = l3PoligonMaterialColor;
             l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3SetTransposeObject(sphere, 40,15, 25);
+            l3SetTransposeObject(sphere, 15, 0, 0);
             l3AddObjectToEnvironment(&env, sphere);
         }
 
-        l3SetCameraInfoToEnvironment(&env, 14, 0, -10,
-                                     20, 20, 20,
+        l3SetCameraInfoToEnvironment(&env, 0, 0, -40,
+                                     0, 0, 0,
                                      0, 1, 0,
                                      radians(50), 2, 100);
     }

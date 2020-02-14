@@ -85,7 +85,6 @@ void l3RaytracingRenderer(l3Environment* env) {
                 l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,
                                                env->camera.near, env->w, env->h, i, j,
                                                ray.rayStartPoint, ray.rayDirection);
-
                 l3TraceRay(&ray, env, 0);
                 l3AddColor(sumcolor, ray.color);
 
