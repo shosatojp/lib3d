@@ -117,8 +117,12 @@ typedef struct _l3Poligon {
      */
     l3PoligonMaterial material;
 
-    // ポリゴンの透明度0.0-1.0
+    // 光の透過率
     l3Type transparency;
+    // 金属度
+    l3Type metallicity;
+    // 拡散反射光の取得範囲
+    l3Type roughness;
 
     /**
      * ポリゴンの種類

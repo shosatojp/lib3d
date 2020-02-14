@@ -1,7 +1,7 @@
 #include "common.h"
 #include "lib3d.h"
 
-#define l3RAY_TRACE_MAX_DEPTH 4
+#define l3RAY_TRACE_MAX_DEPTH 1
 
 void l3GetRayStartPointAndDirection(l3Mat33 p_world_to_camera, l3Mat31 camera_pos, l3Type near,
                                     l3Type w, l3Type h,
@@ -17,5 +17,5 @@ void l3GetReflectedVec(l3Mat41 incident_vec, l3Mat41 normal, l3Mat41 r);
 void l3MultiplyColor(l3RGB* a, l3RGB* b, l3RGB* r);
 void l3MakeWorldToCameraBasisChangeMat33(l3CameraInfo* camerainfo, l3Mat33 r);
 bool l3FindRayCrossPoint(l3Ray* ray, l3Environment* env);
-void l3TraceRay(l3Ray* ray, l3Environment* env, int depth);
+bool l3TraceRay(l3Ray* ray, l3Environment* env, int depth);
 void l3SetWorldCoordinate(l3Environment* env);

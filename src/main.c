@@ -5,7 +5,9 @@ void transition(l3Environment* env, int frame) {
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y = frame * 5 * 3.14 / 180.0;
     obj->theta_x = frame * 5 * 3.14 / 180.0;
-    // l3Object* obj1 = array_at(&env->objects, 1);
+    l3Object* obj2 = array_at(&env->objects, 1);
+    obj2->theta_z = frame * 5 * 3.14 / 180.0;
+    // obj2->theta_x = frame * 5 * 3.14 / 180.0;
     // obj1->theta_y = frame * 5 * 3.14 / 180.0;
 
     // l3Object* obj2 = array_at(&env->objects, 2);
@@ -61,6 +63,14 @@ int main(int argc, const char* argv[]) {
         poligons[3]->color.r = 255;
         poligons[3]->color.b = 255;
 
+        // l3Object* sphere = l3CreateObject();
+        // int vs[] = {
+        //     l3AddVertexToObject(sphere, l3CreateVertex(5, 5, 5, &red)),
+        // };
+        // l3Poligon* poligons[] = {
+        //     l3CreatePoligon(0),
+        // }
+
         // テクスチャ読み込み・貼り付け
         // l3Texture texture;
         // l3Load2DTexture("assets/tex4.ppm", &texture);
@@ -68,6 +78,10 @@ int main(int argc, const char* argv[]) {
         l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon*), poligons);
         l3SetTransposeObject(_object, 15, 15, 15);
         l3AddObjectToEnvironment(&env, _object);
+
+        l3Object* obj2 = l3CloneObject(_object);
+        l3SetTransposeObject(obj2, 30, 15, 20);
+        l3AddObjectToEnvironment(&env, obj2);
         l3SetCameraInfoToEnvironment(&env, 14, 0, -10,
                                      20, 20, 20,
                                      0, 1, 0,

@@ -141,7 +141,7 @@ void l3GetSphereNormal(l3Mat41 sphere_local, l3Mat41 r) {
 void l3GetReflectedVec(l3Mat41 incident_vec, l3Mat41 normal, l3Mat41 r) {
     l3Mat41A tmp;
     l3ScalarMulMat(normal, -2 * l3InnerProductVec(normal, incident_vec, 3), tmp, 3);
-    l3SubMat(incident_vec, tmp, r, 3);
+    l3AddMat(incident_vec, tmp, r, 3);
 }
 
 // rgbもmat31で表すのがいいかも
@@ -248,6 +248,18 @@ bool l3FindRayCrossPoint(l3Ray* ray, l3Environment* env) {
     return found;
 }
 
+void l3GetNormal(l3Poligon* poligon, l3Mat41 intersection, l3Mat41 normal) {
+    switch (poligon->poligonType) {
+        case l3PoligonTypeTriangle:
+            l3NormarizeVec(poligon->cross_prod_e1_e2, normal, 3);
+            break;
+        case l3PoligonTypeShpere:
+            break;
+        default:
+            break;
+    }
+}
+
 /**
  * 始点と方向が決まっているRayから、
  * 交点を見つけ、
@@ -255,24 +267,46 @@ bool l3FindRayCrossPoint(l3Ray* ray, l3Environment* env) {
  * 交点がなかった場合にはそこで再帰終了、MAXDEPTHを超えた場合にも
  * Depthの定義：たどる交点の数
  */
-void l3TraceRay(l3Ray* ray, l3Environment* env, int depth) {
-    // return;
+bool l3TraceRay(l3Ray* ray, l3Environment* env, int depth) {
     if (l3FindRayCrossPoint(ray, env)) {
-        // printf("hoge");
-        // l3PrintMat(ray->rayStartPoint, 3, 1);
-        // // 拡散反射Ray
-        // l3Ray diffuse = {0};
-        // l3TraceRay(&diffuse, env, depth + 1);
+        // l3RGB sumcolor = {100, 100, 100};
+        l3RGB sumcolor = {ray->poligon->color.r,
+                          ray->poligon->color.g,
+                          ray->poligon->color.b};
+        l3Mat41A normal = {0};
+        l3GetNormal(ray->poligon, ray->intersection, normal);
 
-        // // 鏡面反射Ray
-        // l3Ray specular = {0};
-        // l3TraceRay(&specular, env, depth + 1);
+        // 環境光
+        l3RGB envcolor = {255, 255, 255};
+        l3Type brightness = 60;
+        sumcolor.r += 0.21 * brightness;
+        sumcolor.g += 0.72 * brightness;
+        sumcolor.b += 0.07 * brightness;
 
-        // 色合算
+        // 拡散反射Ray
+        l3Ray diffuse = {0};
+        l3Mat31A light = {6, 20, 30};
+        l3NormarizeVec(light, light, 3);
+        l3Type l_d = max(min(1, l3InnerProductVec(normal, light, 3)), 0.3);
+        l3ScalarMulColor(sumcolor, l_d);
+
+        if (depth <= l3RAY_TRACE_MAX_DEPTH) {
+
+            // 鏡面反射Ray
+            l3Ray specular = {0};
+            l3GetReflectedVec(ray->rayDirection, normal, specular.rayDirection);
+            l3AddMat(ray->intersection, specular.rayDirection, specular.rayStartPoint, 3);
+            if (l3TraceRay(&specular, env, depth + 1)) {
+                l3MulColor(sumcolor, specular.color);
+            }
+        }
         // l3SummarizeColor();
-        ray->color.r = ray->poligon->color.r;
-        ray->color.g = ray->poligon->color.g;
-        ray->color.b = ray->poligon->color.b;
+        ray->color.r = sumcolor.r;
+        ray->color.g = sumcolor.g;
+        ray->color.b = sumcolor.b;
+        return true;
+    } else {
+        return false;
     }
 }
 
