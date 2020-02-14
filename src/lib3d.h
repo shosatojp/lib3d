@@ -8,3 +8,5 @@
 #include "render.h"
 #include "util.h"
 #include "vertex.h"
+#include "options.h"
+#include "color.h"

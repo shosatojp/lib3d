@@ -13,7 +13,17 @@ void transition(l3Environment* env, int frame) {
     // obj2->dx = frame;
 }
 
-int main() {
+int main(int argc, const char* argv[]) {
+    // default options
+    l3Options options;
+    options.outdir = "bin";
+    options.h = 1080;
+    options.w = 1920;
+    options.frames = 100;
+    options.threads = 4;
+    options.renderer = l3RaytracingRenderer;
+    if (!l3ParseArgs(argc, argv, &options)) exit(0);
+
     l3Environment env;
     {
         l3RGB red = {255, 0, 0};
@@ -21,9 +31,9 @@ int main() {
         l3RGB blue = {0, 0, 255};
         l3RGB white = {255, 255, 255};
         l3InitializeEnvironment(&env);
-        env.w = 1920;
-        env.h = 1080;
-        env.outdir = "bin";
+        env.w = options.w;
+        env.h = options.h;
+        env.outdir = options.outdir;
 
         // オブジェクト構築
         l3Object* _object = l3CreateObject();
@@ -64,7 +74,7 @@ int main() {
                                      radians(50), 2, 100);
     }
 
-    l3MultithreadRenderer(&env, l3RaytracingRenderer, transition, 100, 16);
+    l3MultithreadRenderer(&env, options.renderer, transition, options.frames, options.threads);
     // l3MultithreadRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
 
     l3DestructEnvironment(&env);

@@ -3,7 +3,7 @@
 static int frame_count = 0;
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 
-void l3MultithreadRenderer(l3Environment* env, l3Renderer* renderer,l3FrameTransitionFunction* transitionFn,  int frames, int thread_count) {
+void l3MultithreadRenderer(l3Environment* env, l3Renderer* renderer, l3FrameTransitionFunction* transitionFn, int frames, int thread_count) {
     printf("starting multithreaded rendering...\n");
     printf("thread count : %d\n", thread_count);
     printf("frame count  : %d\n", frames);
@@ -34,6 +34,9 @@ void l3MultithreadRenderer(l3Environment* env, l3Renderer* renderer,l3FrameTrans
     printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frame_count, f - s, (double)(f - s) / frames);
 }
 
+#define l3ANTI_ALIASING_RAYS_COUNT 6
+#define l3ANTI_ALIASING_ENABLED
+
 void l3RaytracingRenderer(l3Environment* env) {
     // バッファーを作る
     unsigned char* buf = l3CreateBuffer(env->w, env->h);
@@ -41,6 +44,24 @@ void l3RaytracingRenderer(l3Environment* env) {
     // 各フレームについて
     // solve ptrs
     l3SolvePtrsEnvironment(env);
+
+#ifdef l3ANTI_ALIASING_ENABLED
+    // アンチエイリアス用Rayの回転行列
+    l3Type anti_aliasing_max_degree = 0.1;
+    l3Mat44A anti_aliasing_ray_rotate_mats[l3ANTI_ALIASING_RAYS_COUNT];
+    for (size_t i = 0; i < l3ANTI_ALIASING_RAYS_COUNT; i++) {
+        l3Ray antieilias_ray = {0};
+        l3Mat44A rx = {0};
+        l3MakeRoundXMat44(radians(rand() / (l3Type)RAND_MAX * anti_aliasing_max_degree), rx);
+        l3Mat44A ry = {0};
+        l3MakeRoundYMat44(radians(rand() / (l3Type)RAND_MAX * anti_aliasing_max_degree), ry);
+        l3Mat44A rz = {0};
+        l3MakeRoundZMat44(radians(rand() / (l3Type)RAND_MAX * anti_aliasing_max_degree), rz);
+        l3Mat44 rmats[] = {rx, ry, rz};
+        l3Mat44A r = {0};
+        l3MulMat44s44(3, rmats, anti_aliasing_ray_rotate_mats[i]);
+    }
+#endif
 
     //for begin
     for (int f = env->frame_begin; f < env->frame_end; f++) {
@@ -51,30 +72,43 @@ void l3RaytracingRenderer(l3Environment* env) {
         env->transitionFn(env, f);
         // ワールド座標を設定
         l3SetWorldCoordinate(env);
-        // transitionFn
-        // 出力
-        // 初期化
+
         l3Mat33A p_wtoc = {0};
         l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
 
         for (size_t j = 0; j < env->h; j++) {
             for (size_t i = 0; i < env->w; i++) {
+                l3RGB sumcolor = {0};
                 l3Ray ray = {0};
                 l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,
                                                env->camera.near, env->w, env->h, i, j,
                                                ray.rayStartPoint, ray.rayDirection);
+
                 l3TraceRay(&ray, env, 0);
+                l3AddColor(sumcolor, ray.color);
+
+#ifdef l3ANTI_ALIASING_ENABLED
+                // アンチエイリアス
+                for (size_t i = 0; i < l3ANTI_ALIASING_RAYS_COUNT; i++) {
+                    l3Ray antieilias_ray = {0};
+                    l3MulMat(anti_aliasing_ray_rotate_mats[i], ray.rayDirection, antieilias_ray.rayDirection, 4, 4, 1);
+                    memcpy(antieilias_ray.rayStartPoint, ray.rayStartPoint, sizeof(l3Type) * 3);
+                    l3TraceRay(&antieilias_ray, env, 0);
+                    l3AddColor(sumcolor, antieilias_ray.color);
+                }
+                l3DivColor(sumcolor, l3ANTI_ALIASING_RAYS_COUNT + 1);
+#endif
 
                 // バッファ(i,j)に色を設定
-                l3SET_BUFFER_RGB(buf, env->w, env->h, i, j, ray.color);
+                l3SET_BUFFER_RGB(buf, env->w, env->h, i, j, sumcolor);
             }
         }
-
         // PPMに出力
         char name[100] = {0};
         sprintf(name, "%s/%06d.ppm", env->outdir, f);
         l3WriteBuffer(buf, env->w, env->h, name);
 
+        // 初期化
         l3ClearEnvironment(env);
     }
     safe_free(buf);
