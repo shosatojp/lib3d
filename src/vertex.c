@@ -35,6 +35,16 @@ void l3MakeRoundZMat44(l3Type theta, l3Mat44 r) {
     r[10] = 1;
     r[15] = 1;
 }
+void l3MakeRoundMat44(l3Type theta_x, l3Type theta_y, l3Type theta_z, l3Mat44 r) {
+    l3Mat44A rx = {0};
+    l3MakeRoundXMat44(theta_x, rx);
+    l3Mat44A ry = {0};
+    l3MakeRoundYMat44(theta_y, ry);
+    l3Mat44A rz = {0};
+    l3MakeRoundZMat44(theta_z, rz);
+    l3Mat44 rmats[] = {rx, ry, rz};
+    l3MulMat44s44(3, rmats, r);
+}
 void l3MakeTransposeMat44(l3Type dx, l3Type dy, l3Type dz, l3Mat44 r) {
     r[0] = 1;
     r[5] = 1;

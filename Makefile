@@ -1,8 +1,8 @@
 TARGET := lib3d
 CC := gcc
-CCOPT := -g -lm -O3 -std=c11 -pthread -mtune=native -march=native -mfpmath=both
+CCOPT := -g -lm -O0 -std=c11 -pthread -mtune=native -march=native -mfpmath=both
 SRCDIR := src
-TARGETOPT := -o /mnt/f/hoge -t 16 -f 200 -w 1920 -h 1080 -r raytrace
+TARGETOPT := -o /mnt/f/hoge -t 1 -f 10 -w 1920 -h 1080 -r raytrace
 
 SRC := $(shell find $(SRCDIR) -name "*.c")
 OBJ := $(addsuffix .o, $(basename $(SRC)))

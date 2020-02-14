@@ -59,9 +59,18 @@ void l3ClearVertex(l3Vertex* v) {
  */
 l3Poligon* l3CreatePoligon(int v1, int v2, int v3) {
     l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
+    _p->poligonType = l3PoligonTypeTriangle;
     _p->vertex_indices[0] = v1;
     _p->vertex_indices[1] = v2;
     _p->vertex_indices[2] = v3;
+    return _p;
+}
+
+l3Poligon* l3CreatePoligonSphere(int center, int upper) {
+    l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
+    _p->poligonType = l3PoligonTypeShpere;
+    _p->vertex_indices[0] = center;
+    _p->vertex_indices[1] = upper;
     return _p;
 }
 

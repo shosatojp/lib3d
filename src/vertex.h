@@ -8,6 +8,7 @@ void l3MakeProjectionToScreenMat44(l3Type width, l3Type height, l3Mat44 r);
 void l3MakeRoundXMat44(l3Type theta, l3Mat44 r);
 void l3MakeRoundYMat44(l3Type theta, l3Mat44 r);
 void l3MakeRoundZMat44(l3Type theta, l3Mat44 r);
+void l3MakeRoundMat44(l3Type theta_x, l3Type theta_y, l3Type theta_z, l3Mat44 r);
 void l3MakeTransposeMat44(l3Type dx, l3Type dy, l3Type dz, l3Mat44 r);
 void l3MakeScaleMat44(l3Type sx, l3Type sy, l3Type sz, l3Mat44 r);
 void l3MakeLocalToWorldMat44(l3Type dx, l3Type dy, l3Type dz,

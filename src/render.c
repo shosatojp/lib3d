@@ -35,7 +35,7 @@ void l3MultithreadRenderer(l3Environment* env, l3Renderer* renderer, l3FrameTran
 }
 
 #define l3ANTI_ALIASING_RAYS_COUNT 6
-#define l3ANTI_ALIASING_ENABLED
+// #define l3ANTI_ALIASING_ENABLED
 
 void l3RaytracingRenderer(l3Environment* env) {
     // バッファーを作る
@@ -48,18 +48,20 @@ void l3RaytracingRenderer(l3Environment* env) {
 #ifdef l3ANTI_ALIASING_ENABLED
     // アンチエイリアス用Rayの回転行列
     l3Type anti_aliasing_max_degree = 0.1;
-    l3Mat44A anti_aliasing_ray_rotate_mats[l3ANTI_ALIASING_RAYS_COUNT];
+    // l3Mat44A anti_aliasing_ray_rotate_mats[l3ANTI_ALIASING_RAYS_COUNT];
+    l3Mat44 anti_aliasing_ray_rotate_mats[l3ANTI_ALIASING_RAYS_COUNT];
     for (size_t i = 0; i < l3ANTI_ALIASING_RAYS_COUNT; i++) {
         l3Ray antieilias_ray = {0};
         l3Mat44A rx = {0};
-        l3MakeRoundXMat44(radians(rand() / (l3Type)RAND_MAX * anti_aliasing_max_degree), rx);
+        l3MakeRoundXMat44(radians((l3Type)rand() / (l3Type)RAND_MAX * anti_aliasing_max_degree), rx);
         l3Mat44A ry = {0};
         l3MakeRoundYMat44(radians(rand() / (l3Type)RAND_MAX * anti_aliasing_max_degree), ry);
         l3Mat44A rz = {0};
         l3MakeRoundZMat44(radians(rand() / (l3Type)RAND_MAX * anti_aliasing_max_degree), rz);
         l3Mat44 rmats[] = {rx, ry, rz};
         l3Mat44A r = {0};
-        l3MulMat44s44(3, rmats, anti_aliasing_ray_rotate_mats[i]);
+        l3MulMat44s44(3, rmats, r);
+        anti_aliasing_ray_rotate_mats[i] = r;
     }
 #endif
 

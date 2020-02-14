@@ -127,7 +127,7 @@ typedef struct _l3Poligon {
     /**
      * ポリゴンの種類
      * - 三角形ポリゴン
-     * - 球体 (座標(vertices[0])、半径(max_z))
+     * - 球体 (座標(vertices[0]),上方向(vertices[1])、半径(max_z))
      */
     l3PoligonType poligonType;
 } l3Poligon;
