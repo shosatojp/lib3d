@@ -2,6 +2,7 @@
 #include "lib3d.h"
 
 void transition(l3Environment* env, int frame) {
+    // オブジェクト指定をわかりやすく
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y = frame * 5 * 3.14 / 180.0;
     // obj->theta_x = frame * 5 * 3.14 / 180.0;

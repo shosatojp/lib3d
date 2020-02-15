@@ -113,6 +113,26 @@ void l3GetRaySphere2DTextureCoordinate(l3Mat41 sphere_local, l3Mat21 r) {
 }
 
 /**
+ * レイと平面の交点判定（ワールド座標）
+ * ray_origin: Rayの始点
+ * ray_direction: Rayの方向ベクトル（単位ベクトル）
+ * plane_normal: 平面の法線ベクトル
+ * (result) r: return trueの場合、交点。return falseの場合何もしない
+ * return: 交点がある場合true
+ */
+bool l3IntersectRayPlane(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Mat41 plane_normal, l3Mat41 r) {
+    l3Type t = -l3InnerProductVec(ray_origin, plane_normal) / l3InnerProductVec(ray_direction, plane_normal);
+    if (t > 0) {
+        r[0] = ray_origin[0] + t * ray_direction[0];
+        r[1] = ray_origin[1] + t * ray_direction[1];
+        r[2] = ray_origin[2] + t * ray_direction[2];
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
  * 球の法線ベクトル
  * sphere_local: 球のローカル座標空間での点の位置
  * (result) normal: 法線ベクトル
