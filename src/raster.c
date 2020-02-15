@@ -23,7 +23,7 @@ bool l3BackCulling(l3Poligon* _poligon, l3Mat41 camera) {
     l3SubMat(_poligon->vertices[2]->coordinate2d, _poligon->vertices[1]->coordinate2d, bc, 3);
     l3Mat41A norm = {0};
     l3CrossProductVec3(ab, bc, norm);
-    l3Type ip = l3InnerProductVec(norm, camera, 3);
+    l3Type ip = l3InnerProductVec3(norm, camera);
     return ip < 0;
 }
 

@@ -67,7 +67,7 @@ void l3RaytracingRenderer(l3Environment* env) {
 #endif
 
     //for begin
-    for (int f = env->frame_begin; f < env->frame_end; f++) {
+    for (int f = env->frame_begin, e = env->frame_end; f < e; f++) {
         printf("rendering frame %d\n", f);
         frame_count++;
         l3ClearBuffer(buf, env->w, env->h, 255);
@@ -79,8 +79,8 @@ void l3RaytracingRenderer(l3Environment* env) {
         l3Mat33A p_wtoc = {0};
         l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
 
-        for (size_t j = 0; j < env->h; j++) {
-            for (size_t i = 0; i < env->w; i++) {
+        for (size_t j = 0, h = env->h; j < h; j++) {
+            for (size_t i = 0, w = env->w; i < w; i++) {
                 l3RGB sumcolor = {0};
                 l3Ray ray = {0};
                 l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,

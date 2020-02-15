@@ -22,12 +22,18 @@ void l3InitMat(l3Mat a, int x, int y) {
  * a != r, b != r
  * must initialize r : true
  */
+// void l3MulMat4441(l3Mat44 a, l3Mat41 b, l3Mat41 r) {
+//     for (int i = 0; i < 4; ++i) {
+//         for (int k = 0; k < 4; ++k) {
+//             r[i] += a[i + 4 * k] * b[k];
+//         }
+//     }
+// }
 void l3MulMat4441(l3Mat44 a, l3Mat41 b, l3Mat41 r) {
-    for (int i = 0; i < 4; ++i) {
-        for (int k = 0; k < 4; ++k) {
-            r[i] += a[i + 4 * k] * b[k];
-        }
-    }
+    r[0] = a[0] * b[0] + a[4] * b[1] + a[8] * b[2] + a[12] * b[3];
+    r[1] = a[1] * b[0] + a[5] * b[1] + a[9] * b[2] + a[13] * b[3];
+    r[2] = a[2] * b[0] + a[6] * b[1] + a[10] * b[2] + a[14] * b[3];
+    r[3] = a[3] * b[0] + a[7] * b[1] + a[11] * b[2] + a[15] * b[3];
 }
 
 /**
@@ -40,13 +46,22 @@ void l3MulMat4441(l3Mat44 a, l3Mat41 b, l3Mat41 r) {
  * 
  */
 void l3MulMat4444(l3Mat44 a, l3Mat44 b, l3Mat44 r) {
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            for (int k = 0; k < 4; ++k) {
-                r[i + 4 * j] += a[i + k * 4] * b[k + 4 * j];
-            }
-        }
-    }
+    r[0] = a[0] * b[0] + a[4] * b[1] + a[8] * b[2] + a[12] * b[3];
+    r[4] = a[0] * b[4] + a[4] * b[5] + a[8] * b[6] + a[12] * b[7];
+    r[8] = a[0] * b[8] + a[4] * b[9] + a[8] * b[10] + a[12] * b[11];
+    r[12] = a[0] * b[12] + a[4] * b[13] + a[8] * b[14] + a[12] * b[15];
+    r[1] = a[1] * b[0] + a[5] * b[1] + a[9] * b[2] + a[13] * b[3];
+    r[5] = a[1] * b[4] + a[5] * b[5] + a[9] * b[6] + a[13] * b[7];
+    r[9] = a[1] * b[8] + a[5] * b[9] + a[9] * b[10] + a[13] * b[11];
+    r[13] = a[1] * b[12] + a[5] * b[13] + a[9] * b[14] + a[13] * b[15];
+    r[2] = a[2] * b[0] + a[6] * b[1] + a[10] * b[2] + a[14] * b[3];
+    r[6] = a[2] * b[4] + a[6] * b[5] + a[10] * b[6] + a[14] * b[7];
+    r[10] = a[2] * b[8] + a[6] * b[9] + a[10] * b[10] + a[14] * b[11];
+    r[14] = a[2] * b[12] + a[6] * b[13] + a[10] * b[14] + a[14] * b[15];
+    r[3] = a[3] * b[0] + a[7] * b[1] + a[11] * b[2] + a[15] * b[3];
+    r[7] = a[3] * b[4] + a[7] * b[5] + a[11] * b[6] + a[15] * b[7];
+    r[11] = a[3] * b[8] + a[7] * b[9] + a[11] * b[10] + a[15] * b[11];
+    r[15] = a[3] * b[12] + a[7] * b[13] + a[11] * b[14] + a[15] * b[15];
 }
 
 void l3MulMat(l3Mat a, l3Mat b, l3Mat r, int s, int t, int u) {
@@ -63,21 +78,22 @@ void l3MulMat(l3Mat a, l3Mat b, l3Mat r, int s, int t, int u) {
  * a = r, b = r
  * must initialize r : false
  */
-void l3SubMat(l3Mat a, l3Mat b, l3Mat r, int n) {
-    for (int i = 0; i < n; ++i) {
-        r[i] = a[i] - b[i];
-    }
-}
-void l3AddMat(l3Mat a, l3Mat b, l3Mat r, int n) {
-    for (int i = 0; i < n; ++i) {
-        r[i] = a[i] + b[i];
-    }
-}
-void l3ScalarMulMat(l3Mat a, l3Type s, l3Mat r, int n) {
-    for (int i = 0; i < n; ++i) {
-        r[i] = a[i] * s;
-    }
-}
+// void l3SubMat(l3Mat a, l3Mat b, l3Mat r, int n) {
+//     for (int i = 0; i < n; ++i) {
+//         r[i] = a[i] - b[i];
+//     }
+// }
+
+// void l3AddMat(l3Mat a, l3Mat b, l3Mat r, int n) {
+//     for (int i = 0; i < n; ++i) {
+//         r[i] = a[i] + b[i];
+//     }
+// }
+// void l3ScalarMulMat(l3Mat a, l3Type s, l3Mat r, int n) {
+//     for (int i = 0; i < n; ++i) {
+//         r[i] = a[i] * s;
+//     }
+// }
 
 l3Type l3DistanceVec(l3Mat31 a, l3Mat31 b) {
     l3Mat31A tmp;
@@ -89,11 +105,11 @@ l3Type l3DistanceVec(l3Mat31 a, l3Mat31 b) {
  * a = r
  * must initialize r : false
  */
-void l3DivMat(l3Mat a, l3Type d, l3Mat r, int n) {
-    for (int i = 0; i < n; ++i) {
-        r[i] = a[i] / d;
-    }
-}
+// void l3DivMat(l3Mat a, l3Type d, l3Mat r, int n) {
+//     for (int i = 0; i < n; ++i) {
+//         r[i] = a[i] / d;
+//     }
+// }
 
 void l3PrintMat(l3Mat a, int h, int w) {
     for (int i = 0; i < h; ++i) {
@@ -133,27 +149,27 @@ void l3NormarizeVec(l3Mat a, l3Mat r, int n) {
 /**
  * a = r, b = r
  */
-void l3CrossProductVec3(l3Mat41 a, l3Mat41 b, l3Mat41 r) {
-    r[0] = a[1] * b[2] - a[2] * b[1];
-    r[1] = a[2] * b[0] - a[0] * b[2];
-    r[2] = a[0] * b[1] - a[1] * b[0];
-    r[3] = 1;
-}
+// void l3CrossProductVec3(l3Mat41 a, l3Mat41 b, l3Mat41 r) {
+//     r[0] = a[1] * b[2] - a[2] * b[1];
+//     r[1] = a[2] * b[0] - a[0] * b[2];
+//     r[2] = a[0] * b[1] - a[1] * b[0];
+//     r[3] = 1;
+// }
 
 l3Type l3CrossProductVec2(l3Mat21 a, l3Mat21 b) {
     return a[0] * b[1] - a[1] * b[0];
 }
 
-l3Type l3InnerProductVec(l3Mat a, l3Mat b, int n) {
-    l3Type sum = 0.0;
-    for (int i = 0; i < n; ++i) {
-        sum += a[i] * b[i];
-    }
-    return sum;
-}
+// l3Type l3InnerProductVec(l3Mat a, l3Mat b, int n) {
+//     l3Type sum = 0.0;
+//     for (int i = 0; i < n; ++i) {
+//         sum += a[i] * b[i];
+//     }
+//     return sum;
+// }
 
 l3Type l3VecAbs(l3Mat a, int n) {
-    return sqrt(l3InnerProductVec(a, a, n));
+    return sqrtf(l3InnerProductVec(a, a, n));
 }
 
 void l3MulMat44s44(int c, l3Mat44 as[], l3Mat44 r) {
@@ -281,4 +297,3 @@ void l3SimplificateMat(l3Mat a, int h, int w) {
         }
     }
 }
-

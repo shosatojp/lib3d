@@ -124,7 +124,7 @@ int main(int argc, const char* argv[]) {
         l3SetCameraInfoToEnvironment(&env, 0, 0, -40,
                                      0, 0, 0,
                                      0, 1, 0,
-                                     radians(50), 2, 100);
+                                     radians(50), 2, 600);
 
         l3MultithreadRenderer(&env, options.renderer, transition, options.frames, options.threads);
         // l3MultithreadRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
