@@ -75,6 +75,28 @@ l3Poligon* l3CreatePoligonSphere(int center, int upper, l3Type radius) {
     return _p;
 }
 
+/**
+ * 平面オブジェクトを作成
+ * point: 平面上の任意の点
+ * normal: 平面の法線ベクトル（オモテウラなし）
+ */
+l3Poligon* l3CreatePoligonPlane(int point, l3Mat31 normal) {
+    l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
+    _p->poligonType = l3PoligonTypePlane;
+    _p->vertex_indices[0] = point;
+    _p->normal[0] = normal[0];
+    _p->normal[1] = normal[1];
+    _p->normal[2] = normal[2];
+    // memcpy(_p->normal, normal, 3);
+    return _p;
+}
+
+l3Poligon* l3CreatePoligonSky() {
+    l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
+    _p->poligonType = l3PoligonTypeSky;
+    return _p;
+}
+
 l3Poligon* l3ClonePoligon(l3Poligon* p) {
     l3Poligon* _p = (l3Poligon*)malloc(sizeof(l3Poligon));
     memcpy(_p, p, sizeof(l3Poligon));

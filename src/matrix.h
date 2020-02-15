@@ -4,8 +4,10 @@
 
 #define l3MatAt(a, h, i, j) (a)[(j) * (h) + (i)]
 
-l3Mat l3CloneMat(l3Mat a, int h, int w);
+#define l3CopyMat(a, r, n) \
+    memcpy(r, a, sizeof(l3Type) * n)
 
+l3Mat l3CloneMat(l3Mat a, int h, int w);
 
 /**
  * 行列を零行列に初期化する

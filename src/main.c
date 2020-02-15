@@ -8,6 +8,8 @@ void transition(l3Environment* env, int frame) {
     // obj->theta_x = frame * 5 * 3.14 / 180.0;
     // l3Object* obj2 = array_at(&env->objects, 1);
     // obj2->theta_z = frame * 5 * 3.14 / 180.0;
+    l3Object* sphere = array_at(&env->objects, 1);
+    sphere->dy = 50 * fabs(exp(-0.1 * frame / 5.0) * sin(1.0 * frame / 5.0));
 }
 
 int main(int argc, const char* argv[]) {
@@ -73,11 +75,6 @@ int main(int argc, const char* argv[]) {
             l3SetTransposeObject(obj2, 20, 0, 0);
             // l3AddObjectToEnvironment(&env, obj2);
         }
-        l3Object* obj3 = l3CloneObject(_object);
-        {
-            l3SetTransposeObject(obj3, 0, 10, 0);
-            // l3AddObjectToEnvironment(&env, obj3);
-        }
 
         l3Object* sphere = l3CreateObject();
         {
@@ -96,15 +93,42 @@ int main(int argc, const char* argv[]) {
             l3SetTransposeObject(sphere, 15, 0, 0);
             l3AddObjectToEnvironment(&env, sphere);
         }
+        l3Object* obj3 = l3CreateObject();
+        {
+            l3AddVertexToObject(obj3, l3CreateVertex(0, 0, 0, &blue));
+            l3Mat31A normal = {0, -1, 0};
+            l3SetTransposeObject(obj3, 0, -10, 0);
+            l3Poligon* poligons[] = {
+                l3CreatePoligonPlane(0, normal),
+            };
+            poligons[0]->material = l3PoligonMaterialColor;
+            poligons[0]->color.r = 250;
+            poligons[0]->color.g = 250;
+            poligons[0]->color.b = 250;
+
+            l3SetPoligonsToObject(obj3, sizeof(poligons) / sizeof(l3Poligon*), poligons);
+            l3AddObjectToEnvironment(&env, obj3);
+        }
+        l3Object* sky = l3CreateObject();
+        {
+            l3Poligon* poligons[] = {
+                l3CreatePoligonSky(),
+            };
+            poligons[0]->color.r = 200;
+            poligons[0]->color.g = 200;
+            poligons[0]->color.b = 200;
+            l3SetPoligonsToObject(sky, sizeof(poligons) / sizeof(l3Poligon*), poligons);
+            l3AddObjectToEnvironment(&env, sky);
+        }
 
         l3SetCameraInfoToEnvironment(&env, 0, 0, -40,
                                      0, 0, 0,
                                      0, 1, 0,
                                      radians(50), 2, 100);
+
+        l3MultithreadRenderer(&env, options.renderer, transition, options.frames, options.threads);
+        // l3MultithreadRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
+
+        l3DestructEnvironment(&env);
     }
-
-    l3MultithreadRenderer(&env, options.renderer, transition, options.frames, options.threads);
-    // l3MultithreadRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
-
-    l3DestructEnvironment(&env);
 }

@@ -5,6 +5,7 @@ pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 
 void l3MultithreadRenderer(l3Environment* env, l3Renderer* renderer, l3FrameTransitionFunction* transitionFn, int frames, int thread_count) {
     printf("starting multithreaded rendering...\n");
+    thread_count = min(thread_count, frames);
     printf("thread count : %d\n", thread_count);
     printf("frame count  : %d\n", frames);
 

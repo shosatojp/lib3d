@@ -2,7 +2,7 @@ TARGET := lib3d
 CC := gcc
 CCOPT := -g -lm -O0 -std=c11 -pthread -mtune=native -march=native -mfpmath=both
 SRCDIR := src
-TARGETOPT := -o /mnt/f/hoge -t 1 -f 10 -w 1920 -h 1080 -r raytrace
+TARGETOPT := -o bin -t 16 -f 10 -w 1920 -h 1080 -r raytrace
 
 SRC := $(shell find $(SRCDIR) -name "*.c")
 OBJ := $(addsuffix .o, $(basename $(SRC)))
@@ -24,7 +24,7 @@ mp4:
 	ffmpeg -pattern_type glob -framerate 20 -i "bin/*.ppm" out.mp4 -y -vcodec libx264 
 
 clean:
-	-rm bin/*.ppm *.out *.exe *.gif *.mp4 $(TARGET)
+	-rm bin/*.ppm *.out *.exe $(TARGET)
 	-rm src/*.o *.o
 	-rm -rf bin
 

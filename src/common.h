@@ -86,9 +86,11 @@ typedef struct _l3Poligon {
      */
     l3Vertex* vertices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
     int vertex_indices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
+
+    // 三角形ポリゴン用のパラメータ
     l3Mat31A e1;
     l3Mat31A e2;
-    l3Mat31A cross_prod_e1_e2;
+    l3Mat31A normal;
 
     union {
         /**
@@ -108,11 +110,12 @@ typedef struct _l3Poligon {
     /**
      * テクスチャマッピング用。verticesに対応する順番で
      */
-    l3Mat23 textureVertices;  // heap 解放
     l3Texture* texture;
+    // 三角形ポリゴン用
+    l3Mat23 textureVertices;  // heap 解放
     l3Mat33 textureAffineMatInv;  // heap 解放
 
-    l3RGB color;
+    l3RGB color; // ベースカラー？？
 
     /**
      * このポリゴンにどのマテリアルを使うか
@@ -124,7 +127,7 @@ typedef struct _l3Poligon {
     // 金属度(RGB毎に)
     // (これと視線の入射角から拡散反射係数、鏡面反射係数を求める)
     // スカイオブジェクトは0
-    // この値(からもとまる拡散反射係数)の比率で色が決まる
+    // この値(からもとまる拡散反射係数)の比率で色が決まる？？
     l3Type metalness[3];
     // 鏡面反射光の取得範囲(1/光沢度)
     // 鏡面反射光はいくつかの方向のものを(cos theta)^alphaを掛けて足し合わせる
