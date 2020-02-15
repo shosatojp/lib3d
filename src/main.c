@@ -85,9 +85,8 @@ int main(int argc, const char* argv[]) {
                 l3AddVertexToObject(sphere, l3CreateVertex(0, 5, 0, &red)),
             };
             l3Poligon* poligons[] = {
-                l3CreatePoligonSphere(0, 1),
+                l3CreatePoligonSphere(0, 1, 10),
             };
-            poligons[0]->sphere_radius = 10;
             poligons[0]->color.r = 255;
             poligons[0]->color.g = 55;
             poligons[0]->color.b = 55;

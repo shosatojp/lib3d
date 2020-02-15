@@ -42,6 +42,8 @@ typedef enum _l3PoligonMaterial {
 typedef enum _l3PoligonType {
     l3PoligonTypeTriangle = 0,
     l3PoligonTypeShpere,
+    l3PoligonTypeSky,
+    l3PoligonTypePlane,
 } l3PoligonType;
 
 typedef struct _l3RGB {
@@ -119,10 +121,16 @@ typedef struct _l3Poligon {
 
     // 光の透過率
     l3Type transparency;
-    // 金属度
-    l3Type metallicity;
-    // 拡散反射光の取得範囲
+    // 金属度(RGB毎に)
+    // (これと視線の入射角から拡散反射係数、鏡面反射係数を求める)
+    // スカイオブジェクトは0
+    // この値(からもとまる拡散反射係数)の比率で色が決まる
+    l3Type metalness[3];
+    // 鏡面反射光の取得範囲(1/光沢度)
+    // 鏡面反射光はいくつかの方向のものを(cos theta)^alphaを掛けて足し合わせる
     l3Type roughness;
+    // 光源としての強度
+    l3Type lightIntensity;
 
     /**
      * ポリゴンの種類

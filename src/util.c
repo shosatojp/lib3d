@@ -66,11 +66,12 @@ l3Poligon* l3CreatePoligon(int v1, int v2, int v3) {
     return _p;
 }
 
-l3Poligon* l3CreatePoligonSphere(int center, int upper) {
+l3Poligon* l3CreatePoligonSphere(int center, int upper, l3Type radius) {
     l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
     _p->poligonType = l3PoligonTypeShpere;
     _p->vertex_indices[0] = center;
     _p->vertex_indices[1] = upper;
+    _p->sphere_radius = radius;
     return _p;
 }
 

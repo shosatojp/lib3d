@@ -14,7 +14,7 @@ void l3SetOuterRectPoligon(l3Poligon* poligon);
 l3Type l3GetTriangleArea(l3Mat21 p, l3Mat21 a, l3Mat21 b);
 l3Vertex* l3CreateVertex(l3Type x, l3Type y, l3Type z, l3RGB* color);
 l3Poligon* l3CreatePoligon(int v1, int v2, int v3);
-l3Poligon* l3CreatePoligonSphere(int center, int upper);
+l3Poligon* l3CreatePoligonSphere(int center, int upper, l3Type radius);
 l3Poligon* l3ClonePoligon(l3Poligon* p);
 void l3DestructPoligon(l3Poligon* p);
 void l3ClearPoligon(l3Poligon* p);
