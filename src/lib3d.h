@@ -10,3 +10,5 @@
 #include "vertex.h"
 #include "options.h"
 #include "color.h"
+#include "box.h"
+#include "bezier.h"
