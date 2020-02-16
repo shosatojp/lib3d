@@ -186,6 +186,11 @@ typedef struct _l3Environment l3Environment;
 typedef void l3FrameTransitionFunction(l3Environment* env, int frame);
 typedef void l3Renderer(l3Environment* env);
 
+typedef enum _l3MultiThreadRenderingType{
+    l3MultiThreadRenderingTypeRandom,
+    l3MultiThreadRenderingTypeSequential,
+}l3MultiThreadRenderingType;
+
 // マルチスレッド時にこれを持ってく
 struct _l3Environment {
     int w, h;
@@ -196,9 +201,11 @@ struct _l3Environment {
     // カメラ情報
     l3CameraInfo camera;
     // 変換行列？
-
+    l3MultiThreadRenderingType renderType;
     int frame_begin;
     int frame_end;
+    int thread_count;
+    // int frame_per_thread;
     // time
     l3PixelInfo* map;
     const char* outdir;
