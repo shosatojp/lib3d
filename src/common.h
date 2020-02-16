@@ -133,6 +133,7 @@ typedef struct _l3Poligon {
     // 鏡面反射光はいくつかの方向のものを(cos theta)^alphaを掛けて足し合わせる
     l3Type roughness;
     // 光源としての強度
+    // もしくはcolorの1以上で表現する
     l3Type lightIntensity;
 
     /**

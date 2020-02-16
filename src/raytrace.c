@@ -390,12 +390,13 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
             //     l3DivColor(specular_color, count_specular);
             //     l3MulColor(sumcolor, specular_color);
             // }
-            // 鏡面反射Ray
+            // // 鏡面反射Ray
             if (ray->poligon->poligonType != l3PoligonTypeSky) {
                 l3Ray specular = {0};
                 l3GetReflectedVec(ray->rayDirection, normal, specular.rayDirection);
                 l3AddMat3(ray->intersection, specular.rayDirection, specular.rayStartPoint);
-                if (l3TraceRay(&specular, env, depth + 1)) {
+                if (l3TraceRay(&specular, env, depth + 1) &&
+                    !(ray->poligon->poligonType == l3PoligonTypePlane && specular.poligon->poligonType == l3PoligonTypeSky)) {
                     l3MulColor(sumcolor, specular.color);
                 }
             }

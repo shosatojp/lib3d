@@ -66,11 +66,16 @@ int main(int argc, const char* argv[]) {
             // l3Load2DTexture("assets/tex4.ppm", &texture);
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
             l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3SetTransposeObject(_object, -5, 5, 0);
+            l3SetTransposeObject(_object, -5, 4, 0);
             l3SetScaleObject(_object, 2, 2, 2);
-            l3AddObjectToEnvironment(&env, _object);
+            // l3AddObjectToEnvironment(&env, _object);
         }
-
+        l3Object* obj2 = l3CreateBox();
+        {
+            l3SetTransposeObject(obj2, -15, 10, 0);
+            l3SetScaleObject(obj2, 20,20,20);
+            l3AddObjectToEnvironment(&env, obj2);
+        }
         l3Object* sphere = l3CreateObject();
         {
             int vs[] = {
@@ -115,16 +120,13 @@ int main(int argc, const char* argv[]) {
             l3SetPoligonsToObject(sky, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3AddObjectToEnvironment(&env, sky);
         }
-        l3Object* obj2 = l3CloneObject(_object);
-        {
-            l3SetTransposeObject(obj2, 5, 0, 30);
-            // l3AddObjectToEnvironment(&env, obj2);
-        }
 
-        l3SetCameraInfoToEnvironment(&env, 0, 0, -40,
+
+
+        l3SetCameraInfoToEnvironment(&env, 0, 20, -40,
                                      0, 0, 0,
                                      0, 1, 0,
-                                     radians(50), 2, 600);
+                                     radians(50), 2, 200);
 
         l3MultithreadRenderer(&env, options.renderer, transition, options.frames, options.threads);
         // l3MultithreadRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
