@@ -13,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include "array.h"
+#include "hashmap.h"
 
 #define l3POLIGON_VERTEX_COUNT 3
 
@@ -196,6 +197,7 @@ struct _l3Environment {
     int w, h;
     // オブジェクトのポインタの配列
     array objects;  // 中身はheap
+    hashmap objects_map;
 
     // Textureは状態を保持しないのでそのままでおｋ
     // カメラ情報

@@ -220,8 +220,9 @@ void l3SetCameraInfoToEnvironment(l3Environment* env,
  * オブジェクトを追加、インデックスを返却
  * バウンディング半径を計算（原点からの距離の最大値）
  */
-int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj) {
+int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj, const char* name) {
     obj->bounding_radius = l3GetBoundingRadius(obj);
+    hashmap_add(env->objects_map, name, obj);
     return array_push(&env->objects, obj);
 }
 
@@ -267,6 +268,7 @@ void l3InitializeEnvironment(l3Environment* env) {
     array_expand(&env->objects, 10);
     array_init(&env->poligons, sizeof(l3Poligon*), true);
     array_expand(&env->poligons, 10);
+    hashmap_init(&env->objects_map, 10);
 }
 
 void l3ClearEnvironment(l3Environment* env) {
@@ -288,9 +290,6 @@ void l3DestructEnvironment(l3Environment* env) {
     array_clear(&env->poligons);
 }
 
-void array_clone(array* dst, array* src) {
-}
-
 l3Environment* l3CloneEnvironment(l3Environment* env) {
     l3Environment* _env = (l3Environment*)calloc(sizeof(l3Environment), 1);
     memcpy(_env, env, sizeof(l3Environment));
@@ -302,6 +301,8 @@ l3Environment* l3CloneEnvironment(l3Environment* env) {
 
     // これをしないと他のスレッドのメモリを開放しようとしてしまう
     _env->poligons.data = calloc(sizeof(l3Poligon*), _env->poligons.capacity);
+
+    hashmap_init(env->objects_map)
 
     return _env;
 }
