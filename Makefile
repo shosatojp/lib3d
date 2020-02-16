@@ -9,7 +9,7 @@ SRC := $(shell find $(SRCDIR) -name "*.c")
 OBJ := $(addsuffix .o, $(basename $(SRC)))
 
 $(TARGET):$(OBJ)
-	mkdir -p bin
+	mkdir -p $(BINDIR)
 	$(CC) $^ $(CCOPT) -o $@
 
 run: $(TARGET) FORCE
@@ -20,7 +20,6 @@ run: $(TARGET) FORCE
 
 gif:
 	# convert -delay 2 $(BINDIR)/*.ppm out.gif
-	# ffmpeg -pattern_type glob -framerate 30 -i "$(BINDIR)/*.ppm" out.gif -y
 	ffmpeg -pattern_type glob -i "$(BINDIR)/*.ppm" -vf palettegen palette.png -y
 	ffmpeg -pattern_type glob -i "$(BINDIR)/*.ppm" -i palette.png -filter_complex paletteuse out.gif -y
 	rm palette.png
