@@ -1,7 +1,6 @@
 #pragma once
 #include <stdbool.h>
 #define DEFAULT_CAPACITY 10
-#define DEBUG
 
 typedef void array_element;
 typedef unsigned long indextype;
@@ -17,7 +16,7 @@ struct _array {
 typedef struct _array array;
 
 array* array_new(int elem_size, bool isptr, indextype capacity);
-int array_init(array* _array, int elem_size, bool isptr);
+int array_init(array* _array, int elem_size, bool isptr,indextype capacity);
 int array_expand(array* _array, indextype capacity);
 int array_fill(array* _array, indextype _begin, indextype _end, char _c);
 int _array_ins(array* _array, indextype index, ...);

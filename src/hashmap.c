@@ -50,7 +50,7 @@ hashmap* hashmap_new(int capacity) {
 
 int hashmap_init(hashmap* _m, int capacity) {
     _m->hash_entries = array_new(sizeof(hash_entry*), true, capacity);
-    array_expand(_m->hash_entries, capacity);
+    // array_expand(_m->hash_entries, capacity);
     array_fill(_m->hash_entries, 0, _m->hash_entries->length - 1, 0);
     _m->capacity = capacity;
     _m->length = 0;

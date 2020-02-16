@@ -131,8 +131,8 @@ void l3InitializeObject(l3Object* o) {
 
 l3Object* l3CreateObject() {
     l3Object* _o = (l3Object*)calloc(sizeof(l3Object), 1);
-    array_init(&_o->vertices, sizeof(l3Vertex*), true);
-    array_expand(&_o->vertices, 10);
+    array_init(&_o->vertices, sizeof(l3Vertex*), true,10);
+    // array_expand(&_o->vertices, 10);
     l3InitializeObject(_o);
     return _o;
 }
@@ -265,10 +265,8 @@ void l3SolvePtrsEnvironment(l3Environment* env) {
  */
 void l3InitializeEnvironment(l3Environment* env) {
     memset(env, 0, sizeof(l3Environment));
-    array_init(&env->objects, sizeof(l3Object*), true);
-    array_expand(&env->objects, 10);
-    array_init(&env->poligons, sizeof(l3Poligon*), true);
-    array_expand(&env->poligons, 10);
+    array_init(&env->objects, sizeof(l3Object*), true, 10);
+    array_init(&env->poligons, sizeof(l3Poligon*), true, 10);
     hashmap_init(&env->objects_map, 10);
 }
 
@@ -289,6 +287,7 @@ void l3DestructEnvironment(l3Environment* env) {
     });
     array_clear(&env->objects);
     array_clear(&env->poligons);
+    hashmap_destruct(&env->objects_map);
 }
 
 l3Environment* l3CloneEnvironment(l3Environment* env) {
