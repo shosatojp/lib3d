@@ -2,19 +2,17 @@
 #include "lib3d.h"
 
 void transition(l3Environment* env, int frame) {
-    // オブジェクト指定をわかりやすく
-    l3Object* obj = array_at(&env->objects, 0);
-    obj->theta_y += 1 / 100.0 * 2 * PI;
-    obj->theta_x += 1 / 100.0 * 2 * PI;
-    obj->theta_z += 1 / 100.0 * 2 * PI;
-    // l3Object* obj2 = array_at(&env->objects, 1);
-    l3Object* sphere = array_at(&env->objects, 1);
-    sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
-
-    sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
-    sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
+    l3Object* obj = l3FindObject(env, "box");
+    obj->theta_y += radians(360 / 100);
+    obj->theta_x += radians(360 / 100);
+    obj->theta_z += radians(360 / 100);
     obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
     obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
+
+    l3Object* sphere = l3FindObject(env, "sphere");
+    sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
+    sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
+    sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
 
     env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
     env->camera.coordinate[1] = (frame + 1) / 3.0;
@@ -83,7 +81,7 @@ int main(int argc, const char* argv[]) {
         {
             l3SetTransposeObject(obj2, -15, 10, 0);
             l3SetScaleObject(obj2, 20, 20, 20);
-            l3AddObjectToEnvironment(&env, obj2);
+            l3AddObjectToEnvironment(&env, obj2, "box");
         }
         l3Object* sphere = l3CreateObject();
         {
@@ -100,7 +98,7 @@ int main(int argc, const char* argv[]) {
             poligons[0]->material = l3PoligonMaterialColor;
             l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3SetTransposeObject(sphere, 15, 0, 0);
-            l3AddObjectToEnvironment(&env, sphere);
+            l3AddObjectToEnvironment(&env, sphere, "sphere");
         }
         l3Object* obj3 = l3CreateObject();
         {
@@ -116,7 +114,7 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.b = 250;
 
             l3SetPoligonsToObject(obj3, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3AddObjectToEnvironment(&env, obj3);
+            l3AddObjectToEnvironment(&env, obj3, "plane");
         }
         l3Object* sky = l3CreateObject();
         {
@@ -127,7 +125,7 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.g = 200;
             poligons[0]->color.b = 200;
             l3SetPoligonsToObject(sky, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3AddObjectToEnvironment(&env, sky);
+            l3AddObjectToEnvironment(&env, sky, "sky");
         }
 
         l3SetCameraInfoToEnvironment(&env, 0, 20, -60,

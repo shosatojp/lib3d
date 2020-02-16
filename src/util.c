@@ -131,8 +131,8 @@ void l3InitializeObject(l3Object* o) {
 
 l3Object* l3CreateObject() {
     l3Object* _o = (l3Object*)calloc(sizeof(l3Object), 1);
-    array_init(&_o->vertices, sizeof(l3Vertex*), true);
-    array_expand(&_o->vertices, 10);
+    array_init(&_o->vertices, sizeof(l3Vertex*), true,10);
+    // array_expand(&_o->vertices, 10);
     l3InitializeObject(_o);
     return _o;
 }
@@ -220,9 +220,11 @@ void l3SetCameraInfoToEnvironment(l3Environment* env,
  * オブジェクトを追加、インデックスを返却
  * バウンディング半径を計算（原点からの距離の最大値）
  */
-int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj) {
+int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj, const char* name) {
     obj->bounding_radius = l3GetBoundingRadius(obj);
-    return array_push(&env->objects, obj);
+    int index = array_push(&env->objects, obj);
+    hashmap_add(&env->objects_map, name, (void*)(long)index);
+    return index;
 }
 
 /**
@@ -263,10 +265,9 @@ void l3SolvePtrsEnvironment(l3Environment* env) {
  */
 void l3InitializeEnvironment(l3Environment* env) {
     memset(env, 0, sizeof(l3Environment));
-    array_init(&env->objects, sizeof(l3Object*), true);
-    array_expand(&env->objects, 10);
-    array_init(&env->poligons, sizeof(l3Poligon*), true);
-    array_expand(&env->poligons, 10);
+    array_init(&env->objects, sizeof(l3Object*), true, 10);
+    array_init(&env->poligons, sizeof(l3Poligon*), true, 10);
+    hashmap_init(&env->objects_map, 10);
 }
 
 void l3ClearEnvironment(l3Environment* env) {
@@ -286,9 +287,7 @@ void l3DestructEnvironment(l3Environment* env) {
     });
     array_clear(&env->objects);
     array_clear(&env->poligons);
-}
-
-void array_clone(array* dst, array* src) {
+    hashmap_destruct(&env->objects_map);
 }
 
 l3Environment* l3CloneEnvironment(l3Environment* env) {
@@ -303,7 +302,16 @@ l3Environment* l3CloneEnvironment(l3Environment* env) {
     // これをしないと他のスレッドのメモリを開放しようとしてしまう
     _env->poligons.data = calloc(sizeof(l3Poligon*), _env->poligons.capacity);
 
+    hashmap_init(&_env->objects_map, env->objects_map.capacity);
+    hashmap_each_i(&env->objects_map, {
+        hashmap_add(&_env->objects_map, hashmap_ei->key, hashmap_ei->ptr);
+    });
+
     return _env;
+}
+l3Object* l3FindObject(l3Environment* env, const char* name) {
+    int index = (int)(long)hashmap_find(&env->objects_map, name);
+    return array_at(&env->objects, index);
 }
 
 // =============================================

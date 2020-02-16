@@ -16,15 +16,15 @@ static void _array_debug(const char* format, ...) {
 
 array* array_new(int elem_size, bool isptr, indextype capacity) {
     array* _array = (array*)calloc(sizeof(array), 1);
-    array_init(_array, elem_size, isptr);
-    array_expand(_array, capacity);
+    array_init(_array, elem_size, isptr,capacity);
     return _array;
 }
 
-int array_init(array* _array, int elem_size, bool isptr) {
+int array_init(array* _array, int elem_size, bool isptr,indextype capacity) {
     memset(_array, 0, sizeof(array));
     _array->isptr = isptr;
     _array->elem_size = isptr ? sizeof(void*) : elem_size;
+    array_expand(_array, capacity);
     return 0;
 }
 

@@ -37,7 +37,8 @@ void l3InitializeEnvironment(l3Environment* env);
 /**
  * オブジェクトを追加、インデックスを返却
  */
-int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj);
+int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj, const char* name);
+
 /**
  * ポリゴンを追加、インデックスを返却
  */
@@ -61,3 +62,4 @@ l3Environment* l3CloneEnvironment(l3Environment* env);
 l3Object* l3CloneObject(l3Object* o);
 
 // void l3InitializeRay(l3Ray* ray);
+l3Object* l3FindObject(l3Environment* env, const char* name);

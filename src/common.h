@@ -13,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include "array.h"
+#include "hashmap.h"
 
 #define l3POLIGON_VERTEX_COUNT 3
 
@@ -211,6 +212,7 @@ struct _l3Environment {
     const char* outdir;
     l3FrameTransitionFunction* transitionFn;
     array poligons;  // 描画用のポリゴンリスト solve ptrsで作成
+    hashmap objects_map;
 };
 
 typedef struct _l3Ray {
