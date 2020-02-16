@@ -9,3 +9,5 @@ lib3d
 *.mp4
 *.py
 *.txt
+
+!sample.mp4
