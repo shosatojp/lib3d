@@ -222,8 +222,9 @@ void l3SetCameraInfoToEnvironment(l3Environment* env,
  */
 int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj, const char* name) {
     obj->bounding_radius = l3GetBoundingRadius(obj);
-    hashmap_add(env->objects_map, name, obj);
-    return array_push(&env->objects, obj);
+    int index = array_push(&env->objects, obj);
+    hashmap_add(&env->objects_map, name, (void*)(long)index);
+    return index;
 }
 
 /**
@@ -302,9 +303,16 @@ l3Environment* l3CloneEnvironment(l3Environment* env) {
     // これをしないと他のスレッドのメモリを開放しようとしてしまう
     _env->poligons.data = calloc(sizeof(l3Poligon*), _env->poligons.capacity);
 
-    hashmap_init(env->objects_map)
+    hashmap_init(&_env->objects_map, env->objects_map.capacity);
+    hashmap_each_i(&env->objects_map, {
+        hashmap_add(&_env->objects_map, hashmap_ei->key, hashmap_ei->ptr);
+    });
 
     return _env;
+}
+l3Object* l3FindObject(l3Environment* env, const char* name) {
+    int index = (int)(long)hashmap_find(&env->objects_map, name);
+    return array_at(&env->objects, index);
 }
 
 // =============================================

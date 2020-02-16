@@ -197,7 +197,6 @@ struct _l3Environment {
     int w, h;
     // オブジェクトのポインタの配列
     array objects;  // 中身はheap
-    hashmap objects_map;
 
     // Textureは状態を保持しないのでそのままでおｋ
     // カメラ情報
@@ -213,6 +212,7 @@ struct _l3Environment {
     const char* outdir;
     l3FrameTransitionFunction* transitionFn;
     array poligons;  // 描画用のポリゴンリスト solve ptrsで作成
+    hashmap objects_map;
 };
 
 typedef struct _l3Ray {
