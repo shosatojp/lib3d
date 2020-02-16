@@ -10,6 +10,8 @@ void transition(l3Environment* env, int frame) {
     // l3Object* obj2 = array_at(&env->objects, 1);
     l3Object* sphere = array_at(&env->objects, 1);
     sphere->dy = 50 * fabs(exp(-0.1 * frame / 5.0) * sin(1.0 * frame / 5.0));
+    env ->camera.coordinate[0] = 40*cos(frame/100.0*2*PI);
+    env ->camera.coordinate[2] = 80*sin(frame/100.0*2*PI);
 }
 
 int main(int argc, const char* argv[]) {
