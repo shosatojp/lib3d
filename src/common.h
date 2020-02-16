@@ -217,3 +217,9 @@ typedef struct _l3Ray {
     // 色情報（再帰的に決まる）
     l3RGB color;
 } l3Ray;
+
+typedef enum _l32Deffects{//２Dエフェクトを作ったらここで番号振って。
+hoge
+
+
+} l32Deffects;

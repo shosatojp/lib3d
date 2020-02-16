@@ -105,6 +105,12 @@ void l3RaytracingRenderer(l3Environment* env) {
                 l3SET_BUFFER_RGB(buf, env->w, env->h, i, j, sumcolor);
             }
         }
+
+
+        // 2D処理
+        // bufの中身を変更
+
+
         // PPMに出力
         char name[100] = {0};
         sprintf(name, "%s/%06d.ppm", env->outdir, f);
