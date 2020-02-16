@@ -10,4 +10,4 @@ lib3d
 *.py
 *.txt
 palette.png
-sample.gif
+!sample.gif
