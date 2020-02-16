@@ -63,6 +63,7 @@ l3Poligon* l3CreatePoligon(int v1, int v2, int v3) {
     _p->vertex_indices[0] = v1;
     _p->vertex_indices[1] = v2;
     _p->vertex_indices[2] = v3;
+    _p->vertex_count = 3;
     return _p;
 }
 
@@ -72,6 +73,7 @@ l3Poligon* l3CreatePoligonSphere(int center, int upper, l3Type radius) {
     _p->vertex_indices[0] = center;
     _p->vertex_indices[1] = upper;
     _p->sphere_radius = radius;
+    _p->vertex_count = 2;
     return _p;
 }
 
@@ -87,6 +89,7 @@ l3Poligon* l3CreatePoligonPlane(int point, l3Mat31 normal) {
     _p->normal[0] = normal[0];
     _p->normal[1] = normal[1];
     _p->normal[2] = normal[2];
+    _p->vertex_count = 1;
     // memcpy(_p->normal, normal, 3);
     return _p;
 }
@@ -94,6 +97,7 @@ l3Poligon* l3CreatePoligonPlane(int point, l3Mat31 normal) {
 l3Poligon* l3CreatePoligonSky() {
     l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
     _p->poligonType = l3PoligonTypeSky;
+    _p->vertex_count = 0;
     return _p;
 }
 

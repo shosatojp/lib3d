@@ -135,7 +135,7 @@ int main(int argc, const char* argv[]) {
 
         l3MultithreadSequentialRenderer(&env, options.renderer, transition, options.frames, options.threads);
         // l3MultithreadRenderer(&env, options.renderer, transition, options.frames, options.threads);
-        // l3MultithreadRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
+        // l3MultithreadSequentialRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
 
         l3DestructEnvironment(&env);
     }

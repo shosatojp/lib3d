@@ -87,6 +87,7 @@ typedef struct _l3Poligon {
      */
     l3Vertex* vertices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
     int vertex_indices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
+    int vertex_count;
 
     // 三角形ポリゴン用のパラメータ
     l3Mat31A e1;
