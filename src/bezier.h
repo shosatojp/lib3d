@@ -1,6 +1,8 @@
 #include "common.h"
 
 typedef struct _bezier { double x, y, z;} bezier;
-typedef struct Cpoint {double x,y,z;} cpoint; 
 
-bezier l3GetBezierCurve(int frame,int start_frame, int end_frame,int cpoint_number, cpoint cpoints[]);
+bezier l3GetBezierCurve(double timeTransition,int cpoint_number, bezier cpoints[]);
+double Bernstein(int n, int i, double t);
+double Binomial(int n, int k);
+double Factorial(int a);
