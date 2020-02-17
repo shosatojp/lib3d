@@ -240,6 +240,7 @@ bool l3FindRayCrossPoint(l3Ray *ray, l3Environment *env) {
 
     for (size_t i = 0, l = env->poligons.length; i < l; i++) {
         l3Poligon *p = *(poligons + i);  //array_at(&env->poligons, i);
+        if (p->noSize) continue;
         switch (p->poligonType) {
             case l3PoligonTypeTriangle: {
                 l3Mat41A intersection;
@@ -356,6 +357,8 @@ void l3GetLightDirection(l3Mat31 intersection, l3Poligon *light_poligon, l3Mat31
 bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
     if (l3FindRayCrossPoint(ray, env)) {
         l3RGB sumcolor = {0};
+        // 光源がのっぺりする
+        // if (ray->poligon->poligonType == l3PoligonTypeSky || ray->poligon->lightType) {
         if (ray->poligon->poligonType == l3PoligonTypeSky) {
             ray->color.r = ray->poligon->color.r;
             ray->color.g = ray->poligon->color.g;
@@ -386,13 +389,14 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                 // 影は光源を無視
                 bool cross = l3FindRayCrossPoint(&kage_ray, env);
                 if (!cross ||
-                     kage_ray.poligon->poligonType == l3PoligonTypeSky || kage_ray.poligon->lightType) {
+                    kage_ray.poligon->poligonType == l3PoligonTypeSky || kage_ray.poligon == light_poligon) {
+                    // kage_ray.poligon->poligonType == l3PoligonTypeSky || kage_ray.poligon->lightType) {
                     // 影にならないとき
                     l3Type ipv3 = l3InnerProductVec3(normal, light);
                     l3Type l_d = max(min(1, ipv3), 0);
                     l3RGB material_color = ray->poligon->color;
                     if (light_poligon->lightType == l3LightTypePoint) {
-                        l3Type distance = 10;  //l3DistanceVec3(light_poligon->vertices[0]->coordinateWorld, ray->intersection);
+                        l3Type distance = l3DistanceVec3(light_poligon->vertices[0]->coordinateWorld, ray->intersection);
                         material_color.r *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.r / 255.0 / (distance * 0.1);
                         material_color.g *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.g / 255.0 / (distance * 0.1);
                         material_color.b *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.b / 255.0 / (distance * 0.1);
@@ -410,14 +414,14 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
             // 鏡面反射Ray
             // if (ray->poligon->poligonType != l3PoligonTypeSky) {
 
-            // l3Ray specular = {0};
-            // l3GetReflectedVec(ray->rayDirection, normal, specular.rayDirection);
-            // l3AddMat3(ray->intersection, specular.rayDirection, specular.rayStartPoint);
-            // if (l3TraceRay(&specular, env, depth + 1) &&
-            //     !(ray->poligon->poligonType == l3PoligonTypePlane && specular.poligon->poligonType == l3PoligonTypeSky)) {
-            //     l3ScalarMulColor(specular.color, 1.0 * 1.0 * k_s);
-            //     l3AddColor(sumcolor, specular.color);
-            // }
+            l3Ray specular = {0};
+            l3GetReflectedVec(ray->rayDirection, normal, specular.rayDirection);
+            l3AddMat3(ray->intersection, specular.rayDirection, specular.rayStartPoint);
+            if (l3TraceRay(&specular, env, depth + 1) &&
+                !(ray->poligon->poligonType == l3PoligonTypePlane && specular.poligon->poligonType == l3PoligonTypeSky)) {
+                l3ScalarMulColor(specular.color, 1.0 * 1.0 * k_s);
+                l3AddColor(sumcolor, specular.color);
+            }
 
             // }
             // l3Ray specular = {0};

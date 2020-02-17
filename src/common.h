@@ -151,6 +151,7 @@ typedef struct _l3Poligon {
      * - 球体 (座標(vertices[0]),上方向(vertices[1])、半径(max_z))
      */
     l3PoligonType poligonType;
+    bool noSize;
 } l3Poligon;
 
 /**
