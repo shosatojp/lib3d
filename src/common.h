@@ -47,6 +47,11 @@ typedef enum _l3PoligonType {
     l3PoligonTypePlane,
 } l3PoligonType;
 
+typedef enum _l3LightType {
+    l3LightTypeParallel = 1,
+    l3LightTypePoint = 2,
+} l3LightType;
+
 typedef struct _l3RGB {
     l3Type r, g, b;
 } l3RGB;
@@ -92,7 +97,7 @@ typedef struct _l3Poligon {
     // 三角形ポリゴン用のパラメータ
     l3Mat31A e1;
     l3Mat31A e2;
-    l3Mat31A normal;
+    l3Mat31A normal;// 平行光線では光線の方向ベクトル
 
     union {
         /**
@@ -114,10 +119,10 @@ typedef struct _l3Poligon {
      */
     l3Texture* texture;
     // 三角形ポリゴン用
-    l3Mat23 textureVertices;  // heap 解放
+    l3Mat23 textureVertices;      // heap 解放
     l3Mat33 textureAffineMatInv;  // heap 解放
 
-    l3RGB color; // ベースカラー？？
+    l3RGB color;  // ベースカラー？？
 
     /**
      * このポリゴンにどのマテリアルを使うか
@@ -137,7 +142,9 @@ typedef struct _l3Poligon {
     // 光源としての強度
     // もしくはcolorの1以上で表現する
     l3Type lightIntensity;
+    l3Type lightAttenuation;
 
+    l3LightType lightType;
     /**
      * ポリゴンの種類
      * - 三角形ポリゴン
@@ -188,10 +195,10 @@ typedef struct _l3Environment l3Environment;
 typedef void l3FrameTransitionFunction(l3Environment* env, int frame);
 typedef void l3Renderer(l3Environment* env);
 
-typedef enum _l3MultiThreadRenderingType{
+typedef enum _l3MultiThreadRenderingType {
     l3MultiThreadRenderingTypeRandom,
     l3MultiThreadRenderingTypeSequential,
-}l3MultiThreadRenderingType;
+} l3MultiThreadRenderingType;
 
 // マルチスレッド時にこれを持ってく
 struct _l3Environment {

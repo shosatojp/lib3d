@@ -333,79 +333,117 @@ void l3GetNormal(l3Poligon *poligon, l3Mat41 intersection, l3Mat41 normal, l3Env
     }
 }
 
+void l3GetLightDirection(l3Mat31 intersection, l3Poligon *light_poligon, l3Mat31 r) {
+    switch (light_poligon->lightType) {
+        case l3LightTypeParallel:
+            l3ScalarMulMat3(light_poligon->normal, -1, r);
+            break;
+        case l3LightTypePoint:
+            // 重心を求めずにやってる（適当に0番目の頂点）
+            l3SubMat3(light_poligon->vertices[0]->coordinateWorld, intersection, r);
+            l3NormarizeVec3(r, r);
+            break;
+    }
+}
+
 /**
  * 始点と方向が決まっているRayから、
  * 交点を見つけ、
  * その地点の色を求める
- * 交点がなかった場合にはそこで再帰終了、MAXDEPTHを超えた場合にも
+ * 交点がなかった場合にはそこで再帰終了、MAXDEPTHを超えた場合にも TODO: 角度によって
  * Depthの定義：たどる交点の数
  */
 bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
     if (l3FindRayCrossPoint(ray, env)) {
-        l3RGB sumcolor = {ray->poligon->color.r,
-                          ray->poligon->color.g,
-                          ray->poligon->color.b};
+        l3RGB sumcolor = {0};
+        if (ray->poligon->poligonType == l3PoligonTypeSky) {
+            ray->color.r = ray->poligon->color.r;
+            ray->color.g = ray->poligon->color.g;
+            ray->color.b = ray->poligon->color.b;
+            return true;
+        }
         l3Mat41A normal = {0};
         l3GetNormal(ray->poligon, ray->intersection, normal, env);
+        // l3Mat31A inv_ray_direction;
+        // l3ScalarMulMat3(ray->rayDirection, -1, inv_ray_direction);
+        // l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
+        l3Type k_s = 0.3,  //l3ReflectionRate(theta / (2 * PI), 0.2),
+            k_d = 1 - k_s;
 
-        // 拡散反射Ray
-        l3Mat31A light = {1, 1, -1};
-        l3NormarizeVec3(light, light);
-        // 遮るものがあったら光源無視
-        if (ray->poligon->poligonType != l3PoligonTypeSky) {
-            l3Ray kage_ray = {0};
-            l3CopyMat(light, kage_ray.rayDirection, 3);
-            l3AddMat3(ray->intersection, light, kage_ray.rayStartPoint);
-            if (!l3FindRayCrossPoint(&kage_ray, env) || kage_ray.poligon->poligonType == l3PoligonTypeSky) {
-                // 影にならないとき
-                l3Type ipv3 = l3InnerProductVec3(normal, light);
-                l3Type l_d = max(min(1, ipv3), 0.3);
-                l3Type e_d = 3;
-                l3ScalarMulColor(sumcolor, l_d * e_d);
+        for (int i = 0, l = env->poligons.length; i < l; ++i) {
+            l3Poligon *light_poligon = array_at(&env->poligons, i);
+            if (light_poligon->lightType) {
+                // 拡散反射 すべての光源に対して
+                // 分岐点光源並行光源
+                l3Mat31A light;
+                l3Ray kage_ray = {0};
+                l3GetLightDirection(ray->intersection, light_poligon, light);
+                l3NormarizeVec3(light, light);
+                l3CopyMat(light, kage_ray.rayDirection, 3);
+                l3Mat31A tmp;
+                l3DivMat(light, 10, tmp, 3);
+                l3AddMat3(ray->intersection, tmp, kage_ray.rayStartPoint);
+                // 影は光源を無視
+                bool cross = l3FindRayCrossPoint(&kage_ray, env);
+                if (!cross ||
+                     kage_ray.poligon->poligonType == l3PoligonTypeSky || kage_ray.poligon->lightType) {
+                    // 影にならないとき
+                    l3Type ipv3 = l3InnerProductVec3(normal, light);
+                    l3Type l_d = max(min(1, ipv3), 0);
+                    l3RGB material_color = ray->poligon->color;
+                    if (light_poligon->lightType == l3LightTypePoint) {
+                        l3Type distance = 10;  //l3DistanceVec3(light_poligon->vertices[0]->coordinateWorld, ray->intersection);
+                        material_color.r *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.r / 255.0 / (distance * 0.1);
+                        material_color.g *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.g / 255.0 / (distance * 0.1);
+                        material_color.b *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.b / 255.0 / (distance * 0.1);
+                    } else {
+                        material_color.r *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.r / 255.0;
+                        material_color.g *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.g / 255.0;
+                        material_color.b *= l_d * k_d * light_poligon->lightIntensity * light_poligon->color.b / 255.0;
+                    }
+                    l3AddColor(sumcolor, material_color);
+                }
             }
         }
 
         if (depth <= l3RAY_TRACE_MAX_DEPTH) {
             // 鏡面反射Ray
+            // if (ray->poligon->poligonType != l3PoligonTypeSky) {
+
+            // l3Ray specular = {0};
+            // l3GetReflectedVec(ray->rayDirection, normal, specular.rayDirection);
+            // l3AddMat3(ray->intersection, specular.rayDirection, specular.rayStartPoint);
+            // if (l3TraceRay(&specular, env, depth + 1) &&
+            //     !(ray->poligon->poligonType == l3PoligonTypePlane && specular.poligon->poligonType == l3PoligonTypeSky)) {
+            //     l3ScalarMulColor(specular.color, 1.0 * 1.0 * k_s);
+            //     l3AddColor(sumcolor, specular.color);
+            // }
+
+            // }
             // l3Ray specular = {0};
             // l3Mat41A dir = {0};
             // l3GetReflectedVec(ray->rayDirection, normal, dir);
-            // l3RGB specular_color = {0};
-            // int count_specular = 0;
-            // for (size_t j = 0; j < 1; j++) {
-            //     // ランダムに微小角回転させる
-            //     l3Mat44A rotate = {0};
-            //     l3MakeRoundMat44(radians(rand() / (l3Type)RAND_MAX * 2),
-            //                      radians(rand() / (l3Type)RAND_MAX * 2),
-            //                      radians(rand() / (l3Type)RAND_MAX * 2), rotate);
-            //     l3MulMat4441(rotate, dir, specular.rayDirection);
-            //     l3NormarizeVec(specular.rayDirection, specular.rayDirection, 3);
-            //     l3AddMat(ray->intersection, specular.rayDirection, specular.rayStartPoint, 3);
-            //     if (l3TraceRay(&specular, env, depth + 1)) {
-            //         count_specular++;
-            //         l3AddColor(specular_color, specular.color);
-            //     }
-            // }
-            // if (count_specular) {
-            //     l3DivColor(specular_color, count_specular);
-            //     l3MulColor(sumcolor, specular_color);
+            // // ランダムに微小角回転させる
+            // l3Mat44A rotate = {0};
+            // l3MakeRoundMat44(radians(rand() / (l3Type)RAND_MAX * 50),
+            //                  radians(rand() / (l3Type)RAND_MAX * 50),
+            //                  radians(rand() / (l3Type)RAND_MAX * 50), rotate);
+            // l3MulMat4441(rotate, dir, specular.rayDirection);
+            // l3NormarizeVec(specular.rayDirection, specular.rayDirection, 3);
+            // l3AddMat(ray->intersection, specular.rayDirection, specular.rayStartPoint, 3);
+            // if (l3TraceRay(&specular, env, depth + 1)) {
+            //     l3MulColor(sumcolor, specular.color);
             // }
             // // 鏡面反射Ray
-            if (ray->poligon->poligonType != l3PoligonTypeSky) {
-                l3Ray specular = {0};
-                l3GetReflectedVec(ray->rayDirection, normal, specular.rayDirection);
-                l3AddMat3(ray->intersection, specular.rayDirection, specular.rayStartPoint);
-                if (l3TraceRay(&specular, env, depth + 1) &&
-                    !(ray->poligon->poligonType == l3PoligonTypePlane && specular.poligon->poligonType == l3PoligonTypeSky)) {
-                    l3MulColor(sumcolor, specular.color);
-                }
-            }
         }
         ray->color.r = sumcolor.r;
         ray->color.g = sumcolor.g;
         ray->color.b = sumcolor.b;
         return true;
     } else {
+        //     ray->color.r = ray->poligon->color.r;
+        //     ray->color.g = ray->poligon->color.g;
+        //     ray->color.b = ray->poligon->color.b;
         return false;
     }
 }

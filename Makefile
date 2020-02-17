@@ -2,15 +2,16 @@ TARGET := lib3d
 CC := gcc
 CCOPT := -g -lm -O0 -std=c11 -pthread -mtune=native -march=native -mfpmath=both
 SRCDIR := src
-TARGETOPT := -o bin -t 16 -f 10 -w 1920 -h 1080 -r raytrace
+TARGETOPT := -o bin -t 16 -f 30 -w 480 -h 320 -r raytrace -f 100
 BINDIR := bin
 
 SRC := $(shell find $(SRCDIR) -name "*.c")
+HEADER := $(shell find $(SRCDIR) -name "*.h")
 OBJ := $(addsuffix .o, $(basename $(SRC)))
 
-$(TARGET):$(OBJ)
+$(TARGET):$(OBJ) $(HEADER)
 	mkdir -p $(BINDIR)
-	$(CC) $^ $(CCOPT) -o $@
+	$(CC) $(OBJ) $(CCOPT) -o $@
 
 run: $(TARGET) FORCE
 	./$(TARGET) $(TARGETOPT)
