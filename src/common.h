@@ -225,8 +225,15 @@ typedef struct _l3Ray {
     l3RGB color;
 } l3Ray;
 
-typedef enum _l32Deffects{//２Dエフェクトを作ったらここで番号振って。
-hoge
+typedef enum _l3TimeTransitionType{
+    l3TimeType_linear = 0,  // 線形,default
+    l3TimeType_easyEase, // S字,中間ピーク
+    l3TimeType_EasyEaseIn, // 最初遅く、徐々に速く
+    l3TimeType_EasyEaseOut, // 最初速く、徐々に遅く
+} l3TimeTransitionType;
+
+// typedef enum _l32Deffects{//２Dエフェクトを作ったらここで番号振って。
+// hoge
 
 
-} l32Deffects;
+// } l32Deffects;
