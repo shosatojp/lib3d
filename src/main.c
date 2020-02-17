@@ -3,6 +3,8 @@
 
 void transition(l3Environment* env, int frame) {
     // オブジェクト指定をわかりやすく
+    //l3TimeTransition(l3TimeType_ ,frame,0,10)
+
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y += 1 / 100.0 * 2 * PI;
     obj->theta_x += 1 / 100.0 * 2 * PI;
@@ -11,8 +13,12 @@ void transition(l3Environment* env, int frame) {
     l3Object* sphere = array_at(&env->objects, 1);
     //sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0)); //ぴょんぴょん
 
-    sphere->dx = 90 * l3TimeTransition(l3TimeType_linear,frame,0,10);
-    sphere->dy = 70 * l3TimeTransition(l3TimeType_linear,frame,0,9);
+    if(frame <= 30){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_linear,frame,0,30);}
+    if(frame >=60 && frame <= 90){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseIn,frame,60,90);}
+    if(frame >=120 && frame <= 150){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseOut,frame,120,150);}
+    if(frame >=180 && frame <= 210){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEase,frame,180,210);}
+    
+    sphere->dy = 40;
 
     // sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
     // sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);

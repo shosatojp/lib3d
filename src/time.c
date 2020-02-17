@@ -21,7 +21,7 @@ double l3TimeTransition(l3TimeTransitionType TypeId ,int frame, int start_frame,
         return t;
     }
 
-    if(TypeId == l3TimeType_easyEase){
+    if(TypeId == l3TimeType_EasyEase){
         if(frame<start_frame){
             t=0.0;
         }else if(frame>end_frame){
@@ -47,7 +47,7 @@ double l3TimeTransition(l3TimeTransitionType TypeId ,int frame, int start_frame,
         }else if(frame>end_frame){
             t=1.0;
         }else{
-            t =logn(4,p);
+            t =-p*(p-2);
         }
         return t;
     }
