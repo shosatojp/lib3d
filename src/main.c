@@ -6,19 +6,23 @@ void transition(l3Environment* env, int frame) {
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y += 1 / 100.0 * 2 * PI;
     obj->theta_x += 1 / 100.0 * 2 * PI;
-    obj->theta_z += 1 / 100.0 * 2 * PI;
+    obj->theta_z += 10 / 100.0 * 2 * PI;
     // l3Object* obj2 = array_at(&env->objects, 1);
     l3Object* sphere = array_at(&env->objects, 1);
-    sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
+    //sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0)); //ぴょんぴょん
 
-    sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
-    sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
-    obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
-    obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
+    sphere->dx = 90 * l3TimeTransition(l3TimeType_linear,frame,0,10);
+    sphere->dy = 70 * l3TimeTransition(l3TimeType_linear,frame,0,9);
 
-    env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
-    env->camera.coordinate[1] = (frame + 1) / 3.0;
-    env->camera.coordinate[2] = 400.0 / ((frame + 1) / 30.0) * sin(-(frame + 1) / 100.0 * 2 * PI);
+    // sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
+    // sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
+    // obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
+    // obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
+
+    env->camera.coordinate[0] = 0;
+    env->camera.coordinate[1] = 0;
+    env->camera.coordinate[2] = -100;
+    env->camera.target[1] = 20;
 }
 
 int main(int argc, const char* argv[]) {
@@ -89,10 +93,10 @@ int main(int argc, const char* argv[]) {
         {
             int vs[] = {
                 l3AddVertexToObject(sphere, l3CreateVertex(0, 0, 0, &red)),
-                l3AddVertexToObject(sphere, l3CreateVertex(0, 5, 0, &red)),
+                l3AddVertexToObject(sphere, l3CreateVertex(0, 1, 0, &red)),
             };
             l3Poligon* poligons[] = {
-                l3CreatePoligonSphere(0, 1, 10),
+                l3CreatePoligonSphere(0, 1, 1),
             };
             poligons[0]->color.r = 255;
             poligons[0]->color.g = 55;
@@ -102,6 +106,25 @@ int main(int argc, const char* argv[]) {
             l3SetTransposeObject(sphere, 15, 0, 0);
             l3AddObjectToEnvironment(&env, sphere);
         }
+
+        l3Object* point1 = l3CloneObject(sphere);
+        {
+            point1->poligons[0]->color.r = 0;
+            point1->poligons[0]->color.g = 0;
+            point1->poligons[0]->color.b = 0;
+            l3SetTransposeObject(point1,-90,70,0);
+            l3AddObjectToEnvironment(&env, point1);
+        }
+
+        l3Object* point2 = l3CloneObject(sphere);
+        {
+            point2->poligons[0]->color.r = 0;
+            point2->poligons[0]->color.g = 0;
+            point2->poligons[0]->color.b = 0;
+            l3SetTransposeObject(point2,90,70,0);
+            l3AddObjectToEnvironment(&env, point2);
+        }
+
         l3Object* obj3 = l3CreateObject();
         {
             l3AddVertexToObject(obj3, l3CreateVertex(0, 0, 0, &blue));
