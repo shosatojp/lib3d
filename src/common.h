@@ -137,7 +137,7 @@ typedef struct _l3Poligon {
     // (これと視線の入射角から拡散反射係数、鏡面反射係数を求める)
     // スカイオブジェクトは0
     // この値(からもとまる拡散反射係数)の比率で色が決まる？？
-    l3Type metalness;
+    l3Type metalness[3];
     // 鏡面反射光の取得範囲(1/光沢度)
     // 鏡面反射光はいくつかの方向のものを(cos theta)^alphaを掛けて足し合わせる
     l3Type roughness;
