@@ -2,59 +2,58 @@
 #include "lib3d.h"
 
 static void transition(l3Environment* env, int frame) {
-    l3Object* sphere = array_at(&env->objects, 1);
-    // { // イージング処理集
-    // if(frame <= 30){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_linear,frame,0,30);}
-    // if(frame >=60 && frame <= 90){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseIn,frame,60,90);}
-    // if(frame >=120 && frame <= 150){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseOut,frame,120,150);}
-    // if(frame >=180 && frame <= 210){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEase,frame,180,210);}
-    //
-    // sphere->dy = 40;
-    // }
-
-    {  //bezier曲線移動サンプル
-        bezier cpoint[8];
-        {
-            cpoint[0].x = 0;
-            cpoint[0].y = 5;
-            cpoint[0].z = -70;
-            cpoint[1].x = 80;
-            cpoint[1].y = 100;
-            cpoint[1].z = 0;
-            cpoint[2].x = 0;
-            cpoint[2].y = 10;
-            cpoint[2].z = -100;
-            cpoint[3].x = -70;
-            cpoint[3].y = 20;
-            cpoint[3].z = 40;
-            cpoint[4].x = 0;
-            cpoint[4].y = 5;
-            cpoint[4].z = -70;
-            cpoint[5].x = -100;
-            cpoint[5].y = 40;
-            cpoint[5].z = 70;
-            cpoint[6].x = -80;
-            cpoint[6].y = 100;
-            cpoint[6].z = -30;
-            cpoint[7].x = -100;
-            cpoint[7].y = 5;
-            cpoint[7].z = 70;
-        }
-
-        bezier sphere_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 30, 200), 8, cpoint);
-
-        sphere->dx = sphere_bezier.x;
-        sphere->dy = sphere_bezier.y;
-        sphere->dz = sphere_bezier.z;
+    l3Object* sphere = l3FindObject(env, "sphere");
+    // l3Vertex* v0 = array_at(&sphere->vertices, 0);
+    // v0->coordinate[0] = 3;
+    { // イージング処理集
+    if(frame <= 30){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_linear,frame,0,30);}
+    if(frame >=60 && frame <= 90){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseIn,frame,60,90);}
+    if(frame >=120 && frame <= 150){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseOut,frame,120,150);}
+    if(frame >=180 && frame <= 210){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEase,frame,180,210);}
+    
+    sphere->dy = 40;
     }
+
+    // {  //bezier曲線移動サンプル
+    //     bezier cpoint[8];
+    //     {
+    //         cpoint[0].x = 0;
+    //         cpoint[0].y = 5;
+    //         cpoint[0].z = -70;
+    //         cpoint[1].x = 80;
+    //         cpoint[1].y = 100;
+    //         cpoint[1].z = 0;
+    //         cpoint[2].x = 0;
+    //         cpoint[2].y = 10;
+    //         cpoint[2].z = -100;
+    //         cpoint[3].x = -70;
+    //         cpoint[3].y = 20;
+    //         cpoint[3].z = 40;
+    //         cpoint[4].x = 0;
+    //         cpoint[4].y = 5;
+    //         cpoint[4].z = -70;
+    //         cpoint[5].x = -100;
+    //         cpoint[5].y = 40;
+    //         cpoint[5].z = 70;
+    //         cpoint[6].x = -80;
+    //         cpoint[6].y = 100;
+    //         cpoint[6].z = -30;
+    //         cpoint[7].x = -100;
+    //         cpoint[7].y = 5;
+    //         cpoint[7].z = 70;
+    //     }
+
+    //     bezier sphere_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 30, 200), 8, cpoint);
+
+    //     sphere->dx = sphere_bezier.x;
+    //     sphere->dy = sphere_bezier.y;
+    //     sphere->dz = sphere_bezier.z;
+    // }
 
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y += 1 / 100.0 * 2 * PI;
     obj->theta_x += 1 / 100.0 * 2 * PI;
-    obj->theta_z += 10 / 100.0 * 2 * PI;
-    // l3Object* obj2 = array_at(&env->objects, 1);
-
-    //sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0)); //ぴょんぴょん
+    obj->theta_z += 1 / 100.0 * 2 * PI;
 
     {  //運動テスト用固定カメラ
         env->camera.coordinate[0] = 0;
@@ -77,48 +76,7 @@ int scene_bezier(int argc, const char* argv[],l3Options* options) {
         env.outdir = options->outdir;
 
         // オブジェクト構築
-        l3Object* _object = l3CreateObject();
-        {
-            int vs[] = {
-                l3AddVertexToObject(_object, l3CreateVertex(5, 5, 5, &red)),
-                l3AddVertexToObject(_object, l3CreateVertex(-5, -5, 5, &green)),
-                l3AddVertexToObject(_object, l3CreateVertex(5, -5, -5, &blue)),
-                l3AddVertexToObject(_object, l3CreateVertex(-5, 5, -5, &white)),
-            };
-            // 右回りが表、数字はオブジェクトごとの頂点のインデックス
-            l3Poligon* poligons[] = {
-                l3CreatePoligon(0, 2, 1),
-                l3CreatePoligon(0, 3, 2),
-                l3CreatePoligon(1, 2, 3),
-                l3CreatePoligon(0, 1, 3),
-            };
-
-            poligons[0]->material = l3PoligonMaterialColor;
-            poligons[0]->color.r = 150;
-            poligons[1]->material = l3PoligonMaterialColor;
-            poligons[1]->color.g = 150;
-            poligons[2]->material = l3PoligonMaterialColor;
-            poligons[2]->color.b = 150;
-            poligons[3]->material = l3PoligonMaterialColor;
-            poligons[3]->color.r = 150;
-            poligons[3]->color.b = 150;
-            // poligons[0]->transparency = 0.1;
-            // poligons[1]->transparency = 0.1;
-            // poligons[2]->transparency = 0.1;
-            // poligons[3]->transparency = 0.1;
-            poligons[0]->metalness[0] = poligons[1]->metalness[0] = poligons[2]->metalness[0] = poligons[3]->metalness[0] = 0.05;
-            poligons[0]->metalness[1] = poligons[1]->metalness[1] = poligons[2]->metalness[1] = poligons[3]->metalness[1] = 0.05;
-            poligons[0]->metalness[2] = poligons[1]->metalness[2] = poligons[2]->metalness[2] = poligons[3]->metalness[2] = 0.05;
-
-            // テクスチャ読み込み・貼り付け
-            // l3Texture texture;
-            // l3Load2DTexture("assets/tex4.ppm", &texture);
-            // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
-            l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3SetTransposeObject(_object, -5, 10, 0);
-            l3SetScaleObject(_object, 2, 2, 2);
-            l3AddObjectToEnvironment(&env, _object, "test");
-        }
+        
         l3Object* obj2 = l3CreateBox();
         {
             l3SetTransposeObject(obj2, -15, 10, 0);
@@ -129,10 +87,10 @@ int scene_bezier(int argc, const char* argv[],l3Options* options) {
         {
             int vs[] = {
                 l3AddVertexToObject(sphere, l3CreateVertex(0, 0, 0, &red)),
-                l3AddVertexToObject(sphere, l3CreateVertex(0, 10, 0, &red)),
+                l3AddVertexToObject(sphere, l3CreateVertex(0, 1, 0, &red)),
             };
             l3Poligon* poligons[] = {
-                l3CreatePoligonSphere(0, 1, 10),
+                l3CreatePoligonSphere(0, 1, 1),
             };
             poligons[0]->color.r = 255;
             poligons[0]->color.g = 50;
