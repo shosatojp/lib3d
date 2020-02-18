@@ -13,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include "array.h"
+#include "hashmap.h"
 
 #define l3POLIGON_VERTEX_COUNT 3
 
@@ -44,7 +45,14 @@ typedef enum _l3PoligonType {
     l3PoligonTypeShpere,
     l3PoligonTypeSky,
     l3PoligonTypePlane,
+    l3PoligonTypeColumn,
+    l3PoligonTypeCircle,
 } l3PoligonType;
+
+typedef enum _l3LightType {
+    l3LightTypeParallel = 1,
+    l3LightTypePoint = 2,
+} l3LightType;
 
 typedef struct _l3RGB {
     l3Type r, g, b;
@@ -86,11 +94,12 @@ typedef struct _l3Poligon {
      */
     l3Vertex* vertices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
     int vertex_indices[l3POLIGON_VERTEX_COUNT];  // 解放の必要なし
+    int vertex_count;
 
     // 三角形ポリゴン用のパラメータ
     l3Mat31A e1;
     l3Mat31A e2;
-    l3Mat31A normal;
+    l3Mat31A normal;// 平行光線では光線の方向ベクトル
 
     union {
         /**
@@ -112,10 +121,10 @@ typedef struct _l3Poligon {
      */
     l3Texture* texture;
     // 三角形ポリゴン用
-    l3Mat23 textureVertices;  // heap 解放
+    l3Mat23 textureVertices;      // heap 解放
     l3Mat33 textureAffineMatInv;  // heap 解放
 
-    l3RGB color; // ベースカラー？？
+    l3RGB color;  // ベースカラー？？
 
     /**
      * このポリゴンにどのマテリアルを使うか
@@ -132,16 +141,20 @@ typedef struct _l3Poligon {
     // 鏡面反射光の取得範囲(1/光沢度)
     // 鏡面反射光はいくつかの方向のものを(cos theta)^alphaを掛けて足し合わせる
     l3Type roughness;
+    int roughnessSamples;
     // 光源としての強度
     // もしくはcolorの1以上で表現する
     l3Type lightIntensity;
+    l3Type lightAttenuation;
 
+    l3LightType lightType;
     /**
      * ポリゴンの種類
      * - 三角形ポリゴン
      * - 球体 (座標(vertices[0]),上方向(vertices[1])、半径(max_z))
      */
     l3PoligonType poligonType;
+    bool noSize;
 } l3Poligon;
 
 /**
@@ -186,10 +199,10 @@ typedef struct _l3Environment l3Environment;
 typedef void l3FrameTransitionFunction(l3Environment* env, int frame);
 typedef void l3Renderer(l3Environment* env);
 
-typedef enum _l3MultiThreadRenderingType{
+typedef enum _l3MultiThreadRenderingType {
     l3MultiThreadRenderingTypeRandom,
     l3MultiThreadRenderingTypeSequential,
-}l3MultiThreadRenderingType;
+} l3MultiThreadRenderingType;
 
 // マルチスレッド時にこれを持ってく
 struct _l3Environment {
@@ -211,6 +224,7 @@ struct _l3Environment {
     const char* outdir;
     l3FrameTransitionFunction* transitionFn;
     array poligons;  // 描画用のポリゴンリスト solve ptrsで作成
+    hashmap objects_map;
 };
 
 typedef struct _l3Ray {

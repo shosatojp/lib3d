@@ -153,7 +153,7 @@ void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, in
         for (int i = 0; i < _object->poligon_count; i++) {
             l3Poligon* _poligon = _object->poligons[i];
 
-            for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
+            for (int j = 0; j < _poligon->vertex_count; j++) {
                 l3Vertex* _vertex = _poligon->vertices[j];
                 if (!_vertex->converted) {
                     l3InitMat(r, 4, 1);

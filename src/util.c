@@ -63,6 +63,7 @@ l3Poligon* l3CreatePoligon(int v1, int v2, int v3) {
     _p->vertex_indices[0] = v1;
     _p->vertex_indices[1] = v2;
     _p->vertex_indices[2] = v3;
+    _p->vertex_count = 3;
     return _p;
 }
 
@@ -72,6 +73,7 @@ l3Poligon* l3CreatePoligonSphere(int center, int upper, l3Type radius) {
     _p->vertex_indices[0] = center;
     _p->vertex_indices[1] = upper;
     _p->sphere_radius = radius;
+    _p->vertex_count = 2;
     return _p;
 }
 
@@ -87,6 +89,19 @@ l3Poligon* l3CreatePoligonPlane(int point, l3Mat31 normal) {
     _p->normal[0] = normal[0];
     _p->normal[1] = normal[1];
     _p->normal[2] = normal[2];
+    _p->vertex_count = 1;
+    // memcpy(_p->normal, normal, 3);
+    return _p;
+}
+l3Poligon* l3CreatePoligonCircle(int point, l3Mat31 normal, l3Type radius) {
+    l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
+    _p->poligonType = l3PoligonTypePlane;
+    _p->vertex_indices[0] = point;
+    _p->normal[0] = normal[0];
+    _p->normal[1] = normal[1];
+    _p->normal[2] = normal[2];
+    _p->sphere_radius = radius;
+    _p->vertex_count = 1;
     // memcpy(_p->normal, normal, 3);
     return _p;
 }
@@ -94,6 +109,7 @@ l3Poligon* l3CreatePoligonPlane(int point, l3Mat31 normal) {
 l3Poligon* l3CreatePoligonSky() {
     l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
     _p->poligonType = l3PoligonTypeSky;
+    _p->vertex_count = 0;
     return _p;
 }
 
@@ -105,6 +121,16 @@ l3Poligon* l3ClonePoligon(l3Poligon* p) {
     if (p->textureAffineMatInv)
         _p->textureAffineMatInv = l3CloneMat(p->textureAffineMatInv, 3, 3);
     // textureは放置
+    return _p;
+}
+
+l3Poligon* l3CreatePoligonColumn(int top, int end, l3Type radius) {
+    l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
+    _p->poligonType = l3PoligonTypeColumn;
+    _p->vertex_indices[0] = top;
+    _p->vertex_indices[1] = end;
+    _p->sphere_radius = radius;
+    _p->vertex_count = 2;
     return _p;
 }
 
@@ -131,8 +157,8 @@ void l3InitializeObject(l3Object* o) {
 
 l3Object* l3CreateObject() {
     l3Object* _o = (l3Object*)calloc(sizeof(l3Object), 1);
-    array_init(&_o->vertices, sizeof(l3Vertex*), true);
-    array_expand(&_o->vertices, 10);
+    array_init(&_o->vertices, sizeof(l3Vertex*), true, 10);
+    // array_expand(&_o->vertices, 10);
     l3InitializeObject(_o);
     return _o;
 }
@@ -220,9 +246,11 @@ void l3SetCameraInfoToEnvironment(l3Environment* env,
  * オブジェクトを追加、インデックスを返却
  * バウンディング半径を計算（原点からの距離の最大値）
  */
-int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj) {
+int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj, const char* name) {
     obj->bounding_radius = l3GetBoundingRadius(obj);
-    return array_push(&env->objects, obj);
+    int index = array_push(&env->objects, obj);
+    hashmap_add(&env->objects_map, name, (void*)(long)index);
+    return index;
 }
 
 /**
@@ -263,10 +291,9 @@ void l3SolvePtrsEnvironment(l3Environment* env) {
  */
 void l3InitializeEnvironment(l3Environment* env) {
     memset(env, 0, sizeof(l3Environment));
-    array_init(&env->objects, sizeof(l3Object*), true);
-    array_expand(&env->objects, 10);
-    array_init(&env->poligons, sizeof(l3Poligon*), true);
-    array_expand(&env->poligons, 10);
+    array_init(&env->objects, sizeof(l3Object*), true, 10);
+    array_init(&env->poligons, sizeof(l3Poligon*), true, 10);
+    hashmap_init(&env->objects_map, 10);
 }
 
 void l3ClearEnvironment(l3Environment* env) {
@@ -286,9 +313,7 @@ void l3DestructEnvironment(l3Environment* env) {
     });
     array_clear(&env->objects);
     array_clear(&env->poligons);
-}
-
-void array_clone(array* dst, array* src) {
+    hashmap_destruct(&env->objects_map);
 }
 
 l3Environment* l3CloneEnvironment(l3Environment* env) {
@@ -303,7 +328,16 @@ l3Environment* l3CloneEnvironment(l3Environment* env) {
     // これをしないと他のスレッドのメモリを開放しようとしてしまう
     _env->poligons.data = calloc(sizeof(l3Poligon*), _env->poligons.capacity);
 
+    hashmap_init(&_env->objects_map, env->objects_map.capacity);
+    hashmap_each_i(&env->objects_map, {
+        hashmap_add(&_env->objects_map, hashmap_ei->key, hashmap_ei->ptr);
+    });
+
     return _env;
+}
+l3Object* l3FindObject(l3Environment* env, const char* name) {
+    int index = (int)(long)hashmap_find(&env->objects_map, name);
+    return array_at(&env->objects, index);
 }
 
 // =============================================
