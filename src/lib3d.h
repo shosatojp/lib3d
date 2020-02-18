@@ -12,3 +12,4 @@
 #include "color.h"
 #include "box.h"
 #include "bezier.h"
+#include "shape.h"

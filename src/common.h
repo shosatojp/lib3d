@@ -45,6 +45,8 @@ typedef enum _l3PoligonType {
     l3PoligonTypeShpere,
     l3PoligonTypeSky,
     l3PoligonTypePlane,
+    l3PoligonTypeColumn,
+    l3PoligonTypeCircle,
 } l3PoligonType;
 
 typedef enum _l3LightType {

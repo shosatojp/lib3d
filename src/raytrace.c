@@ -10,6 +10,9 @@
  * return: 交点がある場合true
  */
 bool l3IntersectRayPoligon(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Poligon *poligon, l3Mat41 r, l3Mat21 uv) {
+    // 裏を向いているポリゴンは描かない
+    if (l3InnerProductVec3(ray_direction, poligon->normal) > 0) return false;
+
     l3Mat41A a_v0;  // ゼロ初期化不要
     l3Mat31 cw = poligon->vertices[0]->coordinateWorld;
     l3SubMat3(ray_origin, cw, a_v0);
@@ -92,9 +95,8 @@ bool l3IntersectRaySphere(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Mat41 sph
             r[2] = ray_origin[2] + t * ray_direction[2];
             return true;
         }
-    } else {
-        return false;
     }
+    return false;
 }
 
 /**
@@ -286,12 +288,45 @@ bool l3FindRayCrossPoint(l3Ray *ray, l3Environment *env) {
                     min_poligon = p;
                     found = true;
                 }
-            }
+            } break;
             case l3PoligonTypeSky: {
                 l3Mat41A intersection = {0};
                 if (!l3IntersectRaySky(rayStartPoint, rayDirection,
                                        env->camera.coordinate,
                                        env->camera.far, intersection)) {
+                    break;
+                }
+                l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
+                if (!found || min_length > distance) {
+                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                    min_length = distance;
+                    min_poligon = p;
+                    found = true;
+                }
+            } break;
+            case l3PoligonTypeColumn: {
+                l3Mat41A intersection = {0};
+                if (!l3IntersectRayColumn(rayStartPoint, rayDirection,
+                                          p->vertices[0]->coordinateWorld,
+                                          p->vertices[1]->coordinateWorld,
+                                          p->sphere_radius, intersection)) {
+                    break;
+                }
+                l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
+                if (!found || min_length > distance) {
+                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                    min_length = distance;
+                    min_poligon = p;
+                    found = true;
+                }
+            } break;
+            case l3PoligonTypeCircle: {
+                l3Mat41A intersection = {0};
+                if (!l3IntersectRayCircle(rayStartPoint, rayDirection,
+                                          p->vertices[0]->coordinateWorld,
+                                          p->normal,
+                                          p->sphere_radius,
+                                          intersection)) {
                     break;
                 }
                 l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
@@ -331,6 +366,17 @@ void l3GetNormal(l3Poligon *poligon, l3Mat41 intersection, l3Mat41 normal, l3Env
             l3SubMat3(env->camera.coordinate, intersection, sphere_local);
             l3NormarizeVec3(sphere_local, normal);
         } break;
+        case l3PoligonTypeColumn: {
+            l3Mat31A x, tmp;
+            l3SubMat3(intersection, poligon->vertices[0]->coordinateWorld, tmp);
+            l3CrossProductVec3(tmp, poligon->e1, x);
+            l3CrossProductVec3(x, tmp, normal);
+            l3NormarizeVec3(normal, normal);
+            l3ScalarMulMat3(normal, -1, normal);
+        } break;
+        case l3PoligonTypeCircle: {
+            l3CopyMat(poligon->normal, normal, 3);
+        } break;
     }
 }
 
@@ -365,10 +411,24 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
             ray->color.b = ray->poligon->color.b;
             return true;
         }
-        l3Mat41A normal = {0};
-        l3GetNormal(ray->poligon, ray->intersection, normal, env);
         // l3Mat31A inv_ray_direction;
         // l3ScalarMulMat3(ray->rayDirection, -1, inv_ray_direction);
+
+        l3Mat41A normal = {0};
+        l3GetNormal(ray->poligon, ray->intersection, normal, env);
+
+        // 透明度 TODO: ポリゴンが裏から見えないようにする
+        if (ray->poligon->transparency > 0) {
+            l3Ray trans_ray;
+            l3Mat31A tmp;
+            l3DivMat(ray->rayDirection, 10, tmp, 3);
+            l3CopyMat(ray->rayDirection,trans_ray.rayDirection, 3);
+            l3AddMat3(ray->intersection, tmp, trans_ray.rayStartPoint);
+            if (l3TraceRay(&trans_ray, env, depth + 1)) {
+                l3ScalarMulColor(trans_ray.color, 1.0 * 1.0 * ray->poligon->transparency);
+                l3AddColor(sumcolor, trans_ray.color);
+            }
+        }
         // l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
         l3Type k_s = 0.3,  //l3ReflectionRate(theta / (2 * PI), 0.2),
             k_d = 1 - k_s;
@@ -488,6 +548,7 @@ void l3SetWorldCoordinate(l3Environment *env) {
                         }
                     }
                 } break;
+                case l3PoligonTypeCircle:
                 case l3PoligonTypePlane: {
                     l3Vertex *_vertex = _poligon->vertices[0];
                     if (!_vertex->converted) {
@@ -498,6 +559,18 @@ void l3SetWorldCoordinate(l3Environment *env) {
                     }
                 } break;
                 case l3PoligonTypeSky: {
+                } break;
+                case l3PoligonTypeColumn: {
+                    for (int j = 0; j < 2; j++) {
+                        l3Vertex *_vertex = _poligon->vertices[j];
+                        if (!_vertex->converted) {
+                            // ローカル->ワールド
+                            l3InitMat(_vertex->coordinateWorld, 4, 1);
+                            l3MulMat4441(lw, _vertex->coordinate, _vertex->coordinateWorld);
+                            _vertex->converted = true;
+                        }
+                    }
+                    l3SubMat3(_poligon->vertices[1]->coordinateWorld, _poligon->vertices[0]->coordinateWorld, _poligon->e1);
                 } break;
             }
         }

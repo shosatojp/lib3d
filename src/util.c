@@ -93,6 +93,18 @@ l3Poligon* l3CreatePoligonPlane(int point, l3Mat31 normal) {
     // memcpy(_p->normal, normal, 3);
     return _p;
 }
+l3Poligon* l3CreatePoligonCircle(int point, l3Mat31 normal, l3Type radius) {
+    l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
+    _p->poligonType = l3PoligonTypePlane;
+    _p->vertex_indices[0] = point;
+    _p->normal[0] = normal[0];
+    _p->normal[1] = normal[1];
+    _p->normal[2] = normal[2];
+    _p->sphere_radius = radius;
+    _p->vertex_count = 1;
+    // memcpy(_p->normal, normal, 3);
+    return _p;
+}
 
 l3Poligon* l3CreatePoligonSky() {
     l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
@@ -109,6 +121,16 @@ l3Poligon* l3ClonePoligon(l3Poligon* p) {
     if (p->textureAffineMatInv)
         _p->textureAffineMatInv = l3CloneMat(p->textureAffineMatInv, 3, 3);
     // textureは放置
+    return _p;
+}
+
+l3Poligon* l3CreatePoligonColumn(int top, int end, l3Type radius) {
+    l3Poligon* _p = (l3Poligon*)calloc(sizeof(l3Poligon), 1);
+    _p->poligonType = l3PoligonTypeColumn;
+    _p->vertex_indices[0] = top;
+    _p->vertex_indices[1] = end;
+    _p->sphere_radius = radius;
+    _p->vertex_count = 2;
     return _p;
 }
 
@@ -135,7 +157,7 @@ void l3InitializeObject(l3Object* o) {
 
 l3Object* l3CreateObject() {
     l3Object* _o = (l3Object*)calloc(sizeof(l3Object), 1);
-    array_init(&_o->vertices, sizeof(l3Vertex*), true,10);
+    array_init(&_o->vertices, sizeof(l3Vertex*), true, 10);
     // array_expand(&_o->vertices, 10);
     l3InitializeObject(_o);
     return _o;

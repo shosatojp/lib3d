@@ -17,6 +17,8 @@ l3Poligon* l3CreatePoligon(int v1, int v2, int v3);
 l3Poligon* l3CreatePoligonSphere(int center, int upper, l3Type radius);
 l3Poligon* l3CreatePoligonPlane(int point, l3Mat31 normal);
 l3Poligon* l3CreatePoligonSky();
+l3Poligon* l3CreatePoligonColumn(int top, int end, l3Type radius);
+l3Poligon* l3CreatePoligonCircle(int point, l3Mat31 normal, l3Type radius);
 l3Poligon* l3ClonePoligon(l3Poligon* p);
 void l3DestructPoligon(l3Poligon* p);
 void l3ClearPoligon(l3Poligon* p);
