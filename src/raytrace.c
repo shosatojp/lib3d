@@ -437,6 +437,7 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         k_d[1] = 1 - k_s[1];
         k_d[2] = 1 - k_s[2];
 
+        // 拡散反射光
         for (int i = 0, l = env->poligons.length; i < l; ++i) {
             l3Poligon *light_poligon = array_at(&env->poligons, i);
             if (light_poligon->lightType) {
@@ -487,6 +488,7 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                 // }
             }
         }
+        // 鏡面反射光
         if (depth <= l3RAY_TRACE_MAX_DEPTH) {
             if (ray->poligon->roughness == 0) {
                 // 鏡面反射Ray
@@ -535,9 +537,6 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         ray->color.b = sumcolor.b;
         return true;
     } else {
-        //     ray->color.r = ray->poligon->color.r;
-        //     ray->color.g = ray->poligon->color.g;
-        //     ray->color.b = ray->poligon->color.b;
         return false;
     }
 }
