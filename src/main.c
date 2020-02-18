@@ -67,10 +67,14 @@ int main(int argc, const char* argv[]) {
             poligons[3]->material = l3PoligonMaterialColor;
             poligons[3]->color.r = 150;
             poligons[3]->color.b = 150;
-            poligons[0]->transparency = 0.2;
-            poligons[1]->transparency = 0.2;
-            poligons[2]->transparency = 0.2;
-            poligons[3]->transparency = 0.2;
+            poligons[0]->transparency = 0.1;
+            poligons[1]->transparency = 0.1;
+            poligons[2]->transparency = 0.1;
+            poligons[3]->transparency = 0.1;
+            poligons[0]->metalness = 0.7;
+            poligons[1]->metalness = 0.7;
+            poligons[2]->metalness = 0.7;
+            poligons[3]->metalness = 0.7;
 
             // テクスチャ読み込み・貼り付け
             // l3Texture texture;
@@ -79,13 +83,13 @@ int main(int argc, const char* argv[]) {
             l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3SetTransposeObject(_object, -5, 10, 0);
             l3SetScaleObject(_object, 2, 2, 2);
-            l3AddObjectToEnvironment(&env, _object,"test");
+            // l3AddObjectToEnvironment(&env, _object,"test");
         }
         l3Object* obj2 = l3CreateBox();
         {
             l3SetTransposeObject(obj2, -15, 10, 0);
             l3SetScaleObject(obj2, 20, 20, 20);
-            // l3AddObjectToEnvironment(&env, obj2, "box");
+            l3AddObjectToEnvironment(&env, obj2, "box");
         }
         l3Object* column = l3CreateObject();
         {
@@ -119,7 +123,8 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.b = 50;
             poligons[0]->material = l3PoligonMaterialColor;
             poligons[0]->lightType = l3LightTypePoint;
-            poligons[0]->lightIntensity = 2;
+            poligons[0]->lightIntensity = 3;
+            // poligons[0]->transparency = 0.5;
 
             l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3SetTransposeObject(sphere, 15, 0, 0);
@@ -163,6 +168,7 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.r = 200;
             poligons[0]->color.g = 200;
             poligons[0]->color.b = 200;
+            poligons[0]->metalness = 0.5;
 
             l3SetPoligonsToObject(obj3, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3AddObjectToEnvironment(&env, obj3, "plane");
@@ -176,14 +182,14 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.g = 200;
             poligons[0]->color.b = 200;
             poligons[0]->lightType = l3LightTypeParallel;
-            poligons[0]->lightIntensity = 2;
+            poligons[0]->lightIntensity = 1;
             poligons[0]->normal[0] = 1;
             poligons[0]->normal[1] = -1;
             poligons[0]->normal[2] = 1;
             l3NormarizeVec3(poligons[0]->normal,poligons[0]->normal);
 
             l3SetPoligonsToObject(sky, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3AddObjectToEnvironment(&env, sky, "sky");
+            // l3AddObjectToEnvironment(&env, sky, "sky");
         }
 
         l3SetCameraInfoToEnvironment(&env, 0, 20, -60,

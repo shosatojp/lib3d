@@ -411,8 +411,8 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
             ray->color.b = ray->poligon->color.b;
             return true;
         }
-        // l3Mat31A inv_ray_direction;
-        // l3ScalarMulMat3(ray->rayDirection, -1, inv_ray_direction);
+        l3Mat31A inv_ray_direction;
+        l3ScalarMulMat3(ray->rayDirection, -1, inv_ray_direction);
 
         l3Mat41A normal = {0};
         l3GetNormal(ray->poligon, ray->intersection, normal, env);
@@ -422,16 +422,16 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
             l3Ray trans_ray;
             l3Mat31A tmp;
             l3DivMat(ray->rayDirection, 10, tmp, 3);
-            l3CopyMat(ray->rayDirection,trans_ray.rayDirection, 3);
+            l3CopyMat(ray->rayDirection, trans_ray.rayDirection, 3);
             l3AddMat3(ray->intersection, tmp, trans_ray.rayStartPoint);
             if (l3TraceRay(&trans_ray, env, depth + 1)) {
                 l3ScalarMulColor(trans_ray.color, 1.0 * 1.0 * ray->poligon->transparency);
                 l3AddColor(sumcolor, trans_ray.color);
             }
         }
-        // l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
-        l3Type k_s = 0.3,  //l3ReflectionRate(theta / (2 * PI), 0.2),
-            k_d = 1 - k_s;
+        l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
+        l3Type k_s = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness),
+               k_d = 1 - k_s;
 
         for (int i = 0, l = env->poligons.length; i < l; ++i) {
             l3Poligon *light_poligon = array_at(&env->poligons, i);
@@ -449,10 +449,19 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                 // 影は光源を無視
                 bool cross = l3FindRayCrossPoint(&kage_ray, env);
                 if (!cross ||
-                    kage_ray.poligon->poligonType == l3PoligonTypeSky || kage_ray.poligon == light_poligon) {
+                    kage_ray.poligon->poligonType == l3PoligonTypeSky ||
+                    kage_ray.poligon == light_poligon ||
+                    kage_ray.poligon == ray->poligon ||
+                    ray->poligon == light_poligon) {  // kage_ray.poligon->lightType
+                    // TODO: 光源に自身の光も考慮するように
+
                     // kage_ray.poligon->poligonType == l3PoligonTypeSky || kage_ray.poligon->lightType) {
                     // 影にならないとき
                     l3Type ipv3 = l3InnerProductVec3(normal, light);
+
+                    // 光源自身にも光らせる
+                    if (ray->poligon->lightType) ipv3 = 1 - ipv3;
+
                     l3Type l_d = max(min(1, ipv3), 0);
                     l3RGB material_color = ray->poligon->color;
                     if (light_poligon->lightType == l3LightTypePoint) {
@@ -467,6 +476,13 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                     }
                     l3AddColor(sumcolor, material_color);
                 }
+                // if (cross && kage_ray.poligon->transparency > 0) {
+                //     l3RGB material_color = kage_ray.poligon->color;
+                //     material_color.r *= 0.1 * kage_ray.poligon->transparency;
+                //     material_color.g *= 0.1 * kage_ray.poligon->transparency;
+                //     material_color.b *= 0.1 * kage_ray.poligon->transparency;
+                //     l3AddColor(sumcolor, material_color);
+                // }
             }
         }
 
