@@ -14,7 +14,7 @@
  * 
  * main()に実行するためのコードを書きます。
  * 
- * main.cはGitには上げないようにしてください。
+ * main.cはGitには上げないようにしてください。ahhhh
  */
 
 int main(int argc, const char* argv[]) {
@@ -29,6 +29,6 @@ int main(int argc, const char* argv[]) {
     options.renderer = l3RaytracingRenderer;
     if (!l3ParseArgs(argc, argv, &options)) exit(0);
 
-    scene_core(argc, argv, &options);
-    // scene_bezier(argc, argv);
+    // scene_core(argc, argv, &options);
+    scene_bezier(argc, argv, &options);
 }
