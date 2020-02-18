@@ -2,7 +2,7 @@ TARGET := lib3d
 CC := gcc
 CCOPT := -g -lm -O0 -std=c11 -pthread -mtune=native -march=native -mfpmath=both
 SRCDIR := src
-TARGETOPT := -o bin -t 16 -f 30 -w 480 -h 320 -r raytrace -f 100
+TARGETOPT := -o bin -t 4 -f 10 -q ld
 BINDIR := bin
 
 SRC := $(shell find $(SRCDIR) -name "*.c")
@@ -20,7 +20,7 @@ run: $(TARGET) FORCE
 	$(CC) $^ $(CCOPT) -c -o $@
 
 gif:
-	# convert -delay 2 $(BINDIR)/*.ppm out.gif
+	# convert -delay 3.33 $(BINDIR)/*.ppm out.gif
 	ffmpeg -pattern_type glob -i "$(BINDIR)/*.ppm" -vf palettegen palette.png -y
 	ffmpeg -pattern_type glob -i "$(BINDIR)/*.ppm" -i palette.png -filter_complex paletteuse out.gif -y
 	rm palette.png
