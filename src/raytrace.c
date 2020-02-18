@@ -502,9 +502,9 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                 }
             } else {
                 // ラフネスありの鏡面反射Ray
-                l3Type specular_ray_count = 1;  // 増やせばラフネスのアンチエイリアスができるが、負荷が大きすぎる。1でもラフネス感は出る
                 l3RGB specular_color = {0};
-                for (int j = 0; j < specular_ray_count; j++) {
+                // 増やせばラフネスのアンチエイリアスができるが、負荷が大きすぎる。1でもラフネス感は出る
+                for (int j = 0; j < ray->poligon->roughnessSamples; j++) {
                     l3Ray specular = {0};
                     l3Mat41A dir = {0};
                     l3GetReflectedVec(ray->rayDirection, normal, dir);
@@ -525,7 +525,7 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                         l3AddColor(specular_color, specular.color);
                     }
                 }
-                l3DivColor(specular_color, specular_ray_count*10);
+                l3DivColor(specular_color, ray->poligon->roughnessSamples*10);
                 l3AddColor(sumcolor, specular_color);
             }
         }

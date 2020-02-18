@@ -172,6 +172,7 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.b = 60;
             poligons[0]->metalness[0] = poligons[0]->metalness[1] = poligons[0]->metalness[2] = 0.1;
             poligons[0]->roughness = radians(30);
+            poligons[0]->roughnessSamples = 2;
 
             l3SetPoligonsToObject(obj3, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3AddObjectToEnvironment(&env, obj3, "plane");
