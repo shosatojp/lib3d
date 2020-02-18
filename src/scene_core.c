@@ -18,17 +18,7 @@ static void transition(l3Environment* env, int frame) {
     // env->camera.coordinate[2] = 400.0 / ((frame + 1) / 30.0) * sin(-(frame + 1) / 100.0 * 2 * PI);
 }
 
-int scene_core(int argc, const char* argv[]) {
-    // default options
-    l3Options options;
-    options.outdir = "bin";
-    options.h = 1080;
-    options.w = 1920;
-    options.frames = 10;
-    options.threads = 1;
-    options.renderer = l3RaytracingRenderer;
-    if (!l3ParseArgs(argc, argv, &options)) exit(0);
-
+int scene_core(int argc, const char* argv[], l3Options* options) {
     l3Environment env;
     {
         l3RGB red = {255, 0, 0};
@@ -36,9 +26,9 @@ int scene_core(int argc, const char* argv[]) {
         l3RGB blue = {0, 0, 255};
         l3RGB white = {255, 255, 255};
         l3InitializeEnvironment(&env);
-        env.w = options.w;
-        env.h = options.h;
-        env.outdir = options.outdir;
+        env.w = options->w;
+        env.h = options->h;
+        env.outdir = options->outdir;
 
         // オブジェクト構築
         l3Object* _object = l3CreateObject();
@@ -169,8 +159,8 @@ int scene_core(int argc, const char* argv[]) {
             poligons[0]->color.r = 60;
             poligons[0]->color.g = 60;
             poligons[0]->color.b = 60;
-            poligons[0]->metalness[0] = poligons[0]->metalness[1] = poligons[0]->metalness[2] = 0.1;
-            poligons[0]->roughness = radians(30);
+            poligons[0]->metalness[0] = poligons[0]->metalness[1] = poligons[0]->metalness[2] = 0.5;
+            poligons[0]->roughness = radians(10);
             poligons[0]->roughnessSamples = 2;
 
             l3SetPoligonsToObject(obj3, sizeof(poligons) / sizeof(l3Poligon*), poligons);
@@ -200,7 +190,7 @@ int scene_core(int argc, const char* argv[]) {
                                      0, 1, 0,
                                      radians(50), 2, 100000);
 
-        l3MultithreadSequentialRenderer(&env, options.renderer, transition, options.frames, options.threads);
+        l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
 }

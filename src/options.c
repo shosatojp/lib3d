@@ -12,6 +12,29 @@ bool l3ParseArgs(int argc, const char* argv[], l3Options* r) {
             r->threads = atoi(argv[++i]);
         } else if (!strcmp(argv[i], "-f")) {
             r->frames = atoi(argv[++i]);
+        } else if (!strcmp(argv[i], "-b")) {
+            r->frame_begin = atoi(argv[++i]);
+        } else if (!strcmp(argv[i], "-q")) {
+            ++i;
+            if (!strcmp(argv[i], "4k")) {
+                r->w = 4096;
+                r->h = 2160;
+            } else if (!strcmp(argv[i], "2k")) {
+                r->w = 2560;
+                r->h = 1440;
+            } else if (!strcmp(argv[i], "fhd")) {
+                r->w = 1920;
+                r->h = 1080;
+            } else if (!strcmp(argv[i], "hd")) {
+                r->w = 1280;
+                r->h = 720;
+            } else if (!strcmp(argv[i], "sd")) {
+                r->w = 720;
+                r->h = 480;
+            } else if (!strcmp(argv[i], "ld")) {
+                r->w = 480;
+                r->h = 320;
+            }
         } else if (!strcmp(argv[i], "-r")) {
             ++i;
             if (!strcmp(argv[i], "raytrace")) {

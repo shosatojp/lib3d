@@ -18,6 +18,16 @@
  */
 
 int main(int argc, const char* argv[]) {
-    scene_core(argc, argv);
+    // default options
+    l3Options options = {0};
+    options.outdir = "bin";
+    options.h = 1080;
+    options.w = 1920;
+    options.frames = 10;
+    options.threads = 1;
+    options.renderer = l3RaytracingRenderer;
+    if (!l3ParseArgs(argc, argv, &options)) exit(0);
+
+    scene_core(argc, argv, &options);
     // scene_bezier(argc, argv);
 }

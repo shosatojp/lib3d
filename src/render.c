@@ -35,29 +35,30 @@ void l3MultithreadRenderer(l3Environment* env, l3Renderer* renderer, l3FrameTran
     printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frame_count, f - s, (double)(f - s) / frames);
 }
 
-void l3MultithreadSequentialRenderer(l3Environment* env, l3Renderer* renderer,
-                                     l3FrameTransitionFunction* transitionFn, int frames, int thread_count) {
+void l3MultithreadSequentialRenderer(l3Environment* env,
+                                     l3FrameTransitionFunction* transitionFn,
+                                     l3Options* options) {
     printf("starting multithreaded sequential rendering...\n");
-    thread_count = min(thread_count, frames);
+    int thread_count = min(options->threads, options->frames);
     printf("thread count : %d\n", thread_count);
-    printf("frame count  : %d\n", frames);
+    printf("frame count  : %d\n", options->frames);
 
     time_t s, f;
     time(&s);
 
-    int frame_per_thread = frames / thread_count;
-    int amari = frames % thread_count;
+    int frame_per_thread = options->frames / thread_count;
+    int amari = options->frames % thread_count;
     pthread_t* threads = (pthread_t*)malloc(sizeof(pthread_t) * thread_count);
 
     for (int i = 0; i < thread_count; i++) {
         l3Environment* _env = l3CloneEnvironment(env);
         _env->thread_count = thread_count;
-        _env->frame_begin = i;
-        _env->frame_end = frames;
+        _env->frame_begin = options->frame_begin + i;
+        _env->frame_end = options->frame_begin + options->frames;
         _env->transitionFn = transitionFn;
         _env->renderType = l3MultiThreadRenderingTypeSequential;
         printf("thread %d: %d - %d (every %d frames)\n", i, _env->frame_begin, _env->frame_end, _env->thread_count);
-        pthread_create(&threads[i], NULL, (void* (*)(void*))renderer, _env);
+        pthread_create(&threads[i], NULL, (void* (*)(void*))options->renderer, _env);
         transitionFn(env, i);
     }
     // 片付け
@@ -67,7 +68,7 @@ void l3MultithreadSequentialRenderer(l3Environment* env, l3Renderer* renderer,
 
     time(&f);
     free(threads);
-    printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frame_count, f - s, (double)(f - s) / frames);
+    printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frame_count, f - s, (double)(f - s) / options->frames);
 }
 #define l3ANTI_ALIASING_RAYS_COUNT 6
 // #define l3ANTI_ALIASING_ENABLED
@@ -145,10 +146,8 @@ void l3RaytracingRenderer(l3Environment* env) {
             }
         }
 
-
         // 2D処理
         // bufの中身を変更
-
 
         // PPMに出力
         char name[100] = {0};

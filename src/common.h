@@ -251,3 +251,12 @@ typedef enum _l3TimeTransitionType{
 
 
 // } l32Deffects;
+
+typedef struct _l3Options {
+    int w, h;
+    const char* outdir;
+    int threads, frames;
+    l3Renderer* renderer;
+    int frame_begin;
+    int frame_end;
+} l3Options;
