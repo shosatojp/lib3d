@@ -14,7 +14,7 @@
  * 
  * main()に実行するためのコードを書きます。
  * 
- * main.cはGitには上げないようにしてください。
+ * main.cはGitには上げないようにしてください。ahhhh
  */
 
 int main(int argc, const char* argv[]) {
