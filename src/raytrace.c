@@ -467,9 +467,10 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                     l3RGB material_color = ray->poligon->color;
                     if (light_poligon->lightType == l3LightTypePoint) {
                         l3Type distance = l3DistanceVec3(light_poligon->vertices[0]->coordinateWorld, ray->intersection);
-                        material_color.r *= l_d * k_d[0] * light_poligon->lightIntensity * light_poligon->color.r / 255.0 / (distance * 0.1);
-                        material_color.g *= l_d * k_d[1] * light_poligon->lightIntensity * light_poligon->color.g / 255.0 / (distance * 0.1);
-                        material_color.b *= l_d * k_d[2] * light_poligon->lightIntensity * light_poligon->color.b / 255.0 / (distance * 0.1);
+                        l3Type attenuation = light_poligon->lightAttenuation > 0 ? light_poligon->lightAttenuation * distance * distance : 1;
+                        material_color.r *= l_d * k_d[0] * light_poligon->lightIntensity * (light_poligon->color.r / 255.0) / attenuation;
+                        material_color.g *= l_d * k_d[1] * light_poligon->lightIntensity * (light_poligon->color.g / 255.0) / attenuation;
+                        material_color.b *= l_d * k_d[2] * light_poligon->lightIntensity * (light_poligon->color.b / 255.0) / attenuation;
                     } else {
                         material_color.r *= l_d * k_d[0] * light_poligon->lightIntensity * light_poligon->color.r / 255.0;
                         material_color.g *= l_d * k_d[1] * light_poligon->lightIntensity * light_poligon->color.g / 255.0;
@@ -486,39 +487,49 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                 // }
             }
         }
-
         if (depth <= l3RAY_TRACE_MAX_DEPTH) {
-            // 鏡面反射Ray
-            // if (ray->poligon->poligonType != l3PoligonTypeSky) {
-
-            l3Ray specular = {0};
-            l3GetReflectedVec(ray->rayDirection, normal, specular.rayDirection);
-            l3AddMat3(ray->intersection, specular.rayDirection, specular.rayStartPoint);
-            if (l3TraceRay(&specular, env, depth + 1) &&
-                !(ray->poligon->poligonType == l3PoligonTypePlane && specular.poligon->poligonType == l3PoligonTypeSky)) {
-                specular.color.r *= 1.0 * 1.0 * k_s[0];
-                specular.color.g *= 1.0 * 1.0 * k_s[1];
-                specular.color.b *= 1.0 * 1.0 * k_s[2];
-                l3AddColor(sumcolor, specular.color);
+            if (ray->poligon->roughness == 0) {
+                // 鏡面反射Ray
+                l3Ray specular = {0};
+                l3GetReflectedVec(ray->rayDirection, normal, specular.rayDirection);
+                l3AddMat3(ray->intersection, specular.rayDirection, specular.rayStartPoint);
+                if (l3TraceRay(&specular, env, depth + 1) &&
+                    !(ray->poligon->poligonType == l3PoligonTypePlane && specular.poligon->poligonType == l3PoligonTypeSky)) {
+                    specular.color.r *= 1.0 * 1.0 * k_s[0];
+                    specular.color.g *= 1.0 * 1.0 * k_s[1];
+                    specular.color.b *= 1.0 * 1.0 * k_s[2];
+                    l3AddColor(sumcolor, specular.color);
+                }
+            } else {
+                // ラフネスありの鏡面反射Ray
+                l3Type specular_ray_count = 1;  // 増やせばラフネスのアンチエイリアスができるが、負荷が大きすぎる。1でもラフネス感は出る
+                l3RGB specular_color = {0};
+                for (int j = 0; j < specular_ray_count; j++) {
+                    l3Ray specular = {0};
+                    l3Mat41A dir = {0};
+                    l3GetReflectedVec(ray->rayDirection, normal, dir);
+                    // ランダムに微小角回転させる
+                    l3Mat44A rotate = {0};
+                    l3Type radian = ray->poligon->roughness;
+                    l3MakeRoundMat44(rand() / (l3Type)RAND_MAX * radian,
+                                     rand() / (l3Type)RAND_MAX * radian,
+                                     rand() / (l3Type)RAND_MAX * radian, rotate);
+                    l3MulMat4441(rotate, dir, specular.rayDirection);
+                    l3NormarizeVec(specular.rayDirection, specular.rayDirection, 3);
+                    l3AddMat(ray->intersection, specular.rayDirection, specular.rayStartPoint, 3);
+                    if (l3TraceRay(&specular, env, depth + 1) &&
+                        !(ray->poligon->poligonType == l3PoligonTypePlane && specular.poligon->poligonType == l3PoligonTypeSky)) {
+                        specular.color.r *= 1.0 * 1.0 * k_s[0];
+                        specular.color.g *= 1.0 * 1.0 * k_s[1];
+                        specular.color.b *= 1.0 * 1.0 * k_s[2];
+                        l3AddColor(specular_color, specular.color);
+                    }
+                }
+                l3DivColor(specular_color, specular_ray_count*10);
+                l3AddColor(sumcolor, specular_color);
             }
-
-            // }
-            // l3Ray specular = {0};
-            // l3Mat41A dir = {0};
-            // l3GetReflectedVec(ray->rayDirection, normal, dir);
-            // // ランダムに微小角回転させる
-            // l3Mat44A rotate = {0};
-            // l3MakeRoundMat44(radians(rand() / (l3Type)RAND_MAX * 50),
-            //                  radians(rand() / (l3Type)RAND_MAX * 50),
-            //                  radians(rand() / (l3Type)RAND_MAX * 50), rotate);
-            // l3MulMat4441(rotate, dir, specular.rayDirection);
-            // l3NormarizeVec(specular.rayDirection, specular.rayDirection, 3);
-            // l3AddMat(ray->intersection, specular.rayDirection, specular.rayStartPoint, 3);
-            // if (l3TraceRay(&specular, env, depth + 1)) {
-            //     l3MulColor(sumcolor, specular.color);
-            // }
-            // // 鏡面反射Ray
         }
+
         ray->color.r = sumcolor.r;
         ray->color.g = sumcolor.g;
         ray->color.b = sumcolor.b;

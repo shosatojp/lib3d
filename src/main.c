@@ -124,6 +124,8 @@ int main(int argc, const char* argv[]) {
             poligons[0]->lightType = l3LightTypePoint;
             poligons[0]->lightIntensity = 3;
             // poligons[0]->transparency = 0.5;
+            poligons[0]->lightAttenuation = 0.004;
+
 
             l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3SetTransposeObject(sphere, 15, 0, 0);
@@ -143,7 +145,8 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.g = 255;
             poligons[0]->color.b = 255;
             poligons[0]->lightType = l3LightTypePoint;
-            poligons[0]->lightIntensity = 10;
+            poligons[0]->lightIntensity = 0.4;
+            // poligons[0]->lightAttenuation = 1;
             poligons[0]->normal[0] = 0;
             poligons[0]->normal[1] = -1;
             poligons[0]->normal[2] = 0;
@@ -167,7 +170,8 @@ int main(int argc, const char* argv[]) {
             poligons[0]->color.r = 60;
             poligons[0]->color.g = 60;
             poligons[0]->color.b = 60;
-            poligons[0]->metalness[0] = poligons[0]->metalness[1] = poligons[0]->metalness[2] = 0;
+            poligons[0]->metalness[0] = poligons[0]->metalness[1] = poligons[0]->metalness[2] = 0.1;
+            poligons[0]->roughness = radians(30);
 
             l3SetPoligonsToObject(obj3, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3AddObjectToEnvironment(&env, obj3, "plane");
