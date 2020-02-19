@@ -21,14 +21,14 @@ int main(int argc, const char* argv[]) {
     // default options
     l3Options options = {0};
     options.outdir = "bin";
-    options.h = 480;
-    options.w = 320;
+    options.w = 480;
+    options.h = 320;
     options.frame_begin = 0;
     options.frames = 1;
     options.threads = 1;
     options.renderer = l3RaytracingRenderer;
     if (!l3ParseArgs(argc, argv, &options)) exit(0);
 
-    scene_core(argc, argv, &options);
-    // scene_bezier(argc, argv);
+    // scene_core(argc, argv, &options);
+    scene_bezier(argc, argv, &options);
 }

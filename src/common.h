@@ -34,6 +34,11 @@ typedef l3Type l3Mat32A[6];
 typedef l3Type l3Mat31A[3];
 typedef l3Type l3Mat23A[6];
 
+typedef enum _l3CoordinateSystem {
+    l3CoordinateSystemLocal,
+    l3CoordinateSystemWorld,
+} l3CoordinateSystem;
+
 typedef enum _l3PoligonMaterial {
     l3PoligonMaterialVertex = 0,  // default
     l3PoligonMaterialColor,
@@ -99,7 +104,7 @@ typedef struct _l3Poligon {
     // 三角形ポリゴン用のパラメータ
     l3Mat31A e1;
     l3Mat31A e2;
-    l3Mat31A normal;// 平行光線では光線の方向ベクトル
+    l3Mat31A normal;  // 平行光線では光線の方向ベクトル
 
     union {
         /**
@@ -239,16 +244,15 @@ typedef struct _l3Ray {
     l3RGB color;
 } l3Ray;
 
-typedef enum _l3TimeTransitionType{
-    l3TimeType_linear = 0,  // 線形,default
-    l3TimeType_EasyEase, // S字,中間ピーク
-    l3TimeType_EasyEaseIn, // 最初遅く、徐々に速く
-    l3TimeType_EasyEaseOut, // 最初速く、徐々に遅く
+typedef enum _l3TimeTransitionType {
+    l3TimeType_linear = 0,   // 線形,default
+    l3TimeType_EasyEase,     // S字,中間ピーク
+    l3TimeType_EasyEaseIn,   // 最初遅く、徐々に速く
+    l3TimeType_EasyEaseOut,  // 最初速く、徐々に遅く
 } l3TimeTransitionType;
 
 // typedef enum _l32Deffects{//２Dエフェクトを作ったらここで番号振って。
 // hoge
-
 
 // } l32Deffects;
 

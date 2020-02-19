@@ -69,6 +69,7 @@ void l3MultithreadSequentialRenderer(l3Environment* env,
     time(&f);
     free(threads);
     printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frame_count, f - s, (double)(f - s) / options->frames);
+    printf("out dir: %s\n",options->outdir);
 }
 #define l3ANTI_ALIASING_RAYS_COUNT 6
 // #define l3ANTI_ALIASING_ENABLED
