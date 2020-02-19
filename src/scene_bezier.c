@@ -5,50 +5,50 @@ static void transition(l3Environment* env, int frame) {
     l3Object* sphere = l3FindObject(env, "sphere");
     // l3Vertex* v0 = array_at(&sphere->vertices, 0);
     // v0->coordinate[0] = 3;
-    { // イージング処理集
-    if(frame <= 30){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_linear,frame,0,30);}
-    if(frame >=60 && frame <= 90){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseIn,frame,60,90);}
-    if(frame >=120 && frame <= 150){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseOut,frame,120,150);}
-    if(frame >=180 && frame <= 210){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEase,frame,180,210);}
+    // { // イージング処理集
+    // if(frame <= 30){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_linear,frame,0,30);}
+    // if(frame >=60 && frame <= 90){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseIn,frame,60,90);}
+    // if(frame >=120 && frame <= 150){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEaseOut,frame,120,150);}
+    // if(frame >=180 && frame <= 210){sphere->dx = 90- 180 * l3TimeTransition(l3TimeType_EasyEase,frame,180,210);}
     
-    sphere->dy = 40;
-    }
-
-    // {  //bezier曲線移動サンプル
-    //     bezier cpoint[8];
-    //     {
-    //         cpoint[0].x = 0;
-    //         cpoint[0].y = 5;
-    //         cpoint[0].z = -70;
-    //         cpoint[1].x = 80;
-    //         cpoint[1].y = 100;
-    //         cpoint[1].z = 0;
-    //         cpoint[2].x = 0;
-    //         cpoint[2].y = 10;
-    //         cpoint[2].z = -100;
-    //         cpoint[3].x = -70;
-    //         cpoint[3].y = 20;
-    //         cpoint[3].z = 40;
-    //         cpoint[4].x = 0;
-    //         cpoint[4].y = 5;
-    //         cpoint[4].z = -70;
-    //         cpoint[5].x = -100;
-    //         cpoint[5].y = 40;
-    //         cpoint[5].z = 70;
-    //         cpoint[6].x = -80;
-    //         cpoint[6].y = 100;
-    //         cpoint[6].z = -30;
-    //         cpoint[7].x = -100;
-    //         cpoint[7].y = 5;
-    //         cpoint[7].z = 70;
-    //     }
-
-    //     bezier sphere_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 30, 200), 8, cpoint);
-
-    //     sphere->dx = sphere_bezier.x;
-    //     sphere->dy = sphere_bezier.y;
-    //     sphere->dz = sphere_bezier.z;
+    // sphere->dy = 40;
     // }
+
+    {  //bezier曲線移動サンプル
+        bezier cpoint[8];
+        {
+            cpoint[0].x = 0;
+            cpoint[0].y = 5;
+            cpoint[0].z = -70;
+            cpoint[1].x = 80;
+            cpoint[1].y = 100;
+            cpoint[1].z = 0;
+            cpoint[2].x = 0;
+            cpoint[2].y = 10;
+            cpoint[2].z = -100;
+            cpoint[3].x = -70;
+            cpoint[3].y = 20;
+            cpoint[3].z = 40;
+            cpoint[4].x = 0;
+            cpoint[4].y = 5;
+            cpoint[4].z = -70;
+            cpoint[5].x = -100;
+            cpoint[5].y = 40;
+            cpoint[5].z = 70;
+            cpoint[6].x = -80;
+            cpoint[6].y = 100;
+            cpoint[6].z = -30;
+            cpoint[7].x = -100;
+            cpoint[7].y = 5;
+            cpoint[7].z = 70;
+        }
+
+        bezier sphere_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 30, 200), 8, cpoint);
+
+        sphere->dx = sphere_bezier.x;
+        sphere->dy = sphere_bezier.y;
+        sphere->dz = sphere_bezier.z;
+    }
 
     l3Object* obj = array_at(&env->objects, 0);
     obj->theta_y += 1 / 100.0 * 2 * PI;
@@ -58,7 +58,7 @@ static void transition(l3Environment* env, int frame) {
     {  //運動テスト用固定カメラ
         env->camera.coordinate[0] = 0;
         env->camera.coordinate[1] = 0;
-        env->camera.coordinate[2] = -100;
+        env->camera.coordinate[2] = -150;
         env->camera.target[1] = 20;
     }
 }
@@ -81,7 +81,7 @@ int scene_bezier(int argc, const char* argv[],l3Options* options) {
         {
             l3SetTransposeObject(obj2, -15, 10, 0);
             l3SetScaleObject(obj2, 20, 20, 20);
-            // l3AddObjectToEnvironment(&env, obj2, "box");
+            l3AddObjectToEnvironment(&env, obj2, "box");
         }
         l3Object* sphere = l3CreateObject();
         {

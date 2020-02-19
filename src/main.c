@@ -30,5 +30,7 @@ int main(int argc, const char* argv[]) {
     if (!l3ParseArgs(argc, argv, &options)) exit(0);
 
     // scene_core(argc, argv, &options);
-    scene_bezier(argc, argv, &options);
+    // scene_bezier(argc, argv, &options);
+    scene_ramiel(argc, argv, &options);
+    
 }
