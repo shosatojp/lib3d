@@ -52,7 +52,9 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             poligons[1]->material = l3PoligonMaterialColor;
             poligons[1]->color.g = 150;
             poligons[2]->material = l3PoligonMaterialColor;
-            poligons[2]->color.b = 150;
+            poligons[2]->color.r = 255;
+            poligons[2]->color.b = 255;
+            poligons[2]->color.g = 255;
             poligons[3]->material = l3PoligonMaterialColor;
             poligons[3]->color.r = 150;
             poligons[3]->color.b = 150;
@@ -66,12 +68,12 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
 
             // テクスチャ読み込み・貼り付け
             l3Texture texture;
-            l3Load2DTexture("assets/tex4.ppm", &texture);
+            l3Load2DTexture("assets/pose_syanikamaeru_man.ppm", &texture);
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
             poligons[2]->textureType = l3TextureTypeTiled;
-            poligons[2]->textureScaleX = 6;
-            poligons[2]->textureScaleY = 6;
-            poligons[2]->textureCoordinateSystem = l3CoordinateSystemLocal;
+            poligons[2]->textureScaleX = 1;
+            poligons[2]->textureScaleY = 1;
+            poligons[2]->textureCoordinateSystem = l3CoordinateSystemWorld;
             poligons[2]->texture = &texture;
             // poligons[2]->lightType = l3LightTypePoint;
             // poligons[2]->lightIntensity = 4;
@@ -193,7 +195,7 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             l3AddObjectToEnvironment(&env, sky, "sky");
         }
 
-        l3SetCameraInfoToEnvironment(&env, 0, 20, -60,
+        l3SetCameraInfoToEnvironment(&env, 0, 40, -60,
                                      0, 0, 0,
                                      0, 1, 0,
                                      radians(50), 2, 100000);
