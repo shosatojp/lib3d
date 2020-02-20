@@ -125,6 +125,7 @@ unsigned char* l3LoadPPM(const char* path, int* w, int* h) {
 int l3Load2DTexture(const char* path, l3Texture* texture) {
     if (!(texture->buffer = l3LoadPPM(path, &texture->w, &texture->h))) {
         fprintf(stdout, "Failed to load ppm file: %s\n", path);
+        exit(1);
         return -1;
     }
 
