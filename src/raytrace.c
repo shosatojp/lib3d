@@ -474,8 +474,6 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         l3Mat31A k_s;
         l3Mat31A k_d;
         l3Type k_e = 0.1;
-        // 環境光
-        l3RGB env_color = {255, 255, 255};
 
         k_s[0] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[0]);
         k_s[1] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[1]);
@@ -498,6 +496,8 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                     break;
             }
         }
+        // 環境光
+        l3RGB env_color = {255, 255, 255};
         l3RGB color = material_color;
         color.r *= k_e * env_color.r / 255.0;
         color.g *= k_e * env_color.g / 255.0;
