@@ -43,7 +43,7 @@ void l3FragmentShader(l3PixelInfo* p, l3Mat31 v) {
 
 unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y) {
     if (0 <= x && x < texture->w && 0 <= y && y < texture->h) {
-        return (char*)texture->buffer + (x + y * texture->w) * 3;
+        return (unsigned char*)texture->buffer + (x + y * texture->w) * 3;
     } else {
         return NULL;
     }

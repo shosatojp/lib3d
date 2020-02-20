@@ -179,6 +179,7 @@ void l3MulMat44s44(int c, l3Mat44 as[], l3Mat44 r) {
     switch (c) {
         case 2:
             l3MulMat4444(as[0], as[1], r);
+            break;
         default: {
             l3Type tmp0[16] = {0};
             l3Type tmp1[16] = {0};

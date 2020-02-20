@@ -33,7 +33,7 @@ int array_clear(array* _array);
 #define array_ins(_array, index, e) _array_ins(_array, index, e)
 
 #define _array_each(INDEX, ARRAY, STMT)                                             \
-    for (int array_##INDEX = 0; array_##INDEX < (ARRAY)->length; array_##INDEX++) { \
+    for (indextype array_##INDEX = 0; array_##INDEX < (ARRAY)->length; array_##INDEX++) { \
         array_element* array_e##INDEX = array_at((ARRAY), array_##INDEX);           \
         STMT;                                                                       \
     }

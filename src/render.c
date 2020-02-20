@@ -59,7 +59,6 @@ void l3MultithreadSequentialRenderer(l3Environment* env,
         _env->renderType = l3MultiThreadRenderingTypeSequential;
         printf("thread %d: %d - %d (every %d frames)\n", i, _env->frame_begin, _env->frame_end, _env->thread_count);
         pthread_create(&threads[i], NULL, (void* (*)(void*))options->renderer, _env);
-        transitionFn(env, i);
     }
     // 片付け
     for (int i = 0; i < thread_count; i++) {
@@ -69,7 +68,7 @@ void l3MultithreadSequentialRenderer(l3Environment* env,
     time(&f);
     free(threads);
     printf("rendering finished successfully.\ntotal: %d frames, %ld s, %.3f s/frame\n", frame_count, f - s, (double)(f - s) / options->frames);
-    printf("out dir: %s\n",options->outdir);
+    printf("out dir: %s\n", options->outdir);
 }
 #define l3ANTI_ALIASING_RAYS_COUNT 6
 // #define l3ANTI_ALIASING_ENABLED
@@ -102,6 +101,10 @@ void l3RaytracingRenderer(l3Environment* env) {
     }
 #endif
 
+    for (size_t i = 0; i < env->frame_begin; i++) {
+        env->transitionFn(env, i);
+    }
+
     //for begin
     for (int f = env->frame_begin, e = env->frame_end; f < e; f++) {
         /* 動かす */
@@ -120,8 +123,8 @@ void l3RaytracingRenderer(l3Environment* env) {
         l3Mat33A p_wtoc = {0};
         l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
 
-        for (size_t j = 0, h = env->h; j < h; j++) {
-            for (size_t i = 0, w = env->w; i < w; i++) {
+        for (int j = 0, h = env->h; j < h; j++) {
+            for (int i = 0, w = env->w; i < w; i++) {
                 l3RGB sumcolor = {0};
                 l3Ray ray = {0};
                 l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,
@@ -132,7 +135,7 @@ void l3RaytracingRenderer(l3Environment* env) {
 
 #ifdef l3ANTI_ALIASING_ENABLED
                 // アンチエイリアス
-                for (size_t i = 0; i < l3ANTI_ALIASING_RAYS_COUNT; i++) {
+                for (int i = 0; i < l3ANTI_ALIASING_RAYS_COUNT; i++) {
                     l3Ray antieilias_ray = {0};
                     l3MulMat(anti_aliasing_ray_rotate_mats[i], ray.rayDirection, antieilias_ray.rayDirection, 4, 4, 1);
                     memcpy(antieilias_ray.rayStartPoint, ray.rayStartPoint, sizeof(l3Type) * 3);

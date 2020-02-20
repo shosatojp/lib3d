@@ -242,4 +242,5 @@ int scene_bezier(int argc, const char* argv[],l3Options* options) {
 
         l3DestructEnvironment(&env);
     }
+    return 0;
 }

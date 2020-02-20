@@ -93,12 +93,12 @@ void l3NormarizeVec(l3Mat a, l3Mat r, int n);
 /**
  * a = r, b = r
  */
-// void l3CrossProductVec3(l3Mat41 a, l3Mat41 b, l3Mat41 r);
+// void l3CrossProductVec3(l3Mat31 a, l3Mat31 b, l3Mat31 r);
 #define l3CrossProductVec3(a, b, r)             \
     (r)[0] = (a)[1] * (b)[2] - (a)[2] * (b)[1]; \
     (r)[1] = (a)[2] * (b)[0] - (a)[0] * (b)[2]; \
-    (r)[2] = (a)[0] * (b)[1] - (a)[1] * (b)[0]; \
-    (r)[3] = 1;
+    (r)[2] = (a)[0] * (b)[1] - (a)[1] * (b)[0];
+// (r)[3] = 1;
 
 l3Type l3CrossProductVec2(l3Mat21 a, l3Mat21 b);
 // l3Type l3InnerProductVec(l3Mat a, l3Mat b, int n);
@@ -133,4 +133,3 @@ l3Type l3VecAbs(l3Mat a, int n);
         r[1] = a[1] / s;         \
         r[2] = a[2] / s;         \
     }
-

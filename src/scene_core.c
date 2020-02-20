@@ -65,9 +65,17 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             poligons[0]->metalness[2] = poligons[1]->metalness[2] = poligons[2]->metalness[2] = poligons[3]->metalness[2] = 0.05;
 
             // テクスチャ読み込み・貼り付け
-            // l3Texture texture;
-            // l3Load2DTexture("assets/tex4.ppm", &texture);
+            l3Texture texture;
+            l3Load2DTexture("assets/tex4.ppm", &texture);
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
+            poligons[2]->textureType = l3TextureTypeTiled;
+            poligons[2]->textureScaleX = 6;
+            poligons[2]->textureScaleY = 6;
+            poligons[2]->textureCoordinateSystem = l3CoordinateSystemLocal;
+            poligons[2]->texture = &texture;
+            // poligons[2]->lightType = l3LightTypePoint;
+            // poligons[2]->lightIntensity = 4;
+
             l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3SetTransposeObject(_object, -5, 10, 0);
             l3SetScaleObject(_object, 2, 2, 2);
@@ -193,4 +201,5 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
         l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
+    return 0;
 }

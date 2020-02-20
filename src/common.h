@@ -26,6 +26,7 @@ typedef l3Type* l3Mat33;  // Affine
 typedef l3Type* l3Mat32;
 typedef l3Type* l3Mat31;
 typedef l3Type* l3Mat23;
+typedef l3Type* l3Mat22;
 typedef l3Type l3Mat44A[16];
 typedef l3Type l3Mat41A[4];
 typedef l3Type l3Mat21A[2];
@@ -33,6 +34,13 @@ typedef l3Type l3Mat33A[9];
 typedef l3Type l3Mat32A[6];
 typedef l3Type l3Mat31A[3];
 typedef l3Type l3Mat23A[6];
+typedef l3Type l3Mat22A[4];
+
+typedef enum _l3TextureType {
+    l3TextureTypeNone,
+    l3TextureTypeTiled,
+    l3TextureTypeUV,
+} l3TextureType;
 
 typedef enum _l3CoordinateSystem {
     l3CoordinateSystemLocal,
@@ -105,6 +113,7 @@ typedef struct _l3Poligon {
     l3Mat31A e1;
     l3Mat31A e2;
     l3Mat31A normal;  // 平行光線では光線の方向ベクトル
+    l3Mat31A cross_product_e2e1;
 
     union {
         /**
@@ -126,8 +135,14 @@ typedef struct _l3Poligon {
      */
     l3Texture* texture;
     // 三角形ポリゴン用
+    l3TextureType textureType;
+    l3Mat22 texturePuv;
     l3Mat23 textureVertices;      // heap 解放
     l3Mat33 textureAffineMatInv;  // heap 解放
+    l3Type textureRotate;
+    l3Type textureScaleX;
+    l3Type textureScaleY;
+    l3CoordinateSystem textureCoordinateSystem;
 
     l3RGB color;  // ベースカラー？？
 
@@ -264,3 +279,14 @@ typedef struct _l3Options {
     int frame_begin;
     int frame_end;
 } l3Options;
+
+typedef struct _l3Voxel {
+    bool a;
+} l3Voxel;
+
+typedef struct _l3VoxelMap {
+    l3Voxel* voxels;
+    l3Mat31A origin;
+    int size[3];
+    int voxel_size;
+} l3VoxelMap;
