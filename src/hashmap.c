@@ -52,6 +52,7 @@ int hashmap_init(hashmap* _m, int capacity) {
     _m->hash_entries = array_new(sizeof(hash_entry*), true, capacity);
     // array_expand(_m->hash_entries, capacity);
     array_fill(_m->hash_entries, 0, _m->hash_entries->length - 1, 0);
+    memset(_m->hash_entries->data, 0, capacity * sizeof(hash_entry*));
     _m->capacity = capacity;
     _m->length = 0;
     return 0;
@@ -91,6 +92,8 @@ int _hashmap_add(hashmap* _m, hash_entry* _e) {
                  count = 0;
         while (true) {
             hash = (hash + hash2) % _m->capacity;
+            // memdump _m->hash_entries->data
+            memdump(_m->hash_entries->data,_m->capacity * _m->hash_entries->elem_size);
             if (!array_at(_m->hash_entries, hash)) {
                 _m->length++;
                 array_set(_m->hash_entries, _e, hash);
