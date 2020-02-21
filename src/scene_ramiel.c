@@ -2,9 +2,49 @@
 #include "lib3d.h"
 
 static void transition(l3Environment* env, int frame) {
-    l3Object* ramiel = l3FindObject(env, "ramiel");
-    ramiel->theta_y += radians(360 / 100);
 
+    int mode = 0; //0は普通、１は変形
+
+    l3Object* ramiel_normal = l3FindObject(env, "ramiel_normal");
+    l3Vertex* v0 = array_at(&ramiel_normal->vertices, 0);
+    l3Vertex* v1 = array_at(&ramiel_normal->vertices, 1);
+    l3Vertex* v2 = array_at(&ramiel_normal->vertices, 2);
+    l3Vertex* v3 = array_at(&ramiel_normal->vertices, 3);
+    l3Vertex* v4 = array_at(&ramiel_normal->vertices, 4);
+    l3Vertex* v5 = array_at(&ramiel_normal->vertices, 5);
+    l3Vertex* v6 = array_at(&ramiel_normal->vertices, 6);
+    l3Vertex* v7 = array_at(&ramiel_normal->vertices, 7);
+    l3Vertex* v8 = array_at(&ramiel_normal->vertices, 8);
+    l3Vertex* v9 = array_at(&ramiel_normal->vertices, 9);
+    l3Vertex* v10 = array_at(&ramiel_normal->vertices, 10);
+    l3Vertex* v11 = array_at(&ramiel_normal->vertices, 11);
+
+
+    if(mode == 0){ramiel_normal->theta_y += radians(360 / 100);}
+
+    if(mode == 1){
+
+        int keyframe1 = 30 , keyframe2 = 90 , keyframe3 = 120;
+        
+
+        if(frame < keyframe1){
+        
+            ramiel_normal->dy = 800-600*l3TimeTransition(l3TimeType_linear ,frame, 0 , keyframe1 );
+            
+        }
+
+        if(frame > keyframe1 && frame < keyframe2){
+
+
+        
+        }
+
+    }
+
+    
+    
+    
+    
     l3Object* light1 = l3FindObject(env, "light1");
     light1->dx = 800 * cos(-67/100.0*2.0*PI);
     light1->dz = 800 * sin(-67/100.0*2.0*PI);
@@ -27,16 +67,21 @@ int scene_ramiel(int argc, const char* argv[],l3Options* options) {
         // オブジェクト構築
         
 
-        l3Object* ramiel_nomal = l3CreateObject();
+        l3Object* ramiel_normal = l3CreateObject();
         {
             int vs[] = {
-                l3AddVertexToObject(ramiel_nomal,l3CreateVertex(0,0,0,&ramiel_blue)),
-                l3AddVertexToObject(ramiel_nomal,l3CreateVertex(0,200,0,&ramiel_blue)),
-                l3AddVertexToObject(ramiel_nomal,l3CreateVertex(200,0,0,&ramiel_blue)),
-                l3AddVertexToObject(ramiel_nomal,l3CreateVertex(0,0,-200,&ramiel_blue)),
-                l3AddVertexToObject(ramiel_nomal,l3CreateVertex(0,0,200,&ramiel_blue)),
-                l3AddVertexToObject(ramiel_nomal,l3CreateVertex(-200,0,0,&ramiel_blue)),
-                l3AddVertexToObject(ramiel_nomal,l3CreateVertex(0,-200,0,&ramiel_blue)),
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,0,0,&ramiel_blue)),//0
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,200,0,&ramiel_blue)),
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(200,0,0,&ramiel_blue)),
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,0,-200,&ramiel_blue)),
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,0,200,&ramiel_blue)),
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(-200,0,0,&ramiel_blue)),
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,-200,0,&ramiel_blue)),//7
+
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,0,200,&ramiel_blue)),//8 開くよう
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,0,200,&ramiel_blue)),
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,0,200,&ramiel_blue)),
+                l3AddVertexToObject(ramiel_normal,l3CreateVertex(0,0,200,&ramiel_blue)),
             };
 
             // 右回りが表、数字はオブジェクトごとの頂点のインデックス
@@ -49,6 +94,11 @@ int scene_ramiel(int argc, const char* argv[],l3Options* options) {
                 l3CreatePoligon(6,4,2),
                 l3CreatePoligon(6,3,5),
                 l3CreatePoligon(6,5,4),
+
+                l3CreatePoligon(4,8,9),
+                l3CreatePoligon(4,9,10),
+                l3CreatePoligon(4,10,11),
+                l3CreatePoligon(4,11,8),
             };
 
             poligons[0]->material = l3PoligonMaterialColor;
@@ -66,13 +116,22 @@ int scene_ramiel(int argc, const char* argv[],l3Options* options) {
             poligons[6]->material = l3PoligonMaterialColor;
             poligons[6]->color = ramiel_blue;
             poligons[7]->material = l3PoligonMaterialColor;
-            poligons[7]->color = ramiel_blue;;
+            poligons[7]->color = ramiel_blue;
 
-            poligons[0]->metalness[0] = poligons[1]->metalness[0] = poligons[2]->metalness[0] = poligons[3]->metalness[0]= poligons[4]->metalness[0]= poligons[5]->metalness[0]= poligons[6]->metalness[0]= poligons[7]->metalness[0] = 0.5;
-            poligons[0]->metalness[1] = poligons[1]->metalness[1] = poligons[2]->metalness[1] = poligons[3]->metalness[1]= poligons[4]->metalness[1]= poligons[5]->metalness[1]= poligons[6]->metalness[1]= poligons[7]->metalness[1] = 0.5;
-            poligons[0]->metalness[2] = poligons[1]->metalness[2] = poligons[2]->metalness[2] = poligons[3]->metalness[2]= poligons[4]->metalness[2]= poligons[5]->metalness[2]= poligons[6]->metalness[2]= poligons[7]->metalness[2] = 0.0005;
+            poligons[8]->material = l3PoligonMaterialColor;
+            poligons[8]->color = ramiel_blue;
+            poligons[9]->material = l3PoligonMaterialColor;
+            poligons[9]->color = ramiel_blue;
+            poligons[10]->material = l3PoligonMaterialColor;
+            poligons[10]->color = ramiel_blue;
+            poligons[11]->material = l3PoligonMaterialColor;
+            poligons[11]->color = ramiel_blue;
 
-            poligons[0]->transparency = poligons[1]->transparency = poligons[2]->transparency = poligons[3]->transparency= poligons[4]->transparency= poligons[5]->transparency= poligons[6]->transparency= poligons[7]->transparency = 0.05;
+            poligons[0]->metalness[0] = poligons[1]->metalness[0] = poligons[2]->metalness[0] = poligons[3]->metalness[0]= poligons[4]->metalness[0]= poligons[5]->metalness[0]= poligons[6]->metalness[0]= poligons[7]->metalness[0] = poligons[8]->metalness[0] = poligons[9]->metalness[0] = poligons[10]->metalness[0] = poligons[11]->metalness[0] = 0.5;
+            poligons[0]->metalness[1] = poligons[1]->metalness[1] = poligons[2]->metalness[1] = poligons[3]->metalness[1]= poligons[4]->metalness[1]= poligons[5]->metalness[1]= poligons[6]->metalness[1]= poligons[7]->metalness[1] = poligons[8]->metalness[1] = poligons[9]->metalness[1] = poligons[10]->metalness[1] = poligons[11]->metalness[1] = 0.5;
+            poligons[0]->metalness[2] = poligons[1]->metalness[2] = poligons[2]->metalness[2] = poligons[3]->metalness[2]= poligons[4]->metalness[2]= poligons[5]->metalness[2]= poligons[6]->metalness[2]= poligons[7]->metalness[2] = poligons[8]->metalness[2] = poligons[9]->metalness[2] = poligons[10]->metalness[2] = poligons[11]->metalness[2] = 0.0005;
+
+            poligons[0]->transparency = poligons[1]->transparency = poligons[2]->transparency = poligons[3]->transparency= poligons[4]->transparency= poligons[5]->transparency= poligons[6]->transparency= poligons[7]->transparency = poligons[8]->transparency = poligons[9]->transparency = poligons[10]->transparency = poligons[11]->transparency = 0.05;
             
             // poligons[0]->lightType        = poligons[1]->lightType        = poligons[2]->lightType        = poligons[3]->lightType        = poligons[4]->lightType        = poligons[5]->lightType        = poligons[6]->lightType        = poligons[7]->lightType        = l3LightTypeParallel;
             // poligons[0]->lightIntensity   = poligons[1]->lightIntensity   = poligons[2]->lightIntensity   = poligons[3]->lightIntensity   = poligons[4]->lightIntensity   = poligons[5]->lightIntensity   = poligons[6]->lightIntensity   = poligons[7]->lightIntensity   = 0.01;
@@ -82,10 +141,10 @@ int scene_ramiel(int argc, const char* argv[],l3Options* options) {
             // l3Texture texture;
             // l3Load2DTexture("assets/tex4.ppm", &texture);
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
-            l3SetPoligonsToObject(ramiel_nomal, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3SetTransposeObject(ramiel_nomal, 0, 250, 0);
-            l3SetScaleObject(ramiel_nomal, 1, 1, 1);
-            l3AddObjectToEnvironment(&env, ramiel_nomal, "ramiel");
+            l3SetPoligonsToObject(ramiel_normal, sizeof(poligons) / sizeof(l3Poligon*), poligons);
+            l3SetTransposeObject(ramiel_normal, 0, 250, 0);
+            l3SetScaleObject(ramiel_normal, 1, 1, 1);
+            l3AddObjectToEnvironment(&env, ramiel_normal, "ramiel_normal");
 
 
         }
