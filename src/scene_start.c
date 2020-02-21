@@ -8,13 +8,6 @@ static void transition(l3Environment* env, int frame) {
     obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
     obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
 
-
-    // l3Vertex *v0 = array_at(&obj->vertices, 0);
-    // v0->coordinate[0] = frame;
-    // v0->coordinate[1] = frame*2;
-    // v0->coordinate[2]  = frame*3;
-    // v0->coordinate[3] = 1;
-
     l3Object* sphere = l3FindObject(env, "sphere");
     sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
     sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
@@ -25,7 +18,7 @@ static void transition(l3Environment* env, int frame) {
     // env->camera.coordinate[2] = 400.0 / ((frame + 1) / 30.0) * sin(-(frame + 1) / 100.0 * 2 * PI);
 }
 
-int scene_core(int argc, const char* argv[], l3Options* options) {
+int scene_start(int argc, const char* argv[], l3Options* options) {
     l3Environment env;
     {
         l3RGB red = {255, 0, 0};
