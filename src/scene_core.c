@@ -80,9 +80,9 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
                 poligons[i]->textureType = l3TextureTypeUV;
                 // poligons[i]->textureRepeatX = 10;
                 // poligons[i]->textureRepeatY = 10;
-                poligons[i]->textureCoordinateSystem = l3CoordinateSystemWorld;
+                // poligons[i]->textureCoordinateSystem = l3CoordinateSystemWorld;
                 // poligons[i]->texture = &texture;
-                l3SetTexturePoligon(poligons[i], &texture, texture_vertices);
+                l3SetUVTexturePoligon(poligons[i], &texture, texture_vertices);
                 // poligons[i]->lightType = l3LightTypePoint;
                 // poligons[i]->lightIntensity = 0.4;
             }

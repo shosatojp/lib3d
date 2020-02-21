@@ -49,7 +49,9 @@ unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y) {
     }
 }
 
-void l3SetTexturePoligon(l3Poligon* poligon, l3Texture* texture, l3Mat23 texture_vertices) {
+void l3SetUVTexturePoligon(l3Poligon* poligon, l3Texture* texture, l3Mat23 texture_vertices) {
+    poligon->textureType = l3TextureTypeUV;
+    poligon->textureCoordinateSystem = l3CoordinateSystemLocal;
     poligon->material = l3PoligonMaterialTexture;
     l3Type scale[4] = {texture->w, 0, 0, texture->h};
     poligon->textureVertices = (l3Mat23)calloc(sizeof(l3Type), 2 * 3);
