@@ -36,6 +36,7 @@ make clean
 ```cpp
 // テクスチャ読み込み **Objectの直後の{}に入れてはいけない**
 l3Texture texture;
+// convertコマンド等でppmに変換して使用する
 l3Load2DTexture("assets/dot.ppm", &texture);
 
 //==============================================
