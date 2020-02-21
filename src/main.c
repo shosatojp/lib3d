@@ -18,6 +18,8 @@
  */
 
 int main(int argc, const char* argv[]) {
+    // voxel_test();
+    // exit(0);
     // default options
     l3Options options = {0};
     options.outdir = "bin";
@@ -29,6 +31,6 @@ int main(int argc, const char* argv[]) {
     options.renderer = l3RaytracingRenderer;
     if (!l3ParseArgs(argc, argv, &options)) exit(0);
 
-    // scene_core(argc, argv, &options);
-    scene_bezier(argc, argv, &options);
+    scene_core(argc, argv, &options);
+    // scene_bezier(argc, argv, &options);
 }

@@ -136,7 +136,7 @@ void l3MakeProjectionToScreenMat44(l3Type width, l3Type height, l3Mat44 r) {
 }
 
 void l3AppendPoligonsFromEnvironment(l3Environment* env, l3Mat44 wcps, int w, int h) {
-    for (int i = 0; i < env->objects.length; ++i) {
+    for (int i = 0; i < (int)env->objects.length; ++i) {
         l3Object* _object = array_at(&env->objects, i);
         l3Type lw[16] = {0};
         l3MakeLocalToWorldMat44(_object->dx, _object->dy, _object->dz,
@@ -201,7 +201,7 @@ bool l3FrustumCulling(l3Object* _object, l3Mat44 lwcps, int w, int h) {
 
 l3Type l3GetBoundingRadius(l3Object* _object) {
     l3Type r = 0;
-    for (int i = 0; i < _object->vertices.length; i++) {
+    for (int i = 0; i < (int)_object->vertices.length; i++) {
         r = max(r, l3VecAbs(array_at(&_object->vertices, i), 3));
     }
     return r;

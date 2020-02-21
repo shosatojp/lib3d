@@ -120,6 +120,8 @@ l3Poligon* l3ClonePoligon(l3Poligon* p) {
         _p->textureVertices = l3CloneMat(p->textureVertices, 2, 3);
     if (p->textureAffineMatInv)
         _p->textureAffineMatInv = l3CloneMat(p->textureAffineMatInv, 3, 3);
+    if (p->texturePuv)
+        _p->texturePuv = l3CloneMat(p->texturePuv, 2, 2);
     // textureは放置
     return _p;
 }
@@ -138,6 +140,7 @@ l3Poligon* l3CreatePoligonColumn(int top, int end, l3Type radius) {
 void l3DestructPoligon(l3Poligon* p) {
     safe_free(p->textureVertices);
     safe_free(p->textureAffineMatInv);
+    safe_free(p->texturePuv);
 }
 
 void l3ClearPoligon(l3Poligon* p) {
@@ -167,7 +170,7 @@ void l3ClearObject(l3Object* o) {
     for (int j = 0; j < o->poligon_count; j++) {
         l3ClearPoligon(o->poligons[j]);
     }
-    for (int j = 0; j < o->vertices.length; j++) {
+    for (int j = 0; j < (int)o->vertices.length; j++) {
         l3ClearVertex(array_at(&o->vertices, j));
     }
 }
@@ -184,7 +187,7 @@ l3Object* l3CloneObject(l3Object* o) {
 
     // vertices (array)
     _o->vertices.data = malloc(sizeof(l3Vertex*) * o->vertices.capacity);
-    for (int i = 0; i < o->vertices.length; i++) {
+    for (size_t i = 0; i < o->vertices.length; i++) {
         array_set(&_o->vertices, l3CloneVertex(array_at(&o->vertices, i)), i);
     }
     return _o;
@@ -271,7 +274,7 @@ l3Vertex* l3GetVertexPtrObject(l3Object* obj, int index) {
  * すべてのオブジェクトに対して、すべてのポリゴンに格納された頂点のインデックスから実ポインタを算出する
  */
 void l3SolvePtrsEnvironment(l3Environment* env) {
-    for (int i = 0; i < env->objects.length; i++) {
+    for (size_t i = 0; i < env->objects.length; i++) {
         l3Object* object = array_at(&env->objects, i);
         for (int j = 0; j < object->poligon_count; j++) {
             l3Poligon* poligon = object->poligons[j];
@@ -297,7 +300,7 @@ void l3InitializeEnvironment(l3Environment* env) {
 }
 
 void l3ClearEnvironment(l3Environment* env) {
-    for (int i = 0; i < env->objects.length; i++) {
+    for (size_t i = 0; i < env->objects.length; i++) {
         l3Object* object = array_at(&env->objects, i);
         l3ClearObject(object);
     }
@@ -321,7 +324,7 @@ l3Environment* l3CloneEnvironment(l3Environment* env) {
     memcpy(_env, env, sizeof(l3Environment));
 
     _env->objects.data = malloc(sizeof(l3Object*) * _env->objects.capacity);
-    for (int i = 0; i < env->objects.length; i++) {
+    for (size_t i = 0; i < env->objects.length; i++) {
         array_set(&_env->objects, l3CloneObject(array_at(&env->objects, i)), i);
     }
 
