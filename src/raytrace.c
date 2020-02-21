@@ -680,8 +680,8 @@ void l3SetWorldCoordinate(l3Environment *env) {
                         l3Mat22A r = {cos_theta, -sin_theta,
                                       sin_theta, cos_theta};
                         // スケール行列
-                        l3Mat22A s = {_poligon->texture->w * _poligon->textureScaleX, 0,
-                                      0, _poligon->texture->h * _poligon->textureScaleY};
+                        l3Mat22A s = {_poligon->texture->w * _poligon->textureRepeatX, 0,
+                                      0, _poligon->texture->h * _poligon->textureRepeatY};
 
                         l3Mat22A transform = {0};
                         l3MulMat(s, r, transform, 2, 2, 2);
@@ -728,8 +728,8 @@ void l3SetWorldCoordinate(l3Environment *env) {
                         l3Mat22A r = {cos_theta, -sin_theta,
                                       sin_theta, cos_theta};
                         // スケール行列
-                        l3Mat22A s = {_poligon->texture->w * (2 * PI) * _poligon->textureScaleX, 0,
-                                      0, _poligon->texture->h * PI * _poligon->textureScaleY};
+                        l3Mat22A s = {_poligon->texture->w * (2 * PI) * _poligon->textureRepeatX, 0,
+                                      0, _poligon->texture->h * PI * _poligon->textureRepeatY};
 
                         _poligon->texturePuv = malloc(sizeof(l3Type) * 4);
                         l3MulMat(s, r, _poligon->texturePuv, 2, 2, 2);

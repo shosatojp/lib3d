@@ -34,7 +34,11 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
 
         // オブジェクト構築
         l3Object* _object = l3CreateObject();
+
+        // テクスチャ読み込み
         l3Texture texture;
+        l3Load2DTexture("assets/dot.ppm", &texture);
+
         {
             int vs[] = {
                 l3AddVertexToObject(_object, l3CreateVertex(5, 5, 5, &red)),
@@ -70,12 +74,11 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             poligons[0]->metalness[2] = poligons[1]->metalness[2] = poligons[2]->metalness[2] = poligons[3]->metalness[2] = 0.05;
 
             // テクスチャ読み込み・貼り付け
-            l3Load2DTexture("assets/dot.ppm", &texture);
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
             for (int i = 0; i < 4; i++) {
                 poligons[i]->textureType = l3TextureTypeTiled;
-                poligons[i]->textureScaleX = 10;
-                poligons[i]->textureScaleY = 10;
+                poligons[i]->textureRepeatX = 10;
+                poligons[i]->textureRepeatY = 10;
                 poligons[i]->textureCoordinateSystem = l3CoordinateSystemLocal;
                 poligons[i]->texture = &texture;
             }
@@ -132,8 +135,8 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             l3Load2DTexture("assets/star.ppm", &texture2);
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
             poligons[0]->textureType = l3TextureTypeTiled;
-            poligons[0]->textureScaleX = 10;
-            poligons[0]->textureScaleY = 10;
+            poligons[0]->textureRepeatX = 10;
+            poligons[0]->textureRepeatY = 10;
             poligons[0]->textureCoordinateSystem = l3CoordinateSystemLocal;
             poligons[0]->texture = &texture2;
             poligons[0]->normal[0] = 0;

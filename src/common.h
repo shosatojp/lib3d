@@ -131,18 +131,18 @@ typedef struct _l3Poligon {
     l3Mat21A min;
     l3Mat21A max;
     /**
-     * テクスチャマッピング用。verticesに対応する順番で
+     * テクスチャマッピング用。
      */
     l3Texture* texture;
-    // 三角形ポリゴン用
     l3TextureType textureType;
     l3Mat22 texturePuv;
-    l3Mat23 textureVertices;      // heap 解放
-    l3Mat33 textureAffineMatInv;  // heap 解放
     l3Type textureRotate;
-    l3Type textureScaleX;
-    l3Type textureScaleY;
+    l3Type textureRepeatX;
+    l3Type textureRepeatY;
     l3CoordinateSystem textureCoordinateSystem;
+    // 三角形ポリゴン用
+    l3Mat23 textureVertices;      // heap 解放 verticesに対応する順番で
+    l3Mat33 textureAffineMatInv;  // heap 解放
 
     l3RGB color;  // ベースカラー？？
 

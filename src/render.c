@@ -101,7 +101,7 @@ void l3RaytracingRenderer(l3Environment* env) {
     }
 #endif
 
-    for (size_t i = 0; i < env->frame_begin; i++) {
+    for (int i = 0; i < env->frame_begin; i++) {
         env->transitionFn(env, i);
     }
 
