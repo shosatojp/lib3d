@@ -493,14 +493,15 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
         l3Mat31A k_s;
         l3Mat31A k_d;
-        l3Type k_e = env->environmentLightRate;
+        l3Type k_e = env->environmentLightRate,
+               k_ds = 1 - k_e;
 
-        k_s[0] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[0]);
-        k_s[1] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[1]);
-        k_s[2] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[2]);
-        k_d[0] = 1 - k_e - k_s[0];
-        k_d[1] = 1 - k_e - k_s[1];
-        k_d[2] = 1 - k_e - k_s[2];
+        k_s[0] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[0]));
+        k_s[1] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[1]));
+        k_s[2] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[2]));
+        k_d[0] = k_ds * (1 - k_s[0]);
+        k_d[1] = k_ds * (1 - k_s[1]);
+        k_d[2] = k_ds * (1 - k_s[2]);
 
         // 物体色を取得
         l3RGB material_color = ray->poligon->color;
@@ -518,9 +519,9 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         }
         // 環境光
         l3RGB color = material_color;
-        color.r *= k_e * env->environmentColor.r / 255.0;
-        color.g *= k_e * env->environmentColor.g / 255.0;
-        color.b *= k_e * env->environmentColor.b / 255.0;
+        color.r *= k_e * env->environmentLightIntensity * env->environmentColor.r / 255.0;
+        color.g *= k_e * env->environmentLightIntensity * env->environmentColor.g / 255.0;
+        color.b *= k_e * env->environmentLightIntensity * env->environmentColor.b / 255.0;
         l3AddColor(sumcolor, color);
 
         // 拡散反射光

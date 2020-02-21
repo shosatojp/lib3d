@@ -252,6 +252,7 @@ struct _l3Environment {
     // 環境光
     l3RGB environmentColor;
     l3Type environmentLightRate;
+    l3Type environmentLightIntensity;
 };
 
 typedef struct _l3Ray {

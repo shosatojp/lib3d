@@ -234,7 +234,8 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
                                      radians(50), 2, 100000);
 
         env.environmentColor = white;
-        env.environmentLightRate = 0.2;
+        env.environmentLightRate = 0.1;
+        env.environmentLightIntensity = 2;
         
         l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
