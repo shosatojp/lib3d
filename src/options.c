@@ -1,7 +1,7 @@
 #include "lib3d.h"
 
 bool l3ParseArgs(int argc, const char* argv[], l3Options* r) {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-o")) {
             r->outdir = argv[++i];
         } else if (!strcmp(argv[i], "-w")) {
