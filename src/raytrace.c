@@ -502,7 +502,7 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         color.r *= k_e * env_color.r / 255.0;
         color.g *= k_e * env_color.g / 255.0;
         color.b *= k_e * env_color.b / 255.0;
-        l3AddColor(sumcolor,color);
+        l3AddColor(sumcolor, color);
 
         // 拡散反射光
         for (int i = 0, l = env->poligons.length; i < l; ++i) {
@@ -729,7 +729,7 @@ void l3SetWorldCoordinate(l3Environment *env) {
                                       sin_theta, cos_theta};
                         // スケール行列
                         l3Mat22A s = {_poligon->texture->w * (2 * PI) * _poligon->textureRepeatX, 0,
-                                      0, _poligon->texture->h * PI * _poligon->textureRepeatY};
+                                      0, _poligon->texture->h *PI * _poligon->textureRepeatY};
 
                         _poligon->texturePuv = malloc(sizeof(l3Type) * 4);
                         l3MulMat(s, r, _poligon->texturePuv, 2, 2, 2);

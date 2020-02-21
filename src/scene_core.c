@@ -9,6 +9,7 @@ static void transition(l3Environment* env, int frame) {
     // obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
 
     l3Object* sphere = l3FindObject(env, "sphere");
+    sphere->theta_y += radians(360 / 100);
     // sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
     // sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
     // sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
@@ -141,8 +142,8 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             poligons[0]->textureCoordinateSystem = l3CoordinateSystemLocal;
             poligons[0]->texture = &texture2;
             poligons[0]->normal[0] = 0;
-            poligons[0]->normal[1] = 0;
-            poligons[0]->normal[2] = 1;
+            poligons[0]->normal[1] = 1;
+            poligons[0]->normal[2] = 0;
 
             l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3SetTransposeObject(sphere, 15, 0, 0);

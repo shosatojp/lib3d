@@ -6,6 +6,17 @@
             "command": "make",
             "type": "shell",
             "args": []
+        },
+        {
+            "label": "BuildWSL",
+            "command": "make",
+            "type": "shell",
+            "options": {
+                "shell": {
+                    "executable": "C:\\Windows\\System32\\wsl.exe"
+                }
+            },
+            "args": []
         }
     ]
 }
