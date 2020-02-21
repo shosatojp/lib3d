@@ -26,6 +26,7 @@ typedef l3Type* l3Mat33;  // Affine
 typedef l3Type* l3Mat32;
 typedef l3Type* l3Mat31;
 typedef l3Type* l3Mat23;
+typedef l3Type* l3Mat22;
 typedef l3Type l3Mat44A[16];
 typedef l3Type l3Mat41A[4];
 typedef l3Type l3Mat21A[2];
@@ -33,6 +34,18 @@ typedef l3Type l3Mat33A[9];
 typedef l3Type l3Mat32A[6];
 typedef l3Type l3Mat31A[3];
 typedef l3Type l3Mat23A[6];
+typedef l3Type l3Mat22A[4];
+
+typedef enum _l3TextureType {
+    l3TextureTypeNone,
+    l3TextureTypeTiled,
+    l3TextureTypeUV,
+} l3TextureType;
+
+typedef enum _l3CoordinateSystem {
+    l3CoordinateSystemLocal,
+    l3CoordinateSystemWorld,
+} l3CoordinateSystem;
 
 typedef enum _l3PoligonMaterial {
     l3PoligonMaterialVertex = 0,  // default
@@ -99,7 +112,11 @@ typedef struct _l3Poligon {
     // 三角形ポリゴン用のパラメータ
     l3Mat31A e1;
     l3Mat31A e2;
-    l3Mat31A normal;// 平行光線では光線の方向ベクトル
+    l3Mat31A normal;  // 平行光線では光線の方向ベクトル
+    l3Mat31A cross_product_e2e1;
+
+    l3Type boundingRadius;
+    l3Mat41A boundingCenter;
 
     union {
         /**
@@ -117,11 +134,17 @@ typedef struct _l3Poligon {
     l3Mat21A min;
     l3Mat21A max;
     /**
-     * テクスチャマッピング用。verticesに対応する順番で
+     * テクスチャマッピング用。
      */
     l3Texture* texture;
+    l3TextureType textureType;
+    l3Mat22 texturePuv;
+    l3Type textureRotate;
+    l3Type textureRepeatX;
+    l3Type textureRepeatY;
+    l3CoordinateSystem textureCoordinateSystem;
     // 三角形ポリゴン用
-    l3Mat23 textureVertices;      // heap 解放
+    l3Mat23 textureVertices;      // heap 解放 verticesに対応する順番で
     l3Mat33 textureAffineMatInv;  // heap 解放
 
     l3RGB color;  // ベースカラー？？
@@ -146,7 +169,7 @@ typedef struct _l3Poligon {
     // もしくはcolorの1以上で表現する
     l3Type lightIntensity;
     l3Type lightAttenuation;
-
+    l3RGB lightColor;
     l3LightType lightType;
     /**
      * ポリゴンの種類
@@ -225,6 +248,11 @@ struct _l3Environment {
     l3FrameTransitionFunction* transitionFn;
     array poligons;  // 描画用のポリゴンリスト solve ptrsで作成
     hashmap objects_map;
+
+    // 環境光
+    l3RGB environmentColor;
+    l3Type environmentLightRate;
+    l3Type environmentLightIntensity;
 };
 
 typedef struct _l3Ray {
@@ -239,16 +267,15 @@ typedef struct _l3Ray {
     l3RGB color;
 } l3Ray;
 
-typedef enum _l3TimeTransitionType{
-    l3TimeType_linear = 0,  // 線形,default
-    l3TimeType_EasyEase, // S字,中間ピーク
-    l3TimeType_EasyEaseIn, // 最初遅く、徐々に速く
-    l3TimeType_EasyEaseOut, // 最初速く、徐々に遅く
+typedef enum _l3TimeTransitionType {
+    l3TimeType_linear = 0,   // 線形,default
+    l3TimeType_EasyEase,     // S字,中間ピーク
+    l3TimeType_EasyEaseIn,   // 最初遅く、徐々に速く
+    l3TimeType_EasyEaseOut,  // 最初速く、徐々に遅く
 } l3TimeTransitionType;
 
 // typedef enum _l32Deffects{//２Dエフェクトを作ったらここで番号振って。
 // hoge
-
 
 // } l32Deffects;
 
@@ -260,3 +287,14 @@ typedef struct _l3Options {
     int frame_begin;
     int frame_end;
 } l3Options;
+
+typedef struct _l3Voxel {
+    bool a;
+} l3Voxel;
+
+typedef struct _l3VoxelMap {
+    l3Voxel* voxels;
+    l3Mat31A origin;
+    int size[3];
+    int voxel_size;
+} l3VoxelMap;

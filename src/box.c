@@ -79,4 +79,5 @@ l3Object* l3CreateBox(){
     poligons[11]->color.b = 0;
     
     l3SetPoligonsToObject(box, sizeof(poligons) / sizeof(l3Poligon*), poligons);
+    return box;
 }

@@ -36,7 +36,7 @@ int hash_entry_destruct(hash_entry* _e);
 
 /* macros */
 #define _hashmap_each(INDEX, M, STMT)                                                               \
-    for (int hashmap_##INDEX = 0; hashmap_##INDEX < (M)->hash_entries->length; hashmap_##INDEX++) { \
+    for (indextype hashmap_##INDEX = 0; hashmap_##INDEX < (M)->hash_entries->length; hashmap_##INDEX++) { \
         hash_entry* hashmap_e##INDEX = array_at((M)->hash_entries, hashmap_##INDEX);                \
         if (hashmap_e##INDEX) {                                                                     \
             STMT;                                                                                   \

@@ -16,14 +16,14 @@ static void _array_debug(const char* format, ...) {
 
 array* array_new(int elem_size, bool isptr, indextype capacity) {
     array* _array = (array*)calloc(sizeof(array), 1);
-    array_init(_array, elem_size, isptr,capacity);
+    array_init(_array, elem_size, isptr, capacity);
     return _array;
 }
 
-int array_init(array* _array, int elem_size, bool isptr,indextype capacity) {
+int array_init(array* _array, int elem_size, bool isptr, indextype capacity) {
     memset(_array, 0, sizeof(array));
     _array->isptr = isptr;
-    _array->elem_size = isptr ? sizeof(void*) : elem_size;
+    _array->elem_size = isptr ? (int)sizeof(void*) : elem_size;
     array_expand(_array, capacity);
     return 0;
 }
@@ -49,6 +49,7 @@ int array_fill(array* _array, indextype _begin, indextype _end, char _c) {
     _array->length = _array->capacity;
     memset((char*)_array->data + (_begin * _array->elem_size), _c,
            (_end - _begin + 1) * _array->elem_size);
+    return 0;
 }
 
 int _array_ins(array* _array, indextype index, ...) {

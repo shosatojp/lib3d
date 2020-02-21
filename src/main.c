@@ -18,11 +18,13 @@
  */
 
 int main(int argc, const char* argv[]) {
+    // voxel_test();
+    // exit(0);
     // default options
     l3Options options = {0};
     options.outdir = "bin";
-    options.h = 480;
-    options.w = 320;
+    options.w = 480;
+    options.h = 320;
     options.frame_begin = 0;
     options.frames = 1;
     options.threads = 1;

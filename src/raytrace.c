@@ -13,20 +13,18 @@ bool l3IntersectRayPoligon(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Poligon 
     // 裏を向いているポリゴンは描かない
     if (l3InnerProductVec3(ray_direction, poligon->normal) > 0) return false;
 
-    l3Mat41A a_v0;  // ゼロ初期化不要
+    l3Mat41A a_v0 = {0};  // ゼロ初期化不要
     l3Mat31 cw = poligon->vertices[0]->coordinateWorld;
     l3SubMat3(ray_origin, cw, a_v0);
 
     // クラメールの公式利用
-    l3Mat31A cross_prod_r_d;
-    l3Mat31 normal = poligon->normal, e2 = poligon->e2, e1 = poligon->e1;
+    l3Mat31A cross_prod_r_d = {0};
+    l3Mat31 cross_product_e2e1 = poligon->cross_product_e2e1, e2 = poligon->e2, e1 = poligon->e1;
     l3CrossProductVec3(a_v0, ray_direction, cross_prod_r_d);
-    l3Type e = l3InnerProductVec3(ray_direction, normal);
-    l3Type t = -l3InnerProductVec3(a_v0, normal) / e;
+    l3Type e = l3InnerProductVec3(ray_direction, cross_product_e2e1);
+    l3Type t = -l3InnerProductVec3(a_v0, cross_product_e2e1) / e;
     l3Type u = l3InnerProductVec3(e2, cross_prod_r_d) / e;
-    l3Mat31A minus_cross_prod_r_d;
-    l3ScalarMulMat3(cross_prod_r_d, -1, minus_cross_prod_r_d);
-    l3Type v = l3InnerProductVec3(e1, minus_cross_prod_r_d) / e;
+    l3Type v = -l3InnerProductVec3(e1, cross_prod_r_d) / e;
 
     if (0 <= t && 0 <= u && u <= 1 && 0 <= v && v <= 1 && u + v <= 1) {
         r[0] = ray_origin[0] + t * ray_direction[0];
@@ -151,9 +149,8 @@ bool l3IntersectRaySky(l3Mat41 ray_origin, l3Mat41 ray_direction, l3Mat41 sphere
             r[2] = ray_origin[2] + t * ray_direction[2];
             return true;
         }
-    } else {
-        return false;
     }
+    return false;
 }
 
 /**
@@ -189,10 +186,10 @@ void l3MultiplyColor(l3RGB *a, l3RGB *b, l3RGB *r) {
  * ワールド座標空間からカメラ座標空間への基底変換行列
  */
 void l3MakeWorldToCameraBasisChangeMat33(l3CameraInfo *camerainfo, l3Mat33 r) {
-    l3Mat41A tmp = {0};
-    l3Mat41A cx = {0};
-    l3Mat41A cy = {0};
-    l3Mat41A cz = {0};
+    l3Mat31A tmp = {0};
+    l3Mat31A cx = {0};
+    l3Mat31A cy = {0};
+    l3Mat31A cz = {0};
 
     // cz
     l3SubMat(camerainfo->target, camerainfo->coordinate, tmp, 3);
@@ -243,6 +240,20 @@ bool l3FindRayCrossPoint(l3Ray *ray, l3Environment *env) {
     for (size_t i = 0, l = env->poligons.length; i < l; i++) {
         l3Poligon *p = *(poligons + i);  //array_at(&env->poligons, i);
         if (p->noSize) continue;
+
+        // 余計遅くなった（ポリゴン数が少なかったから？）
+        // if (p->boundingRadius) {
+        //     // bounding
+        //     l3Mat31A tmp = {0};
+        //     l3SubMat3(p->boundingCenter, rayStartPoint, tmp);
+        //     l3Type l = l3VecAbs3(tmp);
+        //     l3Type cos_theta = l3InnerProductVec3(tmp, rayDirection) / l;
+        //     l3Type r = l * sqrtf(1 - cos_theta * cos_theta);
+        //     if (r > p->boundingRadius) {
+        //         continue;
+        //     }
+        // }
+
         switch (p->poligonType) {
             case l3PoligonTypeTriangle: {
                 l3Mat41A intersection;
@@ -393,6 +404,58 @@ void l3GetLightDirection(l3Mat31 intersection, l3Poligon *light_poligon, l3Mat31
     }
 }
 
+void l3Get2DTexturePoligonTriangle(l3Poligon *poligon, l3Mat21 uv, l3RGB *color) {
+    unsigned char *raw_color = NULL;
+    switch (poligon->textureType) {
+        case l3TextureTypeTiled: {
+            l3Mat21A uv_texture = {0};
+            l3MulMat(poligon->texturePuv, uv, uv_texture, 2, 2, 1);
+            int tx = uv_texture[0] - poligon->texture->w * floorf(uv_texture[0] / poligon->texture->w),
+                ty = uv_texture[1] - poligon->texture->h * floorf(uv_texture[1] / poligon->texture->h);
+            raw_color = l3GetColorAtTexture(poligon->texture, tx, ty);
+        } break;
+        case l3TextureTypeUV: {
+            l3Mat31A uv1 = {uv[0], uv[1], 1};
+            l3Mat31A uv_texture = {0};
+            l3MulMat(poligon->textureAffineMatInv, uv1, uv_texture, 3, 3, 1);
+            raw_color = l3GetColorAtTexture(poligon->texture, uv_texture[0], uv_texture[1]);
+        } break;
+        default:
+            break;
+    }
+    if (raw_color) {
+        color->r = raw_color[0];
+        color->g = raw_color[1];
+        color->b = raw_color[2];
+    }
+}
+
+void l3Get2DTexturePoligonSphere(l3Poligon *poligon, l3Mat31 p, l3RGB *color) {
+    switch (poligon->textureType) {
+        case l3TextureTypeTiled: {
+            l3Mat31A p_local = {0};
+            l3SubMat3(p, poligon->vertices[0]->coordinateWorld, p_local);
+            l3NormarizeVec3(p_local, p_local);
+            l3Mat21A uv = {0}, uv_texture = {0};
+            uv[0] = acosf(l3InnerProductVec3(p_local, poligon->e1) / poligon->sphere_radius);
+            if (l3InnerProductVec3(p_local, poligon->e2) < 0) uv[0] = 2 * PI - uv[0];
+            uv[1] = acosf(l3InnerProductVec3(p_local, poligon->normal) / poligon->sphere_radius);
+            l3MulMat(poligon->texturePuv, uv, uv_texture, 2, 2, 1);
+            int tx = uv_texture[0] - poligon->texture->w * floorf(uv_texture[0] / poligon->texture->w),
+                ty = uv_texture[1] - poligon->texture->h * floorf(uv_texture[1] / poligon->texture->h);
+
+            unsigned char *raw_color = l3GetColorAtTexture(poligon->texture, tx, ty);
+            if (raw_color) {
+                color->r = raw_color[0];
+                color->g = raw_color[1];
+                color->b = raw_color[2];
+            }
+        } break;
+        default:
+            break;
+    }
+}
+
 /**
  * 始点と方向が決まっているRayから、
  * 交点を見つけ、
@@ -430,12 +493,36 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
         l3Mat31A k_s;
         l3Mat31A k_d;
-        k_s[0] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[0]);
-        k_s[1] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[1]);
-        k_s[2] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[2]);
-        k_d[0] = 1 - k_s[0];
-        k_d[1] = 1 - k_s[1];
-        k_d[2] = 1 - k_s[2];
+        l3Type k_e = env->environmentLightRate,
+               k_ds = 1 - k_e;
+
+        k_s[0] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[0]));
+        k_s[1] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[1]));
+        k_s[2] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[2]));
+        k_d[0] = k_ds * (1 - k_s[0]);
+        k_d[1] = k_ds * (1 - k_s[1]);
+        k_d[2] = k_ds * (1 - k_s[2]);
+
+        // 物体色を取得
+        l3RGB material_color = ray->poligon->color;
+        if (ray->poligon->textureType) {
+            switch (ray->poligon->poligonType) {
+                case l3PoligonTypeTriangle: {
+                    l3Get2DTexturePoligonTriangle(ray->poligon, ray->uv, &material_color);
+                } break;
+                case l3PoligonTypeShpere: {
+                    l3Get2DTexturePoligonSphere(ray->poligon, ray->intersection, &material_color);
+                } break;
+                default:
+                    break;
+            }
+        }
+        // 環境光
+        l3RGB color = material_color;
+        color.r *= k_e * env->environmentLightIntensity * env->environmentColor.r / 255.0;
+        color.g *= k_e * env->environmentLightIntensity * env->environmentColor.g / 255.0;
+        color.b *= k_e * env->environmentLightIntensity * env->environmentColor.b / 255.0;
+        l3AddColor(sumcolor, color);
 
         // 拡散反射光
         for (int i = 0, l = env->poligons.length; i < l; ++i) {
@@ -465,19 +552,20 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                     if (ray->poligon->lightType) ipv3 = 1 - ipv3;
 
                     l3Type l_d = max(min(1, ipv3), 0);
-                    l3RGB material_color = ray->poligon->color;
+                    l3RGB color = material_color;
+
                     if (light_poligon->lightType == l3LightTypePoint) {
                         l3Type distance = l3DistanceVec3(light_poligon->vertices[0]->coordinateWorld, ray->intersection);
                         l3Type attenuation = light_poligon->lightAttenuation > 0 ? light_poligon->lightAttenuation * distance * distance : 1;
-                        material_color.r *= l_d * k_d[0] * light_poligon->lightIntensity * (light_poligon->color.r / 255.0) / attenuation;
-                        material_color.g *= l_d * k_d[1] * light_poligon->lightIntensity * (light_poligon->color.g / 255.0) / attenuation;
-                        material_color.b *= l_d * k_d[2] * light_poligon->lightIntensity * (light_poligon->color.b / 255.0) / attenuation;
+                        color.r *= l_d * k_d[0] * light_poligon->lightIntensity * (light_poligon->lightColor.r / 255.0) / attenuation;
+                        color.g *= l_d * k_d[1] * light_poligon->lightIntensity * (light_poligon->lightColor.g / 255.0) / attenuation;
+                        color.b *= l_d * k_d[2] * light_poligon->lightIntensity * (light_poligon->lightColor.b / 255.0) / attenuation;
                     } else {
-                        material_color.r *= l_d * k_d[0] * light_poligon->lightIntensity * light_poligon->color.r / 255.0;
-                        material_color.g *= l_d * k_d[1] * light_poligon->lightIntensity * light_poligon->color.g / 255.0;
-                        material_color.b *= l_d * k_d[2] * light_poligon->lightIntensity * light_poligon->color.b / 255.0;
+                        color.r *= l_d * k_d[0] * light_poligon->lightIntensity * light_poligon->lightColor.r / 255.0;
+                        color.g *= l_d * k_d[1] * light_poligon->lightIntensity * light_poligon->lightColor.g / 255.0;
+                        color.b *= l_d * k_d[2] * light_poligon->lightIntensity * light_poligon->lightColor.b / 255.0;
                     }
-                    l3AddColor(sumcolor, material_color);
+                    l3AddColor(sumcolor, color);
                 }
                 // if (cross && kage_ray.poligon->transparency > 0) {
                 //     l3RGB material_color = kage_ray.poligon->color;
@@ -527,7 +615,7 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                         l3AddColor(specular_color, specular.color);
                     }
                 }
-                l3DivColor(specular_color, ray->poligon->roughnessSamples*10);
+                l3DivColor(specular_color, ray->poligon->roughnessSamples * 10);
                 l3AddColor(sumcolor, specular_color);
             }
         }
@@ -542,7 +630,7 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
 }
 
 void l3SetWorldCoordinate(l3Environment *env) {
-    for (int i = 0; i < env->objects.length; ++i) {
+    for (int i = 0; i < (int)env->objects.length; ++i) {
         l3Object *_object = array_at(&env->objects, i);
         l3Type lw[16] = {0};
         l3MakeLocalToWorldMat44(_object->dx, _object->dy, _object->dz,
@@ -550,6 +638,7 @@ void l3SetWorldCoordinate(l3Environment *env) {
                                 _object->theta_x, _object->theta_y, _object->theta_z, lw);
         for (int i = 0; i < _object->poligon_count; i++) {
             l3Poligon *_poligon = _object->poligons[i];
+
             switch (_poligon->poligonType) {
                 case l3PoligonTypeTriangle: {
                     for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
@@ -564,7 +653,16 @@ void l3SetWorldCoordinate(l3Environment *env) {
                     // 前処理
                     l3SubMat(_poligon->vertices[1]->coordinateWorld, _poligon->vertices[0]->coordinateWorld, _poligon->e1, 3);
                     l3SubMat(_poligon->vertices[2]->coordinateWorld, _poligon->vertices[0]->coordinateWorld, _poligon->e2, 3);
-                    l3CrossProductVec3(_poligon->e2, _poligon->e1, _poligon->normal);
+                    l3CrossProductVec3(_poligon->e2, _poligon->e1, _poligon->cross_product_e2e1);
+                    l3NormarizeVec3(_poligon->cross_product_e2e1, _poligon->normal);
+
+                    if (_poligon->textureType) {
+                        l3Poligon2DTexturePreProcessTriangle(_poligon, lw);
+                    }
+
+                    // bounding
+                    l3GetBounding(_poligon->vertex_count, _poligon->vertices,
+                                  _poligon->boundingCenter, &_poligon->boundingRadius);
                 } break;
                 case l3PoligonTypeShpere: {
                     for (int j = 0; j < 2; j++) {
@@ -576,6 +674,47 @@ void l3SetWorldCoordinate(l3Environment *env) {
                             _vertex->converted = true;
                         }
                     }
+
+                    if (_poligon->textureType) {
+                        l3Mat41A e1_prime, e2_prime;
+                        l3Mat41A axis_x = {0};
+                        l3Mat41A axis_x_l = {1, 0, 0, 1};
+                        switch (_poligon->textureCoordinateSystem) {
+                            case l3CoordinateSystemLocal: {
+                                l3Mat41A zero_l = {0, 0, 0, 1};
+                                l3Mat41A zero_w = {0};
+                                l3MulMat4441(lw, axis_x_l, axis_x);
+                                l3MulMat4441(lw, zero_l, zero_w);
+                                l3SubMat3(axis_x, zero_w, axis_x);
+                                l3NormarizeVec3(axis_x, axis_x);
+                            } break;
+                            case l3CoordinateSystemWorld: {
+                                l3CopyMat(axis_x_l, axis_x, 4);
+                            } break;
+                        }
+                        l3CrossProductVec3(_poligon->normal, axis_x, e1_prime);
+                        l3CrossProductVec3(e1_prime, _poligon->normal, e2_prime);
+                        l3NormarizeVec3(e1_prime, _poligon->e1);  // X軸方向の単位ベクトル
+                        l3NormarizeVec3(e2_prime, _poligon->e2);  // z軸方向
+
+                        // 回転行列
+                        l3Type cos_theta = cos(_poligon->textureRotate),
+                               sin_theta = sin(_poligon->textureRotate);
+                        l3Mat22A r = {cos_theta, -sin_theta,
+                                      sin_theta, cos_theta};
+                        // スケール行列
+                        l3Mat22A s = {_poligon->texture->w * (2 * PI) * _poligon->textureRepeatX, 0,
+                                      0, _poligon->texture->h * PI * _poligon->textureRepeatY};
+
+                        _poligon->texturePuv = malloc(sizeof(l3Type) * 4);
+                        l3MulMat(s, r, _poligon->texturePuv, 2, 2, 2);
+                    }
+
+                    // bounding
+                    _poligon->boundingRadius = _poligon->sphere_radius;
+                    memcpy(_poligon->boundingCenter,
+                           _poligon->vertices[0]->coordinateWorld,
+                           sizeof(l3Type) * 4);
                 } break;
                 case l3PoligonTypeCircle:
                 case l3PoligonTypePlane: {

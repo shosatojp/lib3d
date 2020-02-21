@@ -5,6 +5,36 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(gdb) Bash on Windows の起動",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/mnt/c/repos/lib3d/lib3d",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "/mnt/c/repos/lib3d",
+            "environment": [],
+            "externalConsole": false,
+            "pipeTransport": {
+                "debuggerPath": "/usr/bin/gdb",
+                "pipeProgram": "${env:windir}\\system32\\bash.exe",
+                "pipeArgs": [
+                    "-c"
+                ],
+                "pipeCwd": "/"
+            },
+            "setupCommands": [
+                {
+                    "description": "gdb の再フォーマットを有効にする",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "sourceFileMap": {
+                "/mnt/c/": "C:\\"
+            },
+            "preLaunchTask": "BuildWSL"
+        },
+        {
             "name": "(gdb) 起動",
             "type": "cppdbg",
             "request": "launch",

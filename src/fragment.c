@@ -43,13 +43,15 @@ void l3FragmentShader(l3PixelInfo* p, l3Mat31 v) {
 
 unsigned char* l3GetColorAtTexture(l3Texture* texture, int x, int y) {
     if (0 <= x && x < texture->w && 0 <= y && y < texture->h) {
-        return (char*)texture->buffer + (x + y * texture->w) * 3;
+        return (unsigned char*)texture->buffer + (x + y * texture->w) * 3;
     } else {
         return NULL;
     }
 }
 
-void l3SetTexturePoligon(l3Poligon* poligon, l3Texture* texture, l3Mat23 texture_vertices) {
+void l3SetUVTexturePoligon(l3Poligon* poligon, l3Texture* texture, l3Mat23 texture_vertices) {
+    poligon->textureType = l3TextureTypeUV;
+    poligon->textureCoordinateSystem = l3CoordinateSystemLocal;
     poligon->material = l3PoligonMaterialTexture;
     l3Type scale[4] = {texture->w, 0, 0, texture->h};
     poligon->textureVertices = (l3Mat23)calloc(sizeof(l3Type), 2 * 3);
@@ -90,6 +92,14 @@ unsigned char* l3LoadPPM(const char* path, int* w, int* h) {
         return NULL;
     }
 
+    // コメント飛ばす
+    if (fgetc(fp) == '#') {
+        while (fgetc(fp) != '\n')
+            ;
+    } else {
+        fseek(fp, -1, SEEK_CUR);
+    }
+
     // W H
     char* endp;
     if ((endp = fgets(buf, sizeof(buf), fp)) == NULL ||
@@ -125,6 +135,7 @@ unsigned char* l3LoadPPM(const char* path, int* w, int* h) {
 int l3Load2DTexture(const char* path, l3Texture* texture) {
     if (!(texture->buffer = l3LoadPPM(path, &texture->w, &texture->h))) {
         fprintf(stdout, "Failed to load ppm file: %s\n", path);
+        exit(1);
         return -1;
     }
 

@@ -52,8 +52,10 @@ int hashmap_init(hashmap* _m, int capacity) {
     _m->hash_entries = array_new(sizeof(hash_entry*), true, capacity);
     // array_expand(_m->hash_entries, capacity);
     array_fill(_m->hash_entries, 0, _m->hash_entries->length - 1, 0);
+    memset(_m->hash_entries->data, 0, capacity * sizeof(hash_entry*));
     _m->capacity = capacity;
     _m->length = 0;
+    return 0;
 }
 
 bool hashmap_add(hashmap* _m, const char* _key, void* _e) {
@@ -98,6 +100,7 @@ int _hashmap_add(hashmap* _m, hash_entry* _e) {
             if (count++ >= _m->capacity) return -1;
         }
     }
+    return 0;
 }
 
 bool hashmap_contains(hashmap* _m, const char* key) {
@@ -137,6 +140,7 @@ int hashmap_del(hashmap* _m, const char* key) {
         hash_entry_destruct(entry);
         _m->length--;
     }
+    return 0;
 }
 
 int _hashmap_rehash(hashmap* _m, int capacity) {
@@ -153,6 +157,7 @@ int _hashmap_rehash(hashmap* _m, int capacity) {
     _m->capacity = _tmp->capacity;
     _m->length = _tmp->length;
     _m->hash_entries = _tmp->hash_entries;
+    return 0;
 }
 
 int hashmap_destruct(hashmap* _m) {
@@ -161,6 +166,7 @@ int hashmap_destruct(hashmap* _m) {
                      hash_entry_destruct(array_ei));
         array_clear(_m->hash_entries);
     }
+    return 0;
 }
 
 hash_entry* hash_entry_new() {
@@ -173,4 +179,5 @@ int hash_entry_destruct(hash_entry* _e) {
         if (_e->key) free((char*)_e->key);
         free(_e);
     }
+    return 0;
 }

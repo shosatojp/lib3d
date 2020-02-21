@@ -34,4 +34,5 @@ double l3TimeTransition(l3TimeTransitionType TypeId ,int frame, int start_frame,
         t =-p*(p-2);
         return t;
     }
+    return 0;
 }
