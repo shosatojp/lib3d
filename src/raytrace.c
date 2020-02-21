@@ -413,10 +413,10 @@ void l3Get2DTexturePoligonTriangle(l3Poligon *poligon, l3Mat21 uv, l3RGB *color)
 void l3Get2DTexturePoligonSphere(l3Poligon *poligon, l3Mat31 p, l3RGB *color) {
     switch (poligon->textureType) {
         case l3TextureTypeTiled: {
-            l3Mat31A p_local;
+            l3Mat31A p_local = {0};
             l3SubMat3(p, poligon->vertices[0]->coordinateWorld, p_local);
             l3NormarizeVec3(p_local, p_local);
-            l3Mat21A uv, uv_texture;
+            l3Mat21A uv = {0}, uv_texture = {0};
             uv[0] = acosf(l3InnerProductVec3(p_local, poligon->e1) / poligon->sphere_radius);
             if (l3InnerProductVec3(p_local, poligon->e2) < 0) uv[0] = 2 * PI - uv[0];
             uv[1] = acosf(l3InnerProductVec3(p_local, poligon->normal) / poligon->sphere_radius);

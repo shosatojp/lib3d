@@ -115,6 +115,8 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             // l3AddObjectToEnvironment(&env, column, "column");
         }
         l3Texture texture2;
+        l3Load2DTexture("assets/star.ppm", &texture2);
+
         l3Object* sphere = l3CreateObject();
         {
             int vs[] = {
@@ -124,15 +126,14 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             l3Poligon* poligons[] = {
                 l3CreatePoligonSphere(0, 1, 10),
             };
-            poligons[0]->color.r = 255;
-            poligons[0]->color.g = 50;
-            poligons[0]->color.b = 50;
+            // poligons[0]->color.r = 255;
+            // poligons[0]->color.g = 50;
+            // poligons[0]->color.b = 50;
             poligons[0]->material = l3PoligonMaterialColor;
             // poligons[0]->lightType = l3LightTypePoint;
             // poligons[0]->lightIntensity = 3;
             // poligons[0]->transparency = 0.5;
             poligons[0]->lightAttenuation = 0.004;
-            l3Load2DTexture("assets/star.ppm", &texture2);
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
             poligons[0]->textureType = l3TextureTypeTiled;
             poligons[0]->textureRepeatX = 10;
