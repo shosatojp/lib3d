@@ -38,7 +38,7 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
 
         // テクスチャ読み込み
         l3Texture texture;
-        l3Load2DTexture("assets/dot.ppm", &texture);
+        l3Load2DTexture("assets/manbou.ppm", &texture);
 
         {
             int vs[] = {
@@ -75,19 +75,20 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             poligons[0]->metalness[2] = poligons[1]->metalness[2] = poligons[2]->metalness[2] = poligons[3]->metalness[2] = 0.05;
 
             // テクスチャ読み込み・貼り付け
-            // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
+            l3Mat32A texture_vertices = {0.5, 0, 0, 0.8, 1, 0.8};
             for (int i = 0; i < 4; i++) {
-                poligons[i]->textureType = l3TextureTypeTiled;
-                poligons[i]->textureRepeatX = 10;
-                poligons[i]->textureRepeatY = 10;
-                poligons[i]->textureCoordinateSystem = l3CoordinateSystemLocal;
-                poligons[i]->texture = &texture;
+                poligons[i]->textureType = l3TextureTypeUV;
+                // poligons[i]->textureRepeatX = 10;
+                // poligons[i]->textureRepeatY = 10;
+                poligons[i]->textureCoordinateSystem = l3CoordinateSystemWorld;
+                // poligons[i]->texture = &texture;
+                l3SetTexturePoligon(poligons[i], &texture, texture_vertices);
+                // poligons[i]->lightType = l3LightTypePoint;
+                // poligons[i]->lightIntensity = 0.4;
             }
-            // poligons[2]->lightType = l3LightTypePoint;
-            // poligons[2]->lightIntensity = 4;
 
             l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3SetTransposeObject(_object, -15, 10, 0);
+            l3SetTransposeObject(_object, 0, 10, 0);
             l3SetScaleObject(_object, 2, 2, 2);
             l3AddObjectToEnvironment(&env, _object, "test");
         }
@@ -95,19 +96,19 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
         {
             l3SetTransposeObject(obj2, 0, 0, 0);
             l3SetScaleObject(obj2, 10, 10, 10);
-            l3AddObjectToEnvironment(&env, obj2, "box1");
+            // l3AddObjectToEnvironment(&env, obj2, "box1");
         }
         l3Object* obj5 = l3CreateBox();
         {
             l3SetTransposeObject(obj5, -20, 0, 0);
             l3SetScaleObject(obj5, 10, 10, 10);
-            l3AddObjectToEnvironment(&env, obj5, "box2");
+            // l3AddObjectToEnvironment(&env, obj5, "box2");
         }
         l3Object* obj4 = l3CreateBox();
         {
             l3SetTransposeObject(obj4, 20, 0, 0);
             l3SetScaleObject(obj4, 10, 10, 10);
-            l3AddObjectToEnvironment(&env, obj4, "boxddd3");
+            // l3AddObjectToEnvironment(&env, obj4, "boxddd3");
         }
         l3Object* column = l3CreateObject();
         {
@@ -159,7 +160,7 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
 
             l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3SetTransposeObject(sphere, 15, 0, 0);
-            l3AddObjectToEnvironment(&env, sphere, "sphere");
+            // l3AddObjectToEnvironment(&env, sphere, "sphere");
         }
         l3Object* sphere2 = l3CreateObject();
         {

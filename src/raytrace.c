@@ -405,22 +405,28 @@ void l3GetLightDirection(l3Mat31 intersection, l3Poligon *light_poligon, l3Mat31
 }
 
 void l3Get2DTexturePoligonTriangle(l3Poligon *poligon, l3Mat21 uv, l3RGB *color) {
+    unsigned char *raw_color = NULL;
     switch (poligon->textureType) {
         case l3TextureTypeTiled: {
             l3Mat21A uv_texture = {0};
             l3MulMat(poligon->texturePuv, uv, uv_texture, 2, 2, 1);
             int tx = uv_texture[0] - poligon->texture->w * floorf(uv_texture[0] / poligon->texture->w),
                 ty = uv_texture[1] - poligon->texture->h * floorf(uv_texture[1] / poligon->texture->h);
-
-            unsigned char *raw_color = l3GetColorAtTexture(poligon->texture, tx, ty);
-            if (raw_color) {
-                color->r = raw_color[0];
-                color->g = raw_color[1];
-                color->b = raw_color[2];
-            }
+            raw_color = l3GetColorAtTexture(poligon->texture, tx, ty);
+        } break;
+        case l3TextureTypeUV: {
+            l3Mat31A uv1 = {uv[0], uv[1], 1};
+            l3Mat31A uv_texture = {0};
+            l3MulMat(poligon->textureAffineMatInv, uv1, uv_texture, 3, 3, 1);
+            raw_color = l3GetColorAtTexture(poligon->texture, uv_texture[0], uv_texture[1]);
         } break;
         default:
             break;
+    }
+    if (raw_color) {
+        color->r = raw_color[0];
+        color->g = raw_color[1];
+        color->b = raw_color[2];
     }
 }
 
@@ -650,58 +656,8 @@ void l3SetWorldCoordinate(l3Environment *env) {
                     l3CrossProductVec3(_poligon->e2, _poligon->e1, _poligon->cross_product_e2e1);
                     l3NormarizeVec3(_poligon->cross_product_e2e1, _poligon->normal);
 
-                    // テクスチャ用の基底変換行列作成
-                    if (_poligon->textureType == l3TextureTypeTiled) {
-                        l3Mat41A e1_prime, e2_prime;
-                        l3Mat41A axis_x = {0};
-                        l3Mat41A axis_x_l = {1, 0, 0, 1};
-                        switch (_poligon->textureCoordinateSystem) {
-                            case l3CoordinateSystemLocal: {
-                                l3Mat41A zero_l = {0, 0, 0, 1};
-                                l3Mat41A zero_w = {0};
-                                l3MulMat4441(lw, axis_x_l, axis_x);
-                                l3MulMat4441(lw, zero_l, zero_w);
-                                l3SubMat3(axis_x, zero_w, axis_x);
-                                l3NormarizeVec3(axis_x, axis_x);
-                            } break;
-                            case l3CoordinateSystemWorld: {
-                                l3CopyMat(axis_x_l, axis_x, 4);
-                            } break;
-                        }
-                        l3CrossProductVec3(_poligon->normal, axis_x, e1_prime);
-                        l3CrossProductVec3(e1_prime, _poligon->normal, e2_prime);
-                        l3NormarizeVec3(e1_prime, e1_prime);
-                        l3NormarizeVec3(e2_prime, e2_prime);
-
-                        l3Mat31A e1_norm, e2_norm;
-                        l3NormarizeVec3(_poligon->e1, e1_norm);
-                        l3NormarizeVec3(_poligon->e2, e2_norm);
-
-                        l3Type tmp[18];
-                        memcpy(tmp + 0, e1_prime, sizeof(l3Type) * 3);
-                        memcpy(tmp + 3, e2_prime, sizeof(l3Type) * 3);
-                        memcpy(tmp + 6, _poligon->normal, sizeof(l3Type) * 3);
-                        memcpy(tmp + 9, e1_norm, sizeof(l3Type) * 3);
-                        memcpy(tmp + 12, e2_norm, sizeof(l3Type) * 3);
-                        memcpy(tmp + 15, _poligon->normal, sizeof(l3Type) * 3);
-
-                        l3SimplificateMat(tmp, 3, 6);
-
-                        l3Mat22A p = {tmp[9], tmp[10], tmp[12], tmp[13]};
-
-                        // 回転行列
-                        l3Type cos_theta = cos(_poligon->textureRotate),
-                               sin_theta = sin(_poligon->textureRotate);
-                        l3Mat22A r = {cos_theta, -sin_theta,
-                                      sin_theta, cos_theta};
-                        // スケール行列
-                        l3Mat22A s = {_poligon->texture->w * _poligon->textureRepeatX, 0,
-                                      0, _poligon->texture->h * _poligon->textureRepeatY};
-
-                        l3Mat22A transform = {0};
-                        l3MulMat(s, r, transform, 2, 2, 2);
-                        _poligon->texturePuv = malloc(sizeof(l3Type) * 4);
-                        l3MulMat(transform, p, _poligon->texturePuv, 2, 2, 2);
+                    if (_poligon->textureType) {
+                        l3Poligon2DTexturePreProcessTriangle(_poligon, lw);
                     }
 
                     // bounding
