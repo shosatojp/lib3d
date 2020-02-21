@@ -66,9 +66,9 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             poligons[3]->material = l3PoligonMaterialColor;
             poligons[3]->color.r = 150;
             poligons[3]->color.b = 150;
-            poligons[0]->transparency = 0.1;
+            // poligons[0]->transparency = 0.1;
             // poligons[1]->transparency = 0.1;
-            poligons[2]->transparency = 0.1;
+            // poligons[2]->transparency = 0.1;
             // poligons[3]->transparency = 0.1;
             poligons[0]->metalness[0] = poligons[1]->metalness[0] = poligons[2]->metalness[0] = poligons[3]->metalness[0] = 0.05;
             poligons[0]->metalness[1] = poligons[1]->metalness[1] = poligons[2]->metalness[1] = poligons[3]->metalness[1] = 0.05;
@@ -85,7 +85,7 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
                 // poligons[i]->lightIntensity = 0.4;
             }
             l3Mat32A texture_vertices = {0.5, 0, 0, 0.8, 1, 0.8};
-            for (int i = 2; i < 4; i++) {
+            for (int i = 0; i < 4; i++) {
                 l3SetUVTexturePoligon(poligons[i], &texture, texture_vertices);
             }
 
