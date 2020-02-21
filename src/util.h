@@ -65,3 +65,6 @@ l3Object* l3CloneObject(l3Object* o);
 
 // void l3InitializeRay(l3Ray* ray);
 l3Object* l3FindObject(l3Environment* env, const char* name);
+void l3GetBounding(int count, l3Vertex* vs[], l3Mat31 center, l3Type* radius);
+
+void memdump(void* __ptr, int __n);

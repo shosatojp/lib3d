@@ -240,6 +240,20 @@ bool l3FindRayCrossPoint(l3Ray *ray, l3Environment *env) {
     for (size_t i = 0, l = env->poligons.length; i < l; i++) {
         l3Poligon *p = *(poligons + i);  //array_at(&env->poligons, i);
         if (p->noSize) continue;
+
+        // 余計遅くなった（ポリゴン数が少なかったから？）
+        // if (p->boundingRadius) {
+        //     // bounding
+        //     l3Mat31A tmp = {0};
+        //     l3SubMat3(p->boundingCenter, rayStartPoint, tmp);
+        //     l3Type l = l3VecAbs3(tmp);
+        //     l3Type cos_theta = l3InnerProductVec3(tmp, rayDirection) / l;
+        //     l3Type r = l * sqrtf(1 - cos_theta * cos_theta);
+        //     if (r > p->boundingRadius) {
+        //         continue;
+        //     }
+        // }
+
         switch (p->poligonType) {
             case l3PoligonTypeTriangle: {
                 l3Mat41A intersection;
@@ -618,6 +632,7 @@ void l3SetWorldCoordinate(l3Environment *env) {
                                 _object->theta_x, _object->theta_y, _object->theta_z, lw);
         for (int i = 0; i < _object->poligon_count; i++) {
             l3Poligon *_poligon = _object->poligons[i];
+
             switch (_poligon->poligonType) {
                 case l3PoligonTypeTriangle: {
                     for (int j = 0; j < l3POLIGON_VERTEX_COUNT; j++) {
@@ -688,6 +703,10 @@ void l3SetWorldCoordinate(l3Environment *env) {
                         _poligon->texturePuv = malloc(sizeof(l3Type) * 4);
                         l3MulMat(transform, p, _poligon->texturePuv, 2, 2, 2);
                     }
+
+                    // bounding
+                    l3GetBounding(_poligon->vertex_count, _poligon->vertices,
+                                  _poligon->boundingCenter, &_poligon->boundingRadius);
                 } break;
                 case l3PoligonTypeShpere: {
                     for (int j = 0; j < 2; j++) {
@@ -729,11 +748,17 @@ void l3SetWorldCoordinate(l3Environment *env) {
                                       sin_theta, cos_theta};
                         // スケール行列
                         l3Mat22A s = {_poligon->texture->w * (2 * PI) * _poligon->textureRepeatX, 0,
-                                      0, _poligon->texture->h *PI * _poligon->textureRepeatY};
+                                      0, _poligon->texture->h * PI * _poligon->textureRepeatY};
 
                         _poligon->texturePuv = malloc(sizeof(l3Type) * 4);
                         l3MulMat(s, r, _poligon->texturePuv, 2, 2, 2);
                     }
+
+                    // bounding
+                    _poligon->boundingRadius = _poligon->sphere_radius;
+                    memcpy(_poligon->boundingCenter,
+                           _poligon->vertices[0]->coordinateWorld,
+                           sizeof(l3Type) * 4);
                 } break;
                 case l3PoligonTypeCircle:
                 case l3PoligonTypePlane: {

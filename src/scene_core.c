@@ -93,9 +93,21 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
         }
         l3Object* obj2 = l3CreateBox();
         {
-            l3SetTransposeObject(obj2, -15, 10, 0);
-            l3SetScaleObject(obj2, 20, 20, 20);
-            // l3AddObjectToEnvironment(&env, obj2, "box");
+            l3SetTransposeObject(obj2, 0, 0, 0);
+            l3SetScaleObject(obj2, 10, 10, 10);
+            l3AddObjectToEnvironment(&env, obj2, "box1");
+        }
+        l3Object* obj5 = l3CreateBox();
+        {
+            l3SetTransposeObject(obj5, -20, 0, 0);
+            l3SetScaleObject(obj5, 10, 10, 10);
+            l3AddObjectToEnvironment(&env, obj5, "box2");
+        }
+        l3Object* obj4 = l3CreateBox();
+        {
+            l3SetTransposeObject(obj4, 20, 0, 0);
+            l3SetScaleObject(obj4, 10, 10, 10);
+            l3AddObjectToEnvironment(&env, obj4, "boxddd3");
         }
         l3Object* column = l3CreateObject();
         {

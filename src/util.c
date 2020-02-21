@@ -343,9 +343,50 @@ l3Object* l3FindObject(l3Environment* env, const char* name) {
     return array_at(&env->objects, index);
 }
 
-// =============================================
-// l3Ray
-// =============================================
-// void l3InitializeRay(l3Ray* ray) {
-//     memset(ray, 0, sizeof(l3Ray));
-// }
+void l3GetBounding(int count, l3Vertex* vs[], l3Mat31 center, l3Type* radius) {
+    l3Mat31A c = {0};
+    l3Type r = 0;
+    for (int i = 0; i < count; i++) {
+        l3Mat41 w = vs[i]->coordinateWorld;
+        l3AddMat3(c, w, c);
+    }
+    l3DivMat(c, count, center, 3);
+    for (int i = 0; i < count; i++) {
+        l3Mat41 w = vs[i]->coordinateWorld;
+        l3Type l = l3DistanceVec3(w, c);
+        r = max(r, l);
+    }
+    *radius = r;
+}
+
+
+void memdump(void* __ptr, int __n) {
+    int width = 16;
+
+    printf("                ");
+    for (int i = 0; i < width; i++) printf("%2d ", i);
+    printf("\n---------------");
+    for (int i = 0; i < width; i++) printf("---");
+    printf("\n");
+
+    char* string = (char*)calloc(sizeof(char), width);
+    int count = 0;
+    while (count < __n) {
+        void* fp = __ptr;
+        printf("%p  ", fp);
+        for (int i = 0; i < width; i++) {
+            if (count++ < __n) {
+                printf("%02x ", *((unsigned char*)__ptr + i));
+                char c = *((unsigned char*)__ptr + i);
+                sprintf((char*)string + (i % width), "%c", (31 < c && c < 126) ? c : '.');
+            } else {
+                printf("   ");
+            }
+        }
+        __ptr = (char*)__ptr + width;
+        printf("|%-16s|", string);
+        memset(string, 0, width);
+        printf("\n");
+    }
+    free(string);
+}

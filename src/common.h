@@ -115,6 +115,9 @@ typedef struct _l3Poligon {
     l3Mat31A normal;  // 平行光線では光線の方向ベクトル
     l3Mat31A cross_product_e2e1;
 
+    l3Type boundingRadius;
+    l3Mat41A boundingCenter;
+
     union {
         /**
          * ソート用

@@ -92,8 +92,6 @@ int _hashmap_add(hashmap* _m, hash_entry* _e) {
                  count = 0;
         while (true) {
             hash = (hash + hash2) % _m->capacity;
-            // memdump _m->hash_entries->data
-            memdump(_m->hash_entries->data,_m->capacity * _m->hash_entries->elem_size);
             if (!array_at(_m->hash_entries, hash)) {
                 _m->length++;
                 array_set(_m->hash_entries, _e, hash);
