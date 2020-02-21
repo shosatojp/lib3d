@@ -90,6 +90,14 @@ unsigned char* l3LoadPPM(const char* path, int* w, int* h) {
         return NULL;
     }
 
+    // コメント飛ばす
+    if (fgetc(fp) == '#') {
+        while (fgetc(fp) != '\n')
+            ;
+    } else {
+        fseek(fp, -1, SEEK_CUR);
+    }
+
     // W H
     char* endp;
     if ((endp = fgets(buf, sizeof(buf), fp)) == NULL ||
