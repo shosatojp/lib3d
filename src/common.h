@@ -169,7 +169,7 @@ typedef struct _l3Poligon {
     // もしくはcolorの1以上で表現する
     l3Type lightIntensity;
     l3Type lightAttenuation;
-
+    l3RGB lightColor;
     l3LightType lightType;
     /**
      * ポリゴンの種類
@@ -248,6 +248,10 @@ struct _l3Environment {
     l3FrameTransitionFunction* transitionFn;
     array poligons;  // 描画用のポリゴンリスト solve ptrsで作成
     hashmap objects_map;
+
+    // 環境光
+    l3RGB environmentColor;
+    l3Type environmentLightRate;
 };
 
 typedef struct _l3Ray {

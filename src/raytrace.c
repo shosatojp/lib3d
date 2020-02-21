@@ -493,7 +493,7 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
         l3Mat31A k_s;
         l3Mat31A k_d;
-        l3Type k_e = 0.1;
+        l3Type k_e = env->environmentLightRate;
 
         k_s[0] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[0]);
         k_s[1] = l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[1]);
@@ -517,11 +517,10 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
             }
         }
         // 環境光
-        l3RGB env_color = {255, 255, 255};
         l3RGB color = material_color;
-        color.r *= k_e * env_color.r / 255.0;
-        color.g *= k_e * env_color.g / 255.0;
-        color.b *= k_e * env_color.b / 255.0;
+        color.r *= k_e * env->environmentColor.r / 255.0;
+        color.g *= k_e * env->environmentColor.g / 255.0;
+        color.b *= k_e * env->environmentColor.b / 255.0;
         l3AddColor(sumcolor, color);
 
         // 拡散反射光
@@ -557,13 +556,13 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                     if (light_poligon->lightType == l3LightTypePoint) {
                         l3Type distance = l3DistanceVec3(light_poligon->vertices[0]->coordinateWorld, ray->intersection);
                         l3Type attenuation = light_poligon->lightAttenuation > 0 ? light_poligon->lightAttenuation * distance * distance : 1;
-                        color.r *= l_d * k_d[0] * light_poligon->lightIntensity * (light_poligon->color.r / 255.0) / attenuation;
-                        color.g *= l_d * k_d[1] * light_poligon->lightIntensity * (light_poligon->color.g / 255.0) / attenuation;
-                        color.b *= l_d * k_d[2] * light_poligon->lightIntensity * (light_poligon->color.b / 255.0) / attenuation;
+                        color.r *= l_d * k_d[0] * light_poligon->lightIntensity * (light_poligon->lightColor.r / 255.0) / attenuation;
+                        color.g *= l_d * k_d[1] * light_poligon->lightIntensity * (light_poligon->lightColor.g / 255.0) / attenuation;
+                        color.b *= l_d * k_d[2] * light_poligon->lightIntensity * (light_poligon->lightColor.b / 255.0) / attenuation;
                     } else {
-                        color.r *= l_d * k_d[0] * light_poligon->lightIntensity * light_poligon->color.r / 255.0;
-                        color.g *= l_d * k_d[1] * light_poligon->lightIntensity * light_poligon->color.g / 255.0;
-                        color.b *= l_d * k_d[2] * light_poligon->lightIntensity * light_poligon->color.b / 255.0;
+                        color.r *= l_d * k_d[0] * light_poligon->lightIntensity * light_poligon->lightColor.r / 255.0;
+                        color.g *= l_d * k_d[1] * light_poligon->lightIntensity * light_poligon->lightColor.g / 255.0;
+                        color.b *= l_d * k_d[2] * light_poligon->lightIntensity * light_poligon->lightColor.b / 255.0;
                     }
                     l3AddColor(sumcolor, color);
                 }

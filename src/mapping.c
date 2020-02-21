@@ -84,6 +84,26 @@ void l3Poligon2DTexturePreProcessTriangle(l3Poligon* poligon, l3Mat44 lw) {
                 &poligon->textureVertices[4]};
             l3Mat33A affinemat = {0};
             l3GetAffineTransformMat33(src, dst, affinemat);
+            // l3PrintMat(affinemat, 3, 3);
+            // {
+            //     l3Mat33A dst = {
+            //         src_tmp[0], src_tmp[1], 1,
+            //         src_tmp[3], src_tmp[4], 1,
+            //         src_tmp[6], src_tmp[7], 1};
+            //     l3Mat33A src = {
+            //         poligon->textureVertices[0], poligon->textureVertices[1], 1,
+            //         poligon->textureVertices[2], poligon->textureVertices[3], 1,
+            //         poligon->textureVertices[4], poligon->textureVertices[5], 1};
+            //     l3Type tmp[18];
+            //     memcpy(tmp + 0, &src[0], sizeof(l3Type) * 3);
+            //     memcpy(tmp + 3, &src[3], sizeof(l3Type) * 3);
+            //     memcpy(tmp + 6, &src[6], sizeof(l3Type) * 3);
+            //     memcpy(tmp + 9, &dst[0], sizeof(l3Type) * 3);
+            //     memcpy(tmp + 12, &dst[3], sizeof(l3Type) * 3);
+            //     memcpy(tmp + 15, &dst[6], sizeof(l3Type) * 3);
+            //     l3SimplificateMat(tmp, 3, 6);
+            //     l3PrintMat(&tmp[9], 3, 3);
+            // }
             l3Mat33A affinematinv = {0};
             l3InverseMat(3, affinemat, affinematinv);
             poligon->textureAffineMatInv = (l3Mat33)calloc(sizeof(l3Type), 9);

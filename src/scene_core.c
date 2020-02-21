@@ -172,9 +172,8 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
                 l3CreatePoligonSphere(0, 1, 10),
             };
             poligons[0]->material = l3PoligonMaterialColor;
-            poligons[0]->color.r = 255;
-            poligons[0]->color.g = 255;
-            poligons[0]->color.b = 255;
+            poligons[0]->color = white;
+            poligons[0]->lightColor = white;
             poligons[0]->lightType = l3LightTypePoint;
             poligons[0]->lightIntensity = 0.4;
             // poligons[0]->lightAttenuation = 1;
@@ -214,9 +213,10 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             l3Poligon* poligons[] = {
                 l3CreatePoligonSky(),
             };
-            poligons[0]->color.r = 200;
-            poligons[0]->color.g = 200;
-            poligons[0]->color.b = 200;
+            poligons[0]->color.r = 176;
+            poligons[0]->color.g = 213;
+            poligons[0]->color.b = 255;
+            poligons[0]->lightColor = white;
             poligons[0]->lightType = l3LightTypeParallel;
             poligons[0]->lightIntensity = 1;
             poligons[0]->normal[0] = 1;
@@ -233,6 +233,9 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
                                      0, 1, 0,
                                      radians(50), 2, 100000);
 
+        env.environmentColor = white;
+        env.environmentLightRate = 0.2;
+        
         l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
