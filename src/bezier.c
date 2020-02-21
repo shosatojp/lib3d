@@ -29,3 +29,16 @@ double Factorial(int a){
     }
     return result;
 }
+
+void l3SetBezierPoint(bezier* b,double x,double y, double z){
+    b->x = x;
+    b->y = y;
+    b->z = z;
+}
+
+void l3BezierToMat41A( l3Mat41 mat, bezier b){
+    mat[0] = b.x;
+    mat[1] = b.y;
+    mat[2] = b.z;
+    mat[3] = 1;
+}
