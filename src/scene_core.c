@@ -45,7 +45,7 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
 
         // テクスチャ読み込み
         l3Texture texture;
-        l3Load2DTexture("assets/manbou.ppm", &texture);
+        //l3Load2DTexture("assets/manbou.ppm", &texture);
 
         {
             int vs[] = {
@@ -140,7 +140,7 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             // l3AddObjectToEnvironment(&env, column, "column");
         }
         l3Texture texture2;
-        l3Load2DTexture("assets/star.ppm", &texture2);
+        // l3Load2DTexture("assets/star.ppm", &texture2);
 
         l3Object* sphere = l3CreateObject();
         {

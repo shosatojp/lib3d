@@ -201,4 +201,5 @@ int scene_start(int argc, const char* argv[], l3Options* options) {
         l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
+    return 0;
 }
