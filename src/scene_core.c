@@ -1,5 +1,14 @@
 #include "lib3d.h"
 
+void l3ConvertCoordinateOnScreen(l3Vertex* v, l3Mat33 p_wtoc, l3Mat31 cameraZ, l3Environment* env, int x, int y) {
+    l3Mat41A _;
+    l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,
+                                   env->camera.near, env->w, env->h, x, y,
+                                   v->coordinateWorld, _);
+    l3AddMat3(v->coordinateWorld, cameraZ, v->coordinateWorld);
+    v->converted = true;
+}
+
 static void transition(l3Environment* env, int frame) {
     l3Object* obj = l3FindObject(env, "box");
     obj->theta_y += radians(360 / 100);
@@ -16,9 +25,24 @@ static void transition(l3Environment* env, int frame) {
 
     // sphere->poligons[0]->textureRotate += radians(1);
 
-    // env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
-    // env->camera.coordinate[1] = (frame + 1) / 3.0;
-    // env->camera.coordinate[2] = 400.0 / ((frame + 1) / 30.0) * sin(-(frame + 1) / 100.0 * 2 * PI);
+    env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
+    env->camera.coordinate[1] = (frame + 1) / 3.0;
+    env->camera.coordinate[2] = 400.0 / ((frame + 1) / 30.0) * sin(-(frame + 1) / 100.0 * 2 * PI);
+
+    l3Mat33A p_wtoc = {0};
+    l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
+    l3Object* obj6 = l3FindObject(env, "obj6");
+    l3Mat31A cameraZ = {0};
+    l3SubMat3(env->camera.target, env->camera.coordinate, cameraZ);
+    l3NormarizeVec3(cameraZ, cameraZ);
+    l3DivMat(cameraZ, 1000.0, cameraZ, 3);
+    l3Type vs[] = {env->w / 2.0, env->h / 2.0,
+                   env->w, env->h};
+    l3Type cs[] = {vs[0], vs[1], vs[2], vs[1], vs[0], vs[3], vs[2], vs[3]};
+    for (int i = 0; i < 4; i++) {
+        l3ConvertCoordinateOnScreen((l3Vertex*)array_at(&obj6->vertices, i),
+                                    p_wtoc, cameraZ, env, cs[i * 2], cs[i * 2 + 1]);
+    }
 }
 
 int scene_core(int argc, const char* argv[], l3Options* options) {
@@ -32,6 +56,23 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
         env.w = options->w;
         env.h = options->h;
         env.outdir = options->outdir;
+
+        // l3Object* board = l3CreateObject();
+        // {
+        //     int vs[] = {
+        //         l3AddVertexToObject(board, l3CreateVertex(5, 5, 5, &red)),
+        //         l3AddVertexToObject(board, l3CreateVertex(-5, -5, 5, &green)),
+        //         l3AddVertexToObject(board, l3CreateVertex(5, -5, -5, &blue)),
+        //         l3AddVertexToObject(board, l3CreateVertex(-5, 5, -5, &white)),
+        //     };
+        //     // 右回りが表、数字はオブジェクトごとの頂点のインデックス
+        //     l3Poligon* poligons[] = {
+        //         l3CreatePoligon(0, 2, 1),
+        //         l3CreatePoligon(0, 3, 2),
+        //         l3CreatePoligon(1, 2, 3),
+        //         l3CreatePoligon(0, 1, 3),
+        //     };
+        // }
 
         // オブジェクト構築
         l3Object* _object = l3CreateObject();
@@ -96,9 +137,16 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
         }
         l3Object* obj2 = l3CreateBox();
         {
-            l3SetTransposeObject(obj2, 0, 0, 0);
+            for (int i = 0; i < 12; i++) {
+                obj2->poligons[i]->lightType = l3LightTypePoint;
+                obj2->poligons[i]->color = red;
+                obj2->poligons[i]->lightColor = red;
+                obj2->poligons[i]->lightIntensity = 0.1;
+                obj2->poligons[i]->transparency = 0.7;
+            }
+            l3SetTransposeObject(obj2, -15, 10, -20);
             l3SetScaleObject(obj2, 10, 10, 10);
-            // l3AddObjectToEnvironment(&env, obj2, "box1");
+            l3AddObjectToEnvironment(&env, obj2, "box1");
         }
         l3Object* obj5 = l3CreateBox();
         {
@@ -111,6 +159,29 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
             l3SetTransposeObject(obj4, 20, 0, 0);
             l3SetScaleObject(obj4, 10, 10, 10);
             // l3AddObjectToEnvironment(&env, obj4, "boxddd3");
+        }
+        l3Object* obj6 = l3CreateObject();
+        {
+            l3AddVertexToObject(obj6, l3CreateVertex(0, 20, 0, &red));
+            l3AddVertexToObject(obj6, l3CreateVertex(0, 20, 0, &red));
+            l3AddVertexToObject(obj6, l3CreateVertex(0, 20, 0, &red));
+            l3AddVertexToObject(obj6, l3CreateVertex(0, 20, 0, &red));
+            l3Poligon* poligons[] = {
+                l3CreatePoligon(0, 1, 2),
+                l3CreatePoligon(1, 3, 2),
+            };
+            poligons[0]->color.r = 255;
+            poligons[0]->color.g = 250;
+            poligons[0]->color.b = 50;
+            poligons[0]->material = l3PoligonMaterialColor;
+            poligons[1]->color.r = 255;
+            poligons[1]->color.g = 20;
+            poligons[1]->color.b = 50;
+            poligons[1]->material = l3PoligonMaterialColor;
+
+            l3SetPoligonsToObject(obj6, sizeof(poligons) / sizeof(l3Poligon*), poligons);
+            l3SetTransposeObject(obj6, 0, 0, 0);
+            l3AddObjectToEnvironment(&env, obj6, "obj6");
         }
         l3Object* column = l3CreateObject();
         {
@@ -241,7 +312,7 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
         env.environmentColor = white;
         env.environmentLightRate = 0.1;
         env.environmentLightIntensity = 2;
-        
+
         l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
