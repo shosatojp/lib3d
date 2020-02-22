@@ -493,8 +493,9 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
         l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
         l3Mat31A k_s;
         l3Mat31A k_d;
-        l3Type k_e = env->environmentLightRate,
-               k_ds = 1 - k_e;
+        l3Type k_eds = 1 - ray->poligon->transparency;
+        l3Type k_e = env->environmentLightRate * k_eds,
+               k_ds = (1 - k_e) * k_eds;
 
         k_s[0] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[0]));
         k_s[1] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[1]));
