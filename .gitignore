@@ -1,6 +1,6 @@
 *.out
 *.exe
-*.ppm
+/*.ppm
 /.vscode/settings.json
 *.gif
 *.o
