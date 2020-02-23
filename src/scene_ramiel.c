@@ -1,30 +1,10 @@
 #include "array.h"
 #include "lib3d.h"
 
-void l3PolarToMat41A(l3Mat41 v, double r, double theta, double phi)
-{
-
-    // v[0] = r * sin(theta) * sin(phi);
-    // v[1] = r * cos(theta);
-    // v[2] = r * sin(theta) * cos(phi);
-
-    // v[0] = r * cos(theta);
-    // v[1] = r * sin(theta) * cos(phi);
-    // v[2] = r * sin(theta) * sin(phi);
-
-    v[0] = r * cos(theta);
-    v[1] = r * sin(theta) * sin(phi);
-    v[2] = r * sin(theta) * cos(phi);
-
-
-
-    v[3] = 1;
-}
-
 static void transition(l3Environment *env, int frame)
 {
 
-    int i,mode = 1; //0は普通、１は変形
+    int i, mode = 1; //0は普通、１は変形
 
     l3Object *ramiel_normal = l3FindObject(env, "ramiel_normal");
     l3Vertex *v0 = array_at(&ramiel_normal->vertices, 0);
@@ -43,16 +23,24 @@ static void transition(l3Environment *env, int frame)
     l3Vertex *v11 = array_at(&ramiel_core->vertices, 0);
 
     l3Object *ramiel_trans = l3FindObject(env, "ramiel_trans");
-    l3Vertex*  ramielv[36];
+    l3Vertex *ramielv[36];
+    l3Mat41A p[36] = {0};
 
-    ramiel_trans->theta_x += radians(360 / 100);;
-    ramiel_trans->theta_y += radians(360 / 100);;
-    ramiel_trans->theta_z += radians(360 / 100);;
+    l3Object *ramiel_trans2 = l3FindObject(env, "ramiel_trans2");
+    l3Vertex *ramielv2[36];
+    l3Mat41A p2[36] = {0};
 
-    for(i=0;i<=35;i++){
-        ramielv[i]= array_at(&ramiel_trans->vertices, i);
+    ramiel_normal->theta_y = -2 * PI / 4;
+    // ramiel_trans->theta_y = -2*PI / 4;
+    ramiel_trans2->sx = 1.5;
+    ramiel_trans2->sy = 1.5;
+    ramiel_trans2->sz = 1.5;
+
+    for (i = 0; i <= 35; i++)
+    {
+        ramielv[i] = array_at(&ramiel_trans->vertices, i);
+        ramielv2[i] = array_at(&ramiel_trans2->vertices, i);
     }
-
 
     if (mode == 0)
     {
@@ -61,18 +49,21 @@ static void transition(l3Environment *env, int frame)
 
     if (mode == 1)
     {
-        int keyframe1 = 30, keyframe2 = 90, keyframe3 = 120, keyframe4 = 150;
+        int keyframe1 = 30, keyframe2 = 90, keyframe3 = 120, keyframe4 = 170, keyframe5 = 200, keyframe6 = 220;
 
-        
+        for (i = 0; i < 36; i++)
+        {
+            ramielv[i]->coordinate[0] = 0;
+            ramielv[i]->coordinate[1] = 0;
+            ramielv[i]->coordinate[2] = 0;
+
+            ramielv2[i]->coordinate[0] = 0;
+            ramielv2[i]->coordinate[1] = 0;
+            ramielv2[i]->coordinate[2] = 0;
+        }
 
         if (frame < keyframe1)
         {
-            for(i=0;i<36;i++){
-                ramielv[i]->coordinate[0] = 0;
-                ramielv[i]->coordinate[1] = 0;
-                ramielv[i]->coordinate[2] = 0;
-                
-            }
 
             ramiel_normal->dy = 800 - 600 * l3TimeTransition(l3TimeType_linear, frame, 0, keyframe1);
         }
@@ -145,8 +136,51 @@ static void transition(l3Environment *env, int frame)
             // l3PrintMat(v10->coordinate, 4, 1);
         }
 
+        if (frame >= keyframe2)
+        {
+
+            for (i = 1; i <= 5; i++)
+            {
+                l3PolarToMat41A(p[1 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), PI, PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[2 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), 5 * PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[3 + 7 * (i - 1)], 300 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 6) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[4 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 12) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[5 + 7 * (i - 1)], 80 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 20) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[6 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 4) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[7 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 3) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+            }
+
+            for (i = 0; i < 36; i++)
+            {
+                ramielv[i]->coordinate[0] = p[i][0];
+                ramielv[i]->coordinate[1] = p[i][1];
+                ramielv[i]->coordinate[2] = p[i][2];
+            }
+
+            ramiel_trans->theta_x += (2 * PI / 30) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) * (1.1 - l3TimeTransition(l3TimeType_linear, frame, keyframe4, keyframe5)) * (1 - l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6));
+        }
+
         if (frame >= keyframe3)
         {
+            for (i = 1; i <= 5; i++)
+            {
+                l3PolarToMat41A(p2[1 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI, PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[2 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), 5 * PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[3 + 7 * (i - 1)], 300 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 6) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[4 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 12) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[5 + 7 * (i - 1)], 80 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 20) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[6 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 4) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[7 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 3) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+            }
+
+            for (i = 0; i < 36; i++)
+            {
+                ramielv2[i]->coordinate[0] = p2[i][0];
+                ramielv2[i]->coordinate[1] = p2[i][1];
+                ramielv2[i]->coordinate[2] = p2[i][2];
+            }
+
+            ramiel_trans2->theta_x -= (2 * PI / 30) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) * (1.1 - l3TimeTransition(l3TimeType_linear, frame, keyframe4, keyframe5)) * (1 - l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6));
         }
     }
 
@@ -154,11 +188,55 @@ static void transition(l3Environment *env, int frame)
     //     l3PolarToMat41A(v1->coordinate,300,);
     // }
 
-    ramiel_core->dy = ramiel_normal->dy;
+    ramiel_core->dy = ramiel_normal->dy = ramiel_trans->dy = ramiel_trans2->dy;
+    ramiel_trans2->dx = ramiel_trans->dx - 50;
 
     l3Object *light1 = l3FindObject(env, "light1");
     light1->dx = 800 * cos(-67 / 100.0 * 2.0 * PI);
     light1->dz = 800 * sin(-67 / 100.0 * 2.0 * PI);
+
+
+
+    bezier cpoint[8];
+        {
+            cpoint[0].x = 800 * cos(-67 / 100.0 * 2.0 * PI);
+            cpoint[0].y = 5;
+            cpoint[0].z = 800 * sin(-67 / 100.0 * 2.0 * PI);
+            cpoint[1].x = 550;
+            cpoint[1].y = 100;
+            cpoint[1].z = 300;
+            cpoint[2].x = 0;
+            cpoint[2].y = 10;
+            cpoint[2].z = -100;
+            cpoint[3].x = -70;
+            cpoint[3].y = 20;
+            cpoint[3].z = 40;
+            cpoint[4].x = 0;
+            cpoint[4].y = 5;
+            cpoint[4].z = -70;
+            cpoint[5].x = -100;
+            cpoint[5].y = 40;
+            cpoint[5].z = 70;
+            cpoint[6].x = -80;
+            cpoint[6].y = 100;
+            cpoint[6].z = -30;
+            cpoint[7].x = -100;
+            cpoint[7].y = 100;
+            cpoint[7].z = 500;
+        }
+
+        bezier camera_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 30, 200), 8, cpoint);
+
+        
+        
+        
+
+    env->camera.coordinate[0] = camera_bezier.x;
+    env->camera.coordinate[1] = camera_bezier.y;
+    env->camera.coordinate[2] = camera_bezier.z;
+    env->camera.target[0] = 0;
+    env->camera.target[1] = 250;
+    env->camera.target[2] = 0;
 }
 
 int scene_ramiel(int argc, const char *argv[], l3Options *options)
@@ -244,7 +322,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             l3AddObjectToEnvironment(&env, ramiel_normal, "ramiel_normal");
         }
 
-        l3Object* ramiel_trans = l3CreateObject();
+        l3Object *ramiel_trans = l3CreateObject();
         {
 
             l3Mat41A p[36] = {0};
@@ -252,115 +330,114 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
 
             for (i = 1; i <= 5; i++)
             {
-                l3PolarToMat41A(p[1 + 7 * (i - 1)], 30, PI, PI / 2 + PI / 5 * (i - 1));
-                l3PolarToMat41A(p[2 + 7 * (i - 1)], 100, 5 * PI / 6, PI / 2 + PI / 5 * (i - 1));
-                l3PolarToMat41A(p[3 + 7 * (i - 1)], 300, PI / 2 - PI / 6, PI / 2 + PI / 5 * (i - 1));
-                l3PolarToMat41A(p[4 + 7 * (i - 1)], 100, PI / 2 - PI / 12, PI / 2 - PI / 10 + PI / 5 * (i - 1));
-                l3PolarToMat41A(p[5 + 7 * (i - 1)], 80, PI / 2 - PI / 20, PI / 2 - PI / 10 + PI / 5 * (i - 1));
-                l3PolarToMat41A(p[6 + 7 * (i - 1)], 30, PI / 6, PI / 2 + PI / 5 * (i - 1));
-                l3PolarToMat41A(p[7 + 7 * (i - 1)], 30, PI / 4, PI / 2 - PI / 10 + PI / 5 * (i - 1));
+                l3PolarToMat41A(p[1 + 7 * (i - 1)], 30, PI, PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[2 + 7 * (i - 1)], 100, 5 * PI / 6, PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[3 + 7 * (i - 1)], 300, PI / 2 - PI / 6, PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[4 + 7 * (i - 1)], 100, PI / 2 - PI / 12, PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[5 + 7 * (i - 1)], 80, PI / 2 - PI / 20, PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[6 + 7 * (i - 1)], 30, PI / 6, PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[7 + 7 * (i - 1)], 30, PI / 4, PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
             }
 
             int vs[] = {
 
-                    
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[0][0], p[0][1], p[0][2], &ramiel_blue)), //0
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[1][0], p[1][1], p[1][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[2][0], p[2][1], p[2][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[3][0], p[3][1], p[3][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[4][0], p[4][1], p[4][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[5][0], p[5][1], p[5][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[6][0], p[6][1], p[6][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[7][0], p[7][1], p[7][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[8][0], p[8][1], p[8][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[9][0], p[9][1], p[9][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[10][0], p[10][1], p[10][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[11][0], p[11][1], p[11][2], &ramiel_blue)), //0
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[12][0], p[12][1], p[12][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[13][0], p[13][1], p[13][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[14][0], p[14][1], p[14][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[15][0], p[15][1], p[15][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[16][0], p[16][1], p[16][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[17][0], p[17][1], p[17][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[18][0], p[18][1], p[18][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[19][0], p[19][1], p[19][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[20][0], p[20][1], p[20][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[21][0], p[21][1], p[21][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[22][0], p[22][1], p[22][2], &ramiel_blue)), //0
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[23][0], p[23][1], p[23][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[24][0], p[24][1], p[24][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[25][0], p[25][1], p[25][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[26][0], p[26][1], p[26][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[27][0], p[27][1], p[27][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[28][0], p[28][1], p[28][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[29][0], p[29][1], p[29][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[30][0], p[30][1], p[30][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[31][0], p[31][1], p[31][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[32][0], p[32][1], p[32][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[33][0], p[33][1], p[33][2], &ramiel_blue)), //0
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[34][0], p[34][1], p[34][2], &ramiel_blue)),
-                    l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[35][0], p[35][1], p[35][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[0][0], p[0][1], p[0][2], &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[1][0], p[1][1], p[1][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[2][0], p[2][1], p[2][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[3][0], p[3][1], p[3][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[4][0], p[4][1], p[4][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[5][0], p[5][1], p[5][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[6][0], p[6][1], p[6][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[7][0], p[7][1], p[7][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[8][0], p[8][1], p[8][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[9][0], p[9][1], p[9][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[10][0], p[10][1], p[10][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[11][0], p[11][1], p[11][2], &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[12][0], p[12][1], p[12][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[13][0], p[13][1], p[13][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[14][0], p[14][1], p[14][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[15][0], p[15][1], p[15][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[16][0], p[16][1], p[16][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[17][0], p[17][1], p[17][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[18][0], p[18][1], p[18][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[19][0], p[19][1], p[19][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[20][0], p[20][1], p[20][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[21][0], p[21][1], p[21][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[22][0], p[22][1], p[22][2], &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[23][0], p[23][1], p[23][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[24][0], p[24][1], p[24][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[25][0], p[25][1], p[25][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[26][0], p[26][1], p[26][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[27][0], p[27][1], p[27][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[28][0], p[28][1], p[28][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[29][0], p[29][1], p[29][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[30][0], p[30][1], p[30][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[31][0], p[31][1], p[31][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[32][0], p[32][1], p[32][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[33][0], p[33][1], p[33][2], &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[34][0], p[34][1], p[34][2], &ramiel_blue)),
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[35][0], p[35][1], p[35][2], &ramiel_blue)),
             };
 
             // 右回りが表、数字はオブジェクトごとの頂点のインデックス
 
             l3Poligon *poligons[] = {
-                
-                    l3CreatePoligon(3 + 7 * 0, 4 + 7 * 0, 6 + 7 * 0), //0
-                    l3CreatePoligon(6 + 7 * 0, 4 + 7 * 0, 7 + 7 * 0),
-                    l3CreatePoligon(0 + 7 * 0, 6 + 7 * 0, 7 + 7 * 0),
-                    l3CreatePoligon(7 + 7 * 0, 4 + 7 * 0, 6 + 7 * (0 + 1)),
-                    l3CreatePoligon(0 + 7 * 0, 7 + 7 * 0, 6 + 7 * (0 + 1)),
-                    l3CreatePoligon(4 + 7 * 0, 3 + 7 * (0 + 1), 6 + 7 * (0 + 1)),
-                    l3CreatePoligon(2 + 7 * 0, 4 + 7 * 0, 3 + 7 * 0),
-                    l3CreatePoligon(2 + 7 * 0, 5 + 7 * 0, 4 + 7 * 0),
-                    l3CreatePoligon(4 + 7 * 0, 5 + 7 * 0, 2 + 7 * (0 + 1)),
-                    l3CreatePoligon(3 + 7 * (0 + 1), 4 + 7 * 0, 2 + 7 * (0 + 1)), //9
 
-                    l3CreatePoligon(3 + 7 * 1, 4 + 7 * 1, 6 + 7 * 1), //0
-                    l3CreatePoligon(6 + 7 * 1, 4 + 7 * 1, 7 + 7 * 1),
-                    l3CreatePoligon(0 + 7 * 1, 6 + 7 * 1, 7 + 7 * 1),
-                    l3CreatePoligon(7 + 7 * 1, 4 + 7 * 1, 6 + 7 * (1 + 1)),
-                    l3CreatePoligon(0 + 7 * 1, 7 + 7 * 1, 6 + 7 * (1 + 1)),
-                    l3CreatePoligon(4 + 7 * 1, 3 + 7 * (1 + 1), 6 + 7 * (1 + 1)),
-                    l3CreatePoligon(2 + 7 * 1, 4 + 7 * 1, 3 + 7 * 1),
-                    l3CreatePoligon(2 + 7 * 1, 5 + 7 * 1, 4 + 7 * 1),
-                    l3CreatePoligon(4 + 7 * 1, 5 + 7 * 1, 2 + 7 * (1 + 1)),
-                    l3CreatePoligon(3 + 7 * (1 + 1), 4 + 7 * 1, 2 + 7 * (1 + 1)), //9
+                l3CreatePoligon(3 + 7 * 0, 4 + 7 * 0, 6 + 7 * 0), //0
+                l3CreatePoligon(6 + 7 * 0, 4 + 7 * 0, 7 + 7 * 0),
+                l3CreatePoligon(0 + 7 * 0, 6 + 7 * 0, 7 + 7 * 0),
+                l3CreatePoligon(7 + 7 * 0, 4 + 7 * 0, 6 + 7 * (0 + 1)),
+                l3CreatePoligon(0 + 7 * 0, 7 + 7 * 0, 6 + 7 * (0 + 1)),
+                l3CreatePoligon(4 + 7 * 0, 3 + 7 * (0 + 1), 6 + 7 * (0 + 1)),
+                l3CreatePoligon(2 + 7 * 0, 4 + 7 * 0, 3 + 7 * 0),
+                l3CreatePoligon(2 + 7 * 0, 5 + 7 * 0, 4 + 7 * 0),
+                l3CreatePoligon(4 + 7 * 0, 5 + 7 * 0, 2 + 7 * (0 + 1)),
+                l3CreatePoligon(3 + 7 * (0 + 1), 4 + 7 * 0, 2 + 7 * (0 + 1)), //9
 
-                    l3CreatePoligon(3 + 7 * 2, 4 + 7 * 2, 6 + 7 * 2), //0
-                    l3CreatePoligon(6 + 7 * 2, 4 + 7 * 2, 7 + 7 * 2),
-                    l3CreatePoligon(0 + 7 * 2, 6 + 7 * 2, 7 + 7 * 2),
-                    l3CreatePoligon(7 + 7 * 2, 4 + 7 * 2, 6 + 7 * (2 + 1)),
-                    l3CreatePoligon(0 + 7 * 2, 7 + 7 * 2, 6 + 7 * (2 + 1)),
-                    l3CreatePoligon(4 + 7 * 2, 3 + 7 * (2 + 1), 6 + 7 * (2 + 1)),
-                    l3CreatePoligon(2 + 7 * 2, 4 + 7 * 2, 3 + 7 * 2),
-                    l3CreatePoligon(2 + 7 * 2, 5 + 7 * 2, 4 + 7 * 2),
-                    l3CreatePoligon(4 + 7 * 2, 5 + 7 * 2, 2 + 7 * (2 + 1)),
-                    l3CreatePoligon(3 + 7 * (2 + 1), 4 + 7 * 2, 2 + 7 * (2 + 1)), //9
+                l3CreatePoligon(3 + 7 * 1, 4 + 7 * 1, 6 + 7 * 1), //0
+                l3CreatePoligon(6 + 7 * 1, 4 + 7 * 1, 7 + 7 * 1),
+                l3CreatePoligon(0 + 7 * 1, 6 + 7 * 1, 7 + 7 * 1),
+                l3CreatePoligon(7 + 7 * 1, 4 + 7 * 1, 6 + 7 * (1 + 1)),
+                l3CreatePoligon(0 + 7 * 1, 7 + 7 * 1, 6 + 7 * (1 + 1)),
+                l3CreatePoligon(4 + 7 * 1, 3 + 7 * (1 + 1), 6 + 7 * (1 + 1)),
+                l3CreatePoligon(2 + 7 * 1, 4 + 7 * 1, 3 + 7 * 1),
+                l3CreatePoligon(2 + 7 * 1, 5 + 7 * 1, 4 + 7 * 1),
+                l3CreatePoligon(4 + 7 * 1, 5 + 7 * 1, 2 + 7 * (1 + 1)),
+                l3CreatePoligon(3 + 7 * (1 + 1), 4 + 7 * 1, 2 + 7 * (1 + 1)), //9
 
-                    l3CreatePoligon(3 + 7 * 3, 4 + 7 * 3, 6 + 7 * 3), //0
-                    l3CreatePoligon(6 + 7 * 3, 4 + 7 * 3, 7 + 7 * 3),
-                    l3CreatePoligon(0 + 7 * 3, 6 + 7 * 3, 7 + 7 * 3),
-                    l3CreatePoligon(7 + 7 * 3, 4 + 7 * 3, 6 + 7 * (3 + 1)),
-                    l3CreatePoligon(0 + 7 * 3, 7 + 7 * 3, 6 + 7 * (3 + 1)),
-                    l3CreatePoligon(4 + 7 * 3, 3 + 7 * (3 + 1), 6 + 7 * (3 + 1)),
-                    l3CreatePoligon(2 + 7 * 3, 4 + 7 * 3, 3 + 7 * 3),
-                    l3CreatePoligon(2 + 7 * 3, 5 + 7 * 3, 4 + 7 * 3),
-                    l3CreatePoligon(4 + 7 * 3, 5 + 7 * 3, 2 + 7 * (3 + 1)),
-                    l3CreatePoligon(3 + 7 * (3 + 1), 4 + 7 * 3, 2 + 7 * (3 + 1)), //9
+                l3CreatePoligon(3 + 7 * 2, 4 + 7 * 2, 6 + 7 * 2), //0
+                l3CreatePoligon(6 + 7 * 2, 4 + 7 * 2, 7 + 7 * 2),
+                l3CreatePoligon(0 + 7 * 2, 6 + 7 * 2, 7 + 7 * 2),
+                l3CreatePoligon(7 + 7 * 2, 4 + 7 * 2, 6 + 7 * (2 + 1)),
+                l3CreatePoligon(0 + 7 * 2, 7 + 7 * 2, 6 + 7 * (2 + 1)),
+                l3CreatePoligon(4 + 7 * 2, 3 + 7 * (2 + 1), 6 + 7 * (2 + 1)),
+                l3CreatePoligon(2 + 7 * 2, 4 + 7 * 2, 3 + 7 * 2),
+                l3CreatePoligon(2 + 7 * 2, 5 + 7 * 2, 4 + 7 * 2),
+                l3CreatePoligon(4 + 7 * 2, 5 + 7 * 2, 2 + 7 * (2 + 1)),
+                l3CreatePoligon(3 + 7 * (2 + 1), 4 + 7 * 2, 2 + 7 * (2 + 1)), //9
 
-                    l3CreatePoligon(3 + 7 * 4, 4 + 7 * 4, 6 + 7 * 4), //0
-                    l3CreatePoligon(6 + 7 * 4, 4 + 7 * 4, 7 + 7 * 4),
-                    l3CreatePoligon(0 + 7 * 4, 6 + 7 * 4, 7 + 7 * 4),
-                    l3CreatePoligon(7 + 7 * 4, 4 + 7 * 4, 6 + 7 * 0),
-                    l3CreatePoligon(0 + 7 * 4, 7 + 7 * 4, 6 + 7 * 0),
-                    l3CreatePoligon(4 + 7 * 4, 3 + 7 * 0, 6 + 7 * 0),
-                    l3CreatePoligon(2 + 7 * 4, 4 + 7 * 4, 3 + 7 * 4),
-                    l3CreatePoligon(2 + 7 * 4, 5 + 7 * 4, 4 + 7 * 4),
-                    l3CreatePoligon(4 + 7 * 4, 5 + 7 * 4, 2 + 7 * 0),
-                    l3CreatePoligon(3 + 7 * 0, 4 + 7 * 4, 2 + 7 * 0), //9
-                
+                l3CreatePoligon(3 + 7 * 3, 4 + 7 * 3, 6 + 7 * 3), //0
+                l3CreatePoligon(6 + 7 * 3, 4 + 7 * 3, 7 + 7 * 3),
+                l3CreatePoligon(0 + 7 * 3, 6 + 7 * 3, 7 + 7 * 3),
+                l3CreatePoligon(7 + 7 * 3, 4 + 7 * 3, 6 + 7 * (3 + 1)),
+                l3CreatePoligon(0 + 7 * 3, 7 + 7 * 3, 6 + 7 * (3 + 1)),
+                l3CreatePoligon(4 + 7 * 3, 3 + 7 * (3 + 1), 6 + 7 * (3 + 1)),
+                l3CreatePoligon(2 + 7 * 3, 4 + 7 * 3, 3 + 7 * 3),
+                l3CreatePoligon(2 + 7 * 3, 5 + 7 * 3, 4 + 7 * 3),
+                l3CreatePoligon(4 + 7 * 3, 5 + 7 * 3, 2 + 7 * (3 + 1)),
+                l3CreatePoligon(3 + 7 * (3 + 1), 4 + 7 * 3, 2 + 7 * (3 + 1)), //9
+
+                l3CreatePoligon(3 + 7 * 4, 4 + 7 * 4, 6 + 7 * 4), //0
+                l3CreatePoligon(6 + 7 * 4, 4 + 7 * 4, 7 + 7 * 4),
+                l3CreatePoligon(0 + 7 * 4, 6 + 7 * 4, 7 + 7 * 4),
+                l3CreatePoligon(7 + 7 * 4, 4 + 7 * 4, 6 + 7 * 0),
+                l3CreatePoligon(0 + 7 * 4, 7 + 7 * 4, 6 + 7 * 0),
+                l3CreatePoligon(4 + 7 * 4, 3 + 7 * 0, 6 + 7 * 0),
+                l3CreatePoligon(2 + 7 * 4, 4 + 7 * 4, 3 + 7 * 4),
+                l3CreatePoligon(2 + 7 * 4, 5 + 7 * 4, 4 + 7 * 4),
+                l3CreatePoligon(4 + 7 * 4, 5 + 7 * 4, 2 + 7 * 0),
+                l3CreatePoligon(3 + 7 * 0, 4 + 7 * 4, 2 + 7 * 0), //9
+
             };
 
             for (i = 0; i <= 4; i++)
@@ -438,7 +515,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             poligons[0]->material = l3PoligonMaterialColor;
             poligons[0]->lightType = l3LightTypePoint;
             poligons[0]->lightIntensity = 1000;
-            // poligons[0]->transparency = 0.5;
+            poligons[0]->transparency = 1;
             poligons[0]->lightAttenuation = 0.0004;
 
             l3SetPoligonsToObject(light1, sizeof(poligons) / sizeof(l3Poligon *), poligons);
@@ -451,7 +528,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             light2->poligons[0]->lightColor.r = 200;
             light2->poligons[0]->lightColor.g = 20;
             light2->poligons[0]->lightColor.b = 120;
-            light2->poligons[0]->transparency = 0.01;
+            light2->poligons[0]->transparency = 1;
 
             light2->poligons[0]->lightIntensity = 1000;
 
@@ -464,12 +541,37 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             light3->poligons[0]->lightColor.r = 40;
             light3->poligons[0]->lightColor.g = 40;
             light3->poligons[0]->lightColor.b = 255;
-            light3->poligons[0]->transparency = 0.01;
+            light3->poligons[0]->transparency = 1;
 
             light3->poligons[0]->lightIntensity = 100;
 
             l3SetTransposeObject(light3, 50, 1200, 100);
             l3AddObjectToEnvironment(&env, light3, "light3");
+        }
+
+        l3Object *light4 = l3CloneObject(light1);
+        {
+            light4->poligons[0]->lightColor.r = 220;
+            light4->poligons[0]->lightColor.g = 40;
+            light4->poligons[0]->lightColor.b = 140;
+            light4->poligons[0]->transparency = 1;
+
+            light4->poligons[0]->lightIntensity = 100;
+
+            l3SetTransposeObject(light3, 50, 0, -100);
+            l3AddObjectToEnvironment(&env, light4, "light4");
+        }
+
+        l3Object *light5 = l3CloneObject(light1);
+        {
+            light5->poligons[0]->lightColor.r = 220;
+            light5->poligons[0]->lightColor.g = 40;
+            light5->poligons[0]->lightColor.b = 140;
+            light5->poligons[0]->transparency = 1;
+            light5->poligons[0]->lightIntensity = 100;
+
+            l3SetTransposeObject(light5, -150, 200, -500);
+            l3AddObjectToEnvironment(&env, light5, "light5");
         }
 
         l3Object *ramiel_core = l3CreateObject();
@@ -495,6 +597,73 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             l3SetTransposeObject(ramiel_core, 0, 250, 0);
             l3SetScaleObject(ramiel_core, 10, 10, 10);
             l3AddObjectToEnvironment(&env, ramiel_core, "ramiel_core");
+        }
+
+        l3Object *b01 = l3CreateBox();
+        {
+            // テクスチャ読み込み
+            //l3Texture texture;
+            //l3Load2DTexture("assets/building.ppm", &texture);
+            int i;
+            for (i = 0; i < 11; ++i)
+            {
+                b01->poligons[i]->color.r = 0;
+                b01->poligons[i]->color.g = 0;
+                b01->poligons[i]->color.b = 0;
+            }
+            //テクスチャ読み込み・貼り付け
+            for (i = 0; i < 11; ++i)
+            {
+                l3Texture texture;
+                l3Load2DTexture("assets/building.ppm", &texture);
+                l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
+                b01->poligons[i]->textureType = l3TextureTypeTiled;
+                b01->poligons[i]->textureRepeatX = 0.5;
+                b01->poligons[i]->textureRepeatY = 0.5;
+                b01->poligons[i]->textureCoordinateSystem = l3CoordinateSystemLocal;
+                b01->poligons[i]->texture = &texture;
+            }
+
+            //obj01->poligons[2]->lightType = l3LightTypePoint;
+            //obj01->poligons[2]->lightIntensity = 4;
+
+            l3SetTransposeObject(b01, 0, 0, 0);
+            l3SetScaleObject(b01, 0, 0, 0);
+            //l3AddObjectToEnvironment(&env, b01, "box01");
+        }
+        double q, j;
+        for (q = 0; q < 7; ++q)
+        {
+            double n = (q + 1.0) * 10.0;
+            for (j = 0; j < n; ++j)
+            {
+                l3Object *b02 = l3CloneObject(b01); //クローン
+                {
+                    l3SetTransposeObject(b01, (q + 5.0) * 80 * cos(j / n * 2.0 * PI), 20.0, (q + 5.0) * 80 * sin(j / n * 2.0 * PI));
+                    l3SetScaleObject(b01, 20 + (rand() % 5) * 5, 50 + (rand() % 10) * 20, 20 + (rand() % 5) * 5);
+                    l3AddObjectToEnvironment(&env, b02, "box02");
+                }
+            }
+        }
+
+        l3Object *obj3 = l3CreateObject();
+        {
+            l3AddVertexToObject(obj3, l3CreateVertex(0, 0, 0, &blue));
+            l3Mat31A normal = {0, 1, 0}; // 正しい
+            l3SetTransposeObject(obj3, 0, 0, 0);
+            l3Poligon *poligons[] = {
+                l3CreatePoligonPlane(0, normal),
+            };
+            poligons[0]->material = l3PoligonMaterialColor;
+            poligons[0]->color.r = 60;
+            poligons[0]->color.g = 60;
+            poligons[0]->color.b = 60;
+            poligons[0]->metalness[0] = poligons[0]->metalness[1] = poligons[0]->metalness[2] = 0.1;
+            poligons[0]->roughness = radians(10);
+            poligons[0]->roughnessSamples = 2;
+
+            l3SetPoligonsToObject(obj3, sizeof(poligons) / sizeof(l3Poligon *), poligons);
+            l3AddObjectToEnvironment(&env, obj3, "plane");
         }
 
         l3Object *sky = l3CreateObject();
