@@ -187,7 +187,7 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon *), poligons);
             l3SetTransposeObject(_object, -15, 10, 0);
             l3SetScaleObject(_object, 2, 2, 2);
-            l3AddObjectToEnvironment(&env, _object, "test");
+            // l3AddObjectToEnvironment(&env, _object, "test");
         }
         l3Object *obj2 = l3CreateBox();
         {
@@ -200,7 +200,7 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             }
             l3SetTransposeObject(obj2, -15, 10, -20);
             l3SetScaleObject(obj2, 10, 10, 10);
-            l3AddObjectToEnvironment(&env, obj2, "box1");
+            // l3AddObjectToEnvironment(&env, obj2, "box1");
         }
         l3Object *obj5 = l3CreateBox();
         {
@@ -235,7 +235,7 @@ int scene_core(int argc, const char *argv[], l3Options *options)
 
             l3SetPoligonsToObject(obj6, sizeof(poligons) / sizeof(l3Poligon*), poligons);
             l3SetTransposeObject(obj6, 0, 0, 0);
-            l3AddObjectToEnvironment(&env, obj6, "obj6");
+            // l3AddObjectToEnvironment(&env, obj6, "obj6");
         }
         l3Object* column = l3CreateObject();
         {
@@ -253,7 +253,7 @@ int scene_core(int argc, const char *argv[], l3Options *options)
 
             l3SetPoligonsToObject(column, sizeof(poligons) / sizeof(l3Poligon *), poligons);
             l3SetTransposeObject(column, 0, 0, 0);
-            // l3AddObjectToEnvironment(&env, column, "column");
+            l3AddObjectToEnvironment(&env, column, "column");
         }
         l3Texture texture2;
         // l3Load2DTexture("assets/star.ppm", &texture2);

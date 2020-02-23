@@ -30,11 +30,31 @@ static void transition(l3Environment *env, int frame)
     l3Vertex *ramielv2[36];
     l3Mat41A p2[36] = {0};
 
+    l3Object *beam = l3FindObject(env, "beam");
+    l3Object *ring = l3FindObject(env, "ring");
+    l3Object *beamlight = l3FindObject(env, "light6");
+    l3Object *beamlight2 = l3FindObject(env, "light7");
+
+    beamlight->dy = 10000;
+    beamlight->poligons[0]->lightIntensity = 0;
+    beamlight2->dx = 10000;
+    beamlight2->dy = 250;
+    beamlight2->poligons[0]->sphere_radius = 10;
+    beamlight2->poligons[0]->lightIntensity = 1;
+
     ramiel_normal->theta_y = -2 * PI / 4;
     // ramiel_trans->theta_y = -2*PI / 4;
     ramiel_trans2->sx = 1.5;
     ramiel_trans2->sy = 1.5;
     ramiel_trans2->sz = 1.5;
+
+    l3Vertex *beams[2];
+    l3Vertex *rings[2];
+
+    beams[0] = array_at(&beam->vertices, 0);
+    beams[1] = array_at(&beam->vertices, 1);
+    rings[0] = array_at(&ring->vertices, 0);
+    rings[1] = array_at(&ring->vertices, 1);
 
     for (i = 0; i <= 35; i++)
     {
@@ -49,7 +69,7 @@ static void transition(l3Environment *env, int frame)
 
     if (mode == 1)
     {
-        int keyframe1 = 30, keyframe2 = 90, keyframe3 = 120, keyframe4 = 170, keyframe5 = 200, keyframe6 = 220;
+        int keyframe1 = 30, keyframe2 = 90, keyframe3 = 120, keyframe4 = 170, keyframe5 = 200, keyframe6 = 260, keyframe7 = 290;
 
         for (i = 0; i < 36; i++)
         {
@@ -61,6 +81,23 @@ static void transition(l3Environment *env, int frame)
             ramielv2[i]->coordinate[1] = 0;
             ramielv2[i]->coordinate[2] = 0;
         }
+        rings[0]->coordinate[0] = 0;
+        rings[0]->coordinate[1] = ramiel_core->dy;
+        rings[0]->coordinate[2] = 0;
+
+        rings[1]->coordinate[0] = 0;
+        rings[1]->coordinate[1] = ramiel_core->dy;
+        rings[1]->coordinate[2] = 0;
+
+        ring->poligons[0]->boundingRadius = 800;
+
+        beams[0]->coordinate[0] = 0;
+        beams[0]->coordinate[1] = ramiel_core->dy;
+        beams[0]->coordinate[2] = 0;
+
+        beams[1]->coordinate[0] = 0;
+        beams[1]->coordinate[1] = ramiel_core->dy;
+        beams[1]->coordinate[2] = 0;
 
         if (frame < keyframe1)
         {
@@ -142,12 +179,12 @@ static void transition(l3Environment *env, int frame)
             for (i = 1; i <= 5; i++)
             {
                 l3PolarToMat41A(p[1 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), PI, PI / 2 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p[2 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), 5 * PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p[3 + 7 * (i - 1)], 300 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 6) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p[4 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 12) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p[5 + 7 * (i - 1)], 80 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 20) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p[6 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 4) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p[7 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 3) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[2 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), 5 * PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[3 + 7 * (i - 1)], 300 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 6) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[4 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 12) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[5 + 7 * (i - 1)], 80 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 20) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[6 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 4) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p[7 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 3) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
             }
 
             for (i = 0; i < 36; i++)
@@ -165,12 +202,12 @@ static void transition(l3Environment *env, int frame)
             for (i = 1; i <= 5; i++)
             {
                 l3PolarToMat41A(p2[1 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI, PI / 2 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p2[2 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), 5 * PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p2[3 + 7 * (i - 1)], 300 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 6) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p2[4 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 12) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p2[5 + 7 * (i - 1)], 80 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 20) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p2[6 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 4) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 + 2 * PI / 5 * (i - 1));
-                l3PolarToMat41A(p2[7 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 3) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[2 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), 5 * PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[3 + 7 * (i - 1)], 300 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 6) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[4 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 12) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[5 + 7 * (i - 1)], 80 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 20) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[6 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 4) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
+                l3PolarToMat41A(p2[7 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 3) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
             }
 
             for (i = 0; i < 36; i++)
@@ -182,22 +219,55 @@ static void transition(l3Environment *env, int frame)
 
             ramiel_trans2->theta_x -= (2 * PI / 30) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) * (1.1 - l3TimeTransition(l3TimeType_linear, frame, keyframe4, keyframe5)) * (1 - l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6));
         }
-    }
 
-    // if(mode == 2){
-    //     l3PolarToMat41A(v1->coordinate,300,);
-    // }
+        if (frame >= keyframe5)
+        {
 
-    ramiel_core->dy = ramiel_normal->dy = ramiel_trans->dy = ramiel_trans2->dy;
-    ramiel_trans2->dx = ramiel_trans->dx - 50;
+            beamlight2->dx = 1000 - 700 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6);
+            beamlight2->dy = 250;
+            beamlight2->poligons[0]->sphere_radius = 200 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6);
+            beamlight2->poligons[0]->lightIntensity = 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6);
 
-    l3Object *light1 = l3FindObject(env, "light1");
-    light1->dx = 800 * cos(-67 / 100.0 * 2.0 * PI);
-    light1->dz = 800 * sin(-67 / 100.0 * 2.0 * PI);
+            ring->poligons[0]->lightIntensity = 1000 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6);
 
+            rings[0]->coordinate[0] = 70;
+            rings[0]->coordinate[1] = ramiel_core->dy;
+            rings[0]->coordinate[2] = 0;
 
+            rings[1]->coordinate[0] = 90;
+            rings[1]->coordinate[1] = ramiel_core->dy;
+            rings[1]->coordinate[2] = 0;
 
-    bezier cpoint[8];
+            ring->poligons[0]->sphere_radius = 500 * (1.0 - l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6));
+
+            beams[0]->coordinate[0] = 0;
+            beams[0]->coordinate[1] = ramiel_core->dy;
+            beams[0]->coordinate[2] = 0;
+
+            ramiel_core->poligons[0]->lightIntensity = 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6);
+
+            if (frame >= keyframe6)
+            {
+                ring->poligons[0]->lightIntensity = 100 * (1.0 - l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe6, keyframe7));
+                beam->poligons[0]->lightIntensity = 1000 * rand();
+                beams[1]->coordinate[0] = 1000;
+                beams[1]->coordinate[1] = ramiel_core->dy;
+                beams[1]->coordinate[2] = 0;
+                beamlight->poligons[0]->lightIntensity = 1000 * rand();
+            }
+        }
+        // if(mode == 2){
+        //     l3PolarToMat41A(v1->coordinate,300,);
+        // }
+
+        ramiel_core->dy = ramiel_normal->dy = ramiel_trans->dy = ramiel_trans2->dy;
+        ramiel_trans2->dx = ramiel_trans->dx - 50;
+
+        l3Object *light1 = l3FindObject(env, "light1");
+        light1->dx = 800 * cos(-67 / 100.0 * 2.0 * PI);
+        light1->dz = 800 * sin(-67 / 100.0 * 2.0 * PI);
+
+        bezier cpoint[8];
         {
             cpoint[0].x = 800 * cos(-67 / 100.0 * 2.0 * PI);
             cpoint[0].y = 5;
@@ -220,23 +290,40 @@ static void transition(l3Environment *env, int frame)
             cpoint[6].x = -80;
             cpoint[6].y = 100;
             cpoint[6].z = -30;
-            cpoint[7].x = -100;
-            cpoint[7].y = 100;
-            cpoint[7].z = 500;
+            cpoint[7].x = 500;
+            cpoint[7].y = 300;
+            cpoint[7].z = -500;
         }
 
-        bezier camera_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 30, 200), 8, cpoint);
+        bezier camera_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 0, keyframe6), 8, cpoint);
 
-        
-        
-        
+        env->camera.coordinate[0] = camera_bezier.x;
+        env->camera.coordinate[1] = camera_bezier.y;
+        env->camera.coordinate[2] = camera_bezier.z;
+        env->camera.target[0] = 0;
+        env->camera.target[1] = 250;
+        env->camera.target[2] = 0;
 
-    env->camera.coordinate[0] = camera_bezier.x;
-    env->camera.coordinate[1] = camera_bezier.y;
-    env->camera.coordinate[2] = camera_bezier.z;
-    env->camera.target[0] = 0;
-    env->camera.target[1] = 250;
-    env->camera.target[2] = 0;
+        // if (frame >= keyframe6)
+        // {
+
+        //     env->camera.coordinate[0] = 500 + 20 * rand();
+        //     env->camera.coordinate[1] = 300 + 20 * rand();
+        //     env->camera.coordinate[2] = -500 + 20 * rand();
+        //     env->camera.target[0] = 0 + 20 * rand();
+        //     env->camera.target[1] = 250 + 20 * rand();
+        //     env->camera.target[2] = 0 + 20 * rand();
+        // }
+        // else
+        // {
+        //     env->camera.coordinate[0] = camera_bezier.x;
+        //     env->camera.coordinate[1] = camera_bezier.y;
+        //     env->camera.coordinate[2] = camera_bezier.z;
+        //     env->camera.target[0] = 0;
+        //     env->camera.target[1] = 250;
+        //     env->camera.target[2] = 0;
+        // }
+    }
 }
 
 int scene_ramiel(int argc, const char *argv[], l3Options *options)
@@ -574,6 +661,30 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             l3AddObjectToEnvironment(&env, light5, "light5");
         }
 
+        l3Object *light6 = l3CloneObject(light1);
+        {
+            light6->poligons[0]->lightColor.r = 250;
+            light6->poligons[0]->lightColor.g = 220;
+            light6->poligons[0]->lightColor.b = 100;
+            light6->poligons[0]->transparency = 1;
+            light6->poligons[0]->lightIntensity = 100;
+
+            l3SetTransposeObject(light6, 100, 250, 0);
+            l3AddObjectToEnvironment(&env, light6, "light6");
+        }
+
+        l3Object *light7 = l3CloneObject(light1);
+        {
+            light7->poligons[0]->lightColor.r = 250;
+            light7->poligons[0]->lightColor.g = 20;
+            light7->poligons[0]->lightColor.b = 10;
+            light7->poligons[0]->transparency = 1;
+            light7->poligons[0]->lightIntensity = 100;
+
+            l3SetTransposeObject(light7, 100, 250, 0);
+            l3AddObjectToEnvironment(&env, light7, "light7");
+        }
+
         l3Object *ramiel_core = l3CreateObject();
         {
             int vs[] = {
@@ -597,6 +708,54 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             l3SetTransposeObject(ramiel_core, 0, 250, 0);
             l3SetScaleObject(ramiel_core, 10, 10, 10);
             l3AddObjectToEnvironment(&env, ramiel_core, "ramiel_core");
+        }
+
+        l3Object *ring = l3CreateObject();
+        {
+            int vs[] = {
+                l3AddVertexToObject(ring, l3CreateVertex(0, 0, 0, &red)),
+                l3AddVertexToObject(ring, l3CreateVertex(0, 20, 0, &red)),
+            };
+            l3Poligon *poligons[] = {
+                l3CreatePoligonColumn(0, 1, 10),
+            };
+            poligons[0]->color.r = 255;
+            poligons[0]->color.g = 250;
+            poligons[0]->color.b = 50;
+            light5->poligons[0]->transparency = 0.7;
+            poligons[0]->material = l3PoligonMaterialColor;
+            poligons[0]->lightIntensity = 1000;
+            poligons[0]->lightType = l3LightTypePoint;
+            poligons[0]->lightAttenuation = 0.004;
+
+            l3SetPoligonsToObject(ring, sizeof(poligons) / sizeof(l3Poligon *), poligons);
+            l3SetTransposeObject(ring, 0, 0, 0);
+            //l3SetScaleObject(ring, 10, 1, 10);
+            l3AddObjectToEnvironment(&env, ring, "ring");
+        }
+
+        l3Object *beam = l3CreateObject();
+        {
+            int vs[] = {
+                l3AddVertexToObject(beam, l3CreateVertex(0, 0, 0, &red)),
+                l3AddVertexToObject(beam, l3CreateVertex(0, 20, 0, &red)),
+            };
+            l3Poligon *poligons[] = {
+                l3CreatePoligonColumn(0, 1, 10),
+            };
+            poligons[0]->color.r = 55;
+            poligons[0]->color.g = 50;
+            poligons[0]->color.b = 250;
+            light5->poligons[0]->transparency = 0.7;
+            poligons[0]->material = l3PoligonMaterialColor;
+            poligons[0]->lightIntensity = 1000;
+            poligons[0]->lightType = l3LightTypePoint;
+            poligons[0]->lightAttenuation = 0.004;
+
+            l3SetPoligonsToObject(beam, sizeof(poligons) / sizeof(l3Poligon *), poligons);
+            l3SetTransposeObject(beam, 0, 0, 0);
+            //l3SetScaleObject(ring, 10, 1000, 10);
+            l3AddObjectToEnvironment(&env, beam, "beam");
         }
 
         l3Object *b01 = l3CreateBox();
