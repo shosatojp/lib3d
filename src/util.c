@@ -250,7 +250,6 @@ void l3SetCameraInfoToEnvironment(l3Environment* env,
  * バウンディング半径を計算（原点からの距離の最大値）
  */
 int l3AddObjectToEnvironment(l3Environment* env, l3Object* obj, const char* name) {
-    obj->bounding_radius = l3GetBoundingRadius(obj);
     int index = array_push(&env->objects, obj);
     hashmap_add(&env->objects_map, name, (void*)(long)index);
     return index;
@@ -343,7 +342,7 @@ l3Object* l3FindObject(l3Environment* env, const char* name) {
     return array_at(&env->objects, index);
 }
 
-void l3GetBounding(int count, l3Vertex* vs[], l3Mat31 center, l3Type* radius) {
+void l3GetBoundingCenter(int count, l3Vertex* vs[], l3Mat31 center) {
     l3Mat31A c = {0};
     l3Type r = 0;
     for (int i = 0; i < count; i++) {
@@ -351,14 +350,17 @@ void l3GetBounding(int count, l3Vertex* vs[], l3Mat31 center, l3Type* radius) {
         l3AddMat3(c, w, c);
     }
     l3DivMat(c, count, center, 3);
-    for (int i = 0; i < count; i++) {
-        l3Mat41 w = vs[i]->coordinateWorld;
-        l3Type l = l3DistanceVec3(w, c);
-        r = max(r, l);
-    }
-    *radius = r;
 }
 
+l3Type l3GetBoundingRadius(int count, l3Vertex* vs[], l3Mat31 center) {
+    l3Type r = 0;
+    for (int i = 0; i < count; i++) {
+        l3Mat41 w = vs[i]->coordinateWorld;
+        l3Type l = l3DistanceVec3(w, center);
+        r = max(r, l);
+    }
+    return r;
+}
 
 void memdump(void* __ptr, int __n) {
     int width = 16;

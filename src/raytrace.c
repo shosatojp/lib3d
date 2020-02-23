@@ -234,120 +234,124 @@ bool l3FindRayCrossPoint(l3Ray *ray, l3Environment *env) {
     l3Type min_length = 0;
     l3Mat41 rayStartPoint = ray->rayStartPoint,
             rayDirection = ray->rayDirection;
-    l3Poligon **poligons = (l3Poligon **)env->poligons.data;
     bool found = false;
 
-    for (size_t i = 0, l = env->poligons.length; i < l; i++) {
-        l3Poligon *p = *(poligons + i);  //array_at(&env->poligons, i);
-        if (p->noSize) continue;
-
+    for (size_t j = 0, l = env->objects.length; j < l; j++) {
+        l3Object *obj = array_at(&env->objects, j);
         // 余計遅くなった（ポリゴン数が少なかったから？）
-        // if (p->boundingRadius) {
+        // if (obj->bounding_radius) {
         //     // bounding
         //     l3Mat31A tmp = {0};
-        //     l3SubMat3(p->boundingCenter, rayStartPoint, tmp);
+        //     l3SubMat3(obj->boundingCenter, rayStartPoint, tmp);
         //     l3Type l = l3VecAbs3(tmp);
         //     l3Type cos_theta = l3InnerProductVec3(tmp, rayDirection) / l;
         //     l3Type r = l * sqrtf(1 - cos_theta * cos_theta);
-        //     if (r > p->boundingRadius) {
+        //     if (r > obj->bounding_radius) {
         //         continue;
         //     }
         // }
 
-        switch (p->poligonType) {
-            case l3PoligonTypeTriangle: {
-                l3Mat41A intersection;
-                l3Mat21A uv;
-                if (!l3IntersectRayPoligon(rayStartPoint, rayDirection, p, intersection, uv)) {
-                    break;
-                }
-                l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
-                if (!found || min_length > distance) {
-                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
-                    memcpy(min_uv, uv, sizeof(l3Type) * 2);
-                    min_length = distance;
-                    min_poligon = p;
-                    found = true;
-                }
-            } break;
-            case l3PoligonTypeShpere: {
-                l3Mat41A intersection = {0};
-                if (!l3IntersectRaySphere(rayStartPoint, rayDirection,
-                                          p->vertices[0]->coordinateWorld,
-                                          p->sphere_radius, intersection)) {
-                    break;
-                }
-                l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
-                if (!found || min_length > distance) {
-                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
-                    min_length = distance;
-                    min_poligon = p;
-                    found = true;
-                }
-            } break;
-            case l3PoligonTypePlane: {
-                l3Mat41A intersection = {0};
-                if (!l3IntersectRayPlane(rayStartPoint, rayDirection,
-                                         p->normal, p->vertices[0]->coordinateWorld,
-                                         intersection)) {
-                    break;
-                }
-                l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
-                if (!found || min_length > distance) {
-                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
-                    min_length = distance;
-                    min_poligon = p;
-                    found = true;
-                }
-            } break;
-            case l3PoligonTypeSky: {
-                l3Mat41A intersection = {0};
-                if (!l3IntersectRaySky(rayStartPoint, rayDirection,
-                                       env->camera.coordinate,
-                                       env->camera.far, intersection)) {
-                    break;
-                }
-                l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
-                if (!found || min_length > distance) {
-                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
-                    min_length = distance;
-                    min_poligon = p;
-                    found = true;
-                }
-            } break;
-            case l3PoligonTypeColumn: {
-                l3Mat41A intersection = {0};
-                if (!l3IntersectRayColumn(rayStartPoint, rayDirection,
-                                          p->vertices[0]->coordinateWorld,
-                                          p->vertices[1]->coordinateWorld,
-                                          p->sphere_radius, intersection)) {
-                    break;
-                }
-                l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
-                if (!found || min_length > distance) {
-                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
-                    min_length = distance;
-                    min_poligon = p;
-                    found = true;
-                }
-            } break;
-            case l3PoligonTypeCircle: {
-                l3Mat41A intersection = {0};
-                if (!l3IntersectRayCircle(rayStartPoint, rayDirection,
-                                          p->vertices[0]->coordinateWorld,
-                                          p->normal,
-                                          p->sphere_radius,
-                                          intersection)) {
-                    break;
-                }
-                l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
-                if (!found || min_length > distance) {
-                    memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
-                    min_length = distance;
-                    min_poligon = p;
-                    found = true;
-                }
-            } break;
+        // ポリゴン毎に
+        l3Poligon **poligons = obj->poligons;
+        for (size_t i = 0, l = obj->poligon_count; i < l; i++) {
+            l3Poligon *p = *(poligons + i);  //array_at(&env->poligons, i);
+            if (p->noSize) continue;
+
+            switch (p->poligonType) {
+                case l3PoligonTypeTriangle: {
+                    l3Mat41A intersection;
+                    l3Mat21A uv;
+                    if (!l3IntersectRayPoligon(rayStartPoint, rayDirection, p, intersection, uv)) {
+                        break;
+                    }
+                    l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
+                    if (!found || min_length > distance) {
+                        memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                        memcpy(min_uv, uv, sizeof(l3Type) * 2);
+                        min_length = distance;
+                        min_poligon = p;
+                        found = true;
+                    }
+                } break;
+                case l3PoligonTypeShpere: {
+                    l3Mat41A intersection = {0};
+                    if (!l3IntersectRaySphere(rayStartPoint, rayDirection,
+                                              p->vertices[0]->coordinateWorld,
+                                              p->sphere_radius, intersection)) {
+                        break;
+                    }
+                    l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
+                    if (!found || min_length > distance) {
+                        memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                        min_length = distance;
+                        min_poligon = p;
+                        found = true;
+                    }
+                } break;
+                case l3PoligonTypePlane: {
+                    l3Mat41A intersection = {0};
+                    if (!l3IntersectRayPlane(rayStartPoint, rayDirection,
+                                             p->normal, p->vertices[0]->coordinateWorld,
+                                             intersection)) {
+                        break;
+                    }
+                    l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
+                    if (!found || min_length > distance) {
+                        memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                        min_length = distance;
+                        min_poligon = p;
+                        found = true;
+                    }
+                } break;
+                case l3PoligonTypeSky: {
+                    l3Mat41A intersection = {0};
+                    if (!l3IntersectRaySky(rayStartPoint, rayDirection,
+                                           env->camera.coordinate,
+                                           env->camera.far, intersection)) {
+                        break;
+                    }
+                    l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
+                    if (!found || min_length > distance) {
+                        memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                        min_length = distance;
+                        min_poligon = p;
+                        found = true;
+                    }
+                } break;
+                case l3PoligonTypeColumn: {
+                    l3Mat41A intersection = {0};
+                    if (!l3IntersectRayColumn(rayStartPoint, rayDirection,
+                                              p->vertices[0]->coordinateWorld,
+                                              p->vertices[1]->coordinateWorld,
+                                              p->sphere_radius, intersection)) {
+                        break;
+                    }
+                    l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
+                    if (!found || min_length > distance) {
+                        memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                        min_length = distance;
+                        min_poligon = p;
+                        found = true;
+                    }
+                } break;
+                case l3PoligonTypeCircle: {
+                    l3Mat41A intersection = {0};
+                    if (!l3IntersectRayCircle(rayStartPoint, rayDirection,
+                                              p->vertices[0]->coordinateWorld,
+                                              p->normal,
+                                              p->sphere_radius,
+                                              intersection)) {
+                        break;
+                    }
+                    l3Type distance = l3DistanceVec3(rayStartPoint, intersection);
+                    if (!found || min_length > distance) {
+                        memcpy(min_intersection, intersection, sizeof(l3Type) * 4);
+                        min_length = distance;
+                        min_poligon = p;
+                        found = true;
+                    }
+                } break;
+            }
         }
     }
 
@@ -637,6 +641,9 @@ void l3SetWorldCoordinate(l3Environment *env) {
         l3MakeLocalToWorldMat44(_object->dx, _object->dy, _object->dz,
                                 _object->sx, _object->sy, _object->sz,
                                 _object->theta_x, _object->theta_y, _object->theta_z, lw);
+
+        bool boundingCalclated = false;
+        l3PoligonType objectPoligonType = l3PoligonTypeTriangle;
         for (int i = 0; i < _object->poligon_count; i++) {
             l3Poligon *_poligon = _object->poligons[i];
 
@@ -662,8 +669,8 @@ void l3SetWorldCoordinate(l3Environment *env) {
                     }
 
                     // bounding
-                    l3GetBounding(_poligon->vertex_count, _poligon->vertices,
-                                  _poligon->boundingCenter, &_poligon->boundingRadius);
+                    // l3GetBoundingCenter(_poligon->vertex_count, _poligon->vertices,
+                    //                     _poligon->boundingCenter, &_poligon->boundingRadius);
                 } break;
                 case l3PoligonTypeShpere: {
                     for (int j = 0; j < 2; j++) {
@@ -712,10 +719,11 @@ void l3SetWorldCoordinate(l3Environment *env) {
                     }
 
                     // bounding
-                    _poligon->boundingRadius = _poligon->sphere_radius;
-                    memcpy(_poligon->boundingCenter,
+                    _object->bounding_radius = _poligon->sphere_radius;
+                    memcpy(_object->boundingCenter,
                            _poligon->vertices[0]->coordinateWorld,
                            sizeof(l3Type) * 4);
+                    boundingCalclated = true;
                 } break;
                 case l3PoligonTypeCircle:
                 case l3PoligonTypePlane: {
@@ -726,8 +734,10 @@ void l3SetWorldCoordinate(l3Environment *env) {
                         l3MulMat4441(lw, _vertex->coordinate, _vertex->coordinateWorld);
                         _vertex->converted = true;
                     }
+                    boundingCalclated = true;
                 } break;
                 case l3PoligonTypeSky: {
+                    boundingCalclated = true;
                 } break;
                 case l3PoligonTypeColumn: {
                     for (int j = 0; j < 2; j++) {
@@ -740,8 +750,14 @@ void l3SetWorldCoordinate(l3Environment *env) {
                         }
                     }
                     l3SubMat3(_poligon->vertices[1]->coordinateWorld, _poligon->vertices[0]->coordinateWorld, _poligon->e1);
+                    boundingCalclated = true;
                 } break;
             }
+        }
+
+        if (!boundingCalclated) {
+            l3GetBoundingCenter(_object->vertices.length, (l3Vertex **)_object->vertices.data, _object->boundingCenter);
+            _object->bounding_radius = l3GetBoundingRadius(_object->vertices.length, (l3Vertex **)_object->vertices.data, _object->boundingCenter);
         }
     }
 }

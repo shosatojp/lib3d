@@ -198,11 +198,3 @@ bool l3FrustumCulling(l3Object* _object, l3Mat44 lwcps, int w, int h) {
            (-r < center[1] && center[1] < h + r) &&
            (-r < center[2] && center[2] < 1 + r);
 }
-
-l3Type l3GetBoundingRadius(l3Object* _object) {
-    l3Type r = 0;
-    for (int i = 0; i < (int)_object->vertices.length; i++) {
-        r = max(r, l3VecAbs(array_at(&_object->vertices, i), 3));
-    }
-    return r;
-}

@@ -196,6 +196,7 @@ typedef struct _l3Object {
     l3Type sx, sy, sz;
     l3Type theta_x, theta_y, theta_z;
     l3Type bounding_radius;
+    l3Mat41A boundingCenter;
 } l3Object;
 
 typedef struct _l3PixelInfo {

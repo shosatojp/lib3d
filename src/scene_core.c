@@ -57,6 +57,49 @@ int scene_core(int argc, const char* argv[], l3Options* options) {
         env.h = options->h;
         env.outdir = options->outdir;
 
+        // l3Object* b01 = l3CreateBox();
+        // {
+        //     // テクスチャ読み込み
+        //     //l3Texture texture;
+        //     //l3Load2DTexture("assets/building.ppm", &texture);
+        //     int i;
+        //     for (i = 0; i < 11; ++i) {
+        //         b01->poligons[i]->color.r = 0;
+        //         b01->poligons[i]->color.g = 0;
+        //         b01->poligons[i]->color.b = 0;
+        //     }
+        //     //テクスチャ読み込み・貼り付け
+        //     for (i = 0; i < 11; ++i) {
+        //         l3Texture texture;
+        //         l3Load2DTexture("assets/building.ppm", &texture);
+        //         l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
+        //         b01->poligons[i]->textureType = l3TextureTypeTiled;
+        //         b01->poligons[i]->textureRepeatX = 0.5;
+        //         b01->poligons[i]->textureRepeatY = 0.5;
+        //         b01->poligons[i]->textureCoordinateSystem = l3CoordinateSystemLocal;
+        //         b01->poligons[i]->texture = &texture;
+        //     }
+
+        //     //obj01->poligons[2]->lightType = l3LightTypePoint;
+        //     //obj01->poligons[2]->lightIntensity = 4;
+
+        //     l3SetTransposeObject(b01, 0, 0, 0);
+        //     l3SetScaleObject(b01, 0, 0, 0);
+        //     //l3AddObjectToEnvironment(&env, b01, "box01");
+        // }
+        // double i, j;
+        // for (i = 0; i < 7; ++i) {
+        //     double n = (i + 1.0) * 10.0;
+        //     for (j = 0; j < n; ++j) {
+        //         l3Object* b02 = l3CloneObject(b01);  //クローン
+        //         {
+        //             l3SetTransposeObject(b01, (i + 5.0) * 80 * cos(j / n * 2.0 * PI), 20.0, (i + 5.0) * 80 * sin(j / n * 2.0 * PI));
+        //             l3SetScaleObject(b01, 20 + (rand() % 5) * 5, 50 + (rand() % 10) * 20, 20 + (rand() % 5) * 5);
+        //             l3AddObjectToEnvironment(&env, b02, "box02");
+        //         }
+        //     }
+        // }
+
         // l3Object* board = l3CreateObject();
         // {
         //     int vs[] = {
