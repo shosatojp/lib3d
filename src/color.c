@@ -10,5 +10,5 @@
  * 透過率
  */
 l3Type l3ReflectionRate(l3Type angle, l3Type metallicity) {
-    return exp(angle * 20 - 15) / exp(5) * (1 - metallicity) + metallicity;
+    return exp(angle / (PI / 2) * 5) / exp(5) * (1 - metallicity) + metallicity;
 }

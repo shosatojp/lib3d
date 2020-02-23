@@ -14,20 +14,14 @@ static void transition(l3Environment* env, int frame) {
     obj->theta_y += radians(360 / 100);
     obj->theta_x += radians(360 / 100);
     obj->theta_z += radians(360 / 100);
-    obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
-    obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
+    // obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
+    // obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
 
-    // l3Vertex *v0 = array_at(&obj->vertices, 0);
-    // v0->coordinate[0] = frame;
-    // v0->coordinate[1] = frame*2;
-    // v0->coordinate[2]  = frame*3;
-    // v0->coordinate[3] = 1;
-
-    l3Object *sphere = l3FindObject(env, "sphere");
-    sphere->theta_y += radians(360 / 100);
-    sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
-    sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
-    sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
+    // l3Object* sphere = l3FindObject(env, "sphere");
+    // sphere->theta_y += radians(360 / 100);
+    // sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
+    // sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
+    // sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
 
     l3Object *ramiel_trans = l3FindObject(env, "ramiel_trans");
     ramiel_trans->theta_x = (frame / 10.0 * 2 * PI)*l3TimeTransition(l3TimeType_EasyEaseIn,frame,0,100);
@@ -35,8 +29,8 @@ static void transition(l3Environment* env, int frame) {
     // sphere->poligons[0]->textureRotate += radians(1);
 
     // env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
-    // env->camera.coordinate[1] = (frame + 1) / 3.0;
-    // env->camera.coordinate[2] = 400.0 / ((frame + 1) / 30.0) * sin(-(frame + 1) / 100.0 * 2 * PI);
+    // env->camera.coordinate[1] = 70 * sinf(frame / 300.0 * (PI/2));
+    // env->camera.coordinate[2] = 70 * -cosf(frame / 300.0 * (PI/2));
 
     // l3Mat33A p_wtoc = {0};
     // l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
@@ -67,66 +61,6 @@ int scene_core(int argc, const char *argv[], l3Options *options)
         env.h = options->h;
         env.outdir = options->outdir;
 
-        // l3Object* b01 = l3CreateBox();
-        // {
-        //     // テクスチャ読み込み
-        //     //l3Texture texture;
-        //     //l3Load2DTexture("assets/building.ppm", &texture);
-        //     int i;
-        //     for (i = 0; i < 11; ++i) {
-        //         b01->poligons[i]->color.r = 0;
-        //         b01->poligons[i]->color.g = 0;
-        //         b01->poligons[i]->color.b = 0;
-        //     }
-        //     //テクスチャ読み込み・貼り付け
-        //     for (i = 0; i < 11; ++i) {
-        //         l3Texture texture;
-        //         l3Load2DTexture("assets/building.ppm", &texture);
-        //         l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
-        //         b01->poligons[i]->textureType = l3TextureTypeTiled;
-        //         b01->poligons[i]->textureRepeatX = 0.5;
-        //         b01->poligons[i]->textureRepeatY = 0.5;
-        //         b01->poligons[i]->textureCoordinateSystem = l3CoordinateSystemLocal;
-        //         b01->poligons[i]->texture = &texture;
-        //     }
-
-        //     //obj01->poligons[2]->lightType = l3LightTypePoint;
-        //     //obj01->poligons[2]->lightIntensity = 4;
-
-        //     l3SetTransposeObject(b01, 0, 0, 0);
-        //     l3SetScaleObject(b01, 0, 0, 0);
-        //     //l3AddObjectToEnvironment(&env, b01, "box01");
-        // }
-        // double i, j;
-        // for (i = 0; i < 7; ++i) {
-        //     double n = (i + 1.0) * 10.0;
-        //     for (j = 0; j < n; ++j) {
-        //         l3Object* b02 = l3CloneObject(b01);  //クローン
-        //         {
-        //             l3SetTransposeObject(b01, (i + 5.0) * 80 * cos(j / n * 2.0 * PI), 20.0, (i + 5.0) * 80 * sin(j / n * 2.0 * PI));
-        //             l3SetScaleObject(b01, 20 + (rand() % 5) * 5, 50 + (rand() % 10) * 20, 20 + (rand() % 5) * 5);
-        //             l3AddObjectToEnvironment(&env, b02, "box02");
-        //         }
-        //     }
-        // }
-
-        // l3Object* board = l3CreateObject();
-        // {
-        //     int vs[] = {
-        //         l3AddVertexToObject(board, l3CreateVertex(5, 5, 5, &red)),
-        //         l3AddVertexToObject(board, l3CreateVertex(-5, -5, 5, &green)),
-        //         l3AddVertexToObject(board, l3CreateVertex(5, -5, -5, &blue)),
-        //         l3AddVertexToObject(board, l3CreateVertex(-5, 5, -5, &white)),
-        //     };
-        //     // 右回りが表、数字はオブジェクトごとの頂点のインデックス
-        //     l3Poligon* poligons[] = {
-        //         l3CreatePoligon(0, 2, 1),
-        //         l3CreatePoligon(0, 3, 2),
-        //         l3CreatePoligon(1, 2, 3),
-        //         l3CreatePoligon(0, 1, 3),
-        //     };
-        // }
-
         // オブジェクト構築
         l3Object *_object = l3CreateObject();
 
@@ -149,40 +83,42 @@ int scene_core(int argc, const char *argv[], l3Options *options)
                 l3CreatePoligon(0, 1, 3),
             };
 
-            poligons[0]->material = l3PoligonMaterialColor;
-            poligons[0]->color.r = 150;
-            poligons[1]->material = l3PoligonMaterialColor;
-            poligons[1]->color.g = 150;
-            poligons[2]->material = l3PoligonMaterialColor;
-            poligons[2]->color.r = 255;
-            poligons[2]->color.b = 255;
-            poligons[2]->color.g = 255;
-            poligons[3]->material = l3PoligonMaterialColor;
-            poligons[3]->color.r = 150;
-            poligons[3]->color.b = 150;
-            // poligons[0]->transparency = 0.1;
-            // poligons[1]->transparency = 0.1;
-            // poligons[2]->transparency = 0.1;
-            // poligons[3]->transparency = 0.1;
-            poligons[0]->metalness[0] = poligons[1]->metalness[0] = poligons[2]->metalness[0] = poligons[3]->metalness[0] = 0.04;
-            poligons[0]->metalness[1] = poligons[1]->metalness[1] = poligons[2]->metalness[1] = poligons[3]->metalness[1] = 0.04;
-            poligons[0]->metalness[2] = poligons[1]->metalness[2] = poligons[2]->metalness[2] = poligons[3]->metalness[2] = 0.9;
+            // poligons[0]->material = l3PoligonMaterialColor;
+            // poligons[0]->color.r = 150;
+            // poligons[1]->material = l3PoligonMaterialColor;
+            // poligons[1]->color.g = 150;
+            // poligons[2]->material = l3PoligonMaterialColor;
+            // poligons[2]->color.r = 255;
+            // poligons[2]->color.b = 255;
+            // poligons[2]->color.g = 255;
+            // poligons[3]->material = l3PoligonMaterialColor;
+            // poligons[3]->color.r = 150;
+            // poligons[3]->color.b = 150;
+            // poligons[0]->transparency = 0.7;
+            // poligons[1]->transparency = 0.7;
+            // poligons[2]->transparency = 0.7;
+            // poligons[3]->transparency = 0.7;
+            poligons[0]->metalness[0] = poligons[1]->metalness[0] = poligons[2]->metalness[0] = poligons[3]->metalness[0] = 0.6;
+            poligons[0]->metalness[1] = poligons[1]->metalness[1] = poligons[2]->metalness[1] = poligons[3]->metalness[1] = 0.6;
+            poligons[0]->metalness[2] = poligons[1]->metalness[2] = poligons[2]->metalness[2] = poligons[3]->metalness[2] = 0.6;
 
             // テクスチャ読み込み・貼り付け
-            for (int i = 0; i < 2; i++)
-            {
-                poligons[i]->textureType = l3TextureTypeTiled;
-                poligons[i]->textureRepeatX = 10;
-                poligons[i]->textureRepeatY = 10;
-                poligons[i]->textureCoordinateSystem = l3CoordinateSystemLocal;
-                poligons[i]->texture = &texture;
+            for (int i = 0; i < 4; i++) {
+                // poligons[i]->textureType = l3TextureTypeTiled;
+                // poligons[i]->textureRepeatX = 3;
+                // poligons[i]->textureRepeatY = 3;
+                // poligons[i]->textureCoordinateSystem = l3CoordinateSystemLocal;
+                // poligons[i]->texture = &texture;
                 // poligons[i]->lightType = l3LightTypePoint;
                 // poligons[i]->lightIntensity = 0.4;
+                poligons[i]->material = l3PoligonMaterialColor;
+                poligons[i]->color.r = 150;
+                poligons[i]->color.b = 150;
             }
-            l3Mat32A texture_vertices = {0.5, 0, 0, 0.8, 1, 0.8};
-            for (int i = 0; i < 4; i++) {
-                l3SetUVTexturePoligon(poligons[i], &texture, texture_vertices);
-            }
+            // l3Mat32A texture_vertices = {0.5, 0, 0, 0.8, 1, 0.8};
+            // for (int i = 0; i < 4; i++) {
+            //     l3SetUVTexturePoligon(poligons[i], &texture, texture_vertices);
+            // }
 
             l3SetPoligonsToObject(_object, sizeof(poligons) / sizeof(l3Poligon *), poligons);
             l3SetTransposeObject(_object, -15, 10, 0);
@@ -274,25 +210,42 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             poligons[0]->lightColor.g = 50;
             poligons[0]->lightColor.b = 50;
             poligons[0]->material = l3PoligonMaterialColor;
-            poligons[0]->lightType = l3LightTypePoint;
-            poligons[0]->lightIntensity = 3;
+            // poligons[0]->lightType = l3LightTypePoint;
+            poligons[0]->lightIntensity = 2;
             // poligons[0]->transparency = 0.5;
-            poligons[0]->lightAttenuation = 0.004;
+            poligons[0]->lightAttenuation = 0.005;
+            poligons[0]->metalness[0] = 0.5;
+            poligons[0]->metalness[1] = 0.5;
+            poligons[0]->metalness[2] = 0.5;
+            poligons[0]->roughness = radians(0);
+
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
             // poligons[0]->textureType = l3TextureTypeTiled;
             // poligons[0]->textureRepeatX = 10;
             // poligons[0]->textureRepeatY = 10;
             // poligons[0]->textureCoordinateSystem = l3CoordinateSystemLocal;
             // poligons[0]->texture = &texture2;
-            // poligons[0]->normal[0] = 0;
-            // poligons[0]->normal[1] = 1;
-            // poligons[0]->normal[2] = 0;
+            poligons[0]->normal[0] = 0;
+            poligons[0]->normal[1] = 1;
+            poligons[0]->normal[2] = 0;
 
-            l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon *), poligons);
-            l3SetTransposeObject(sphere, 15, 0, 0);
+            l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon*), poligons);
+            l3SetTransposeObject(sphere, -30, 0, 0);
             l3AddObjectToEnvironment(&env, sphere, "sphere");
         }
-        l3Object *sphere2 = l3CreateObject();
+        l3Object* sphere_green = l3CloneObject(sphere);
+        {
+            sphere_green->poligons[0]->roughness = radians(0.0001);
+            l3SetTransposeObject(sphere_green, 0, 0, 0);
+            l3AddObjectToEnvironment(&env, sphere_green, "sphere_green");
+        }
+        l3Object* sphere_blue = l3CloneObject(sphere);
+        {
+            sphere_blue->poligons[0]->roughness = radians(50);
+            l3SetTransposeObject(sphere_blue, 30, 0, 0);
+            l3AddObjectToEnvironment(&env, sphere_blue, "sphere_blue");
+        }
+        l3Object* sphere2 = l3CreateObject();
         {
             int vs[] = {
                 l3AddVertexToObject(sphere2, l3CreateVertex(0, 0, 0, &red)),
@@ -332,8 +285,8 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             poligons[0]->color.g = 60;
             poligons[0]->color.b = 60;
             poligons[0]->metalness[0] = poligons[0]->metalness[1] = poligons[0]->metalness[2] = 0.1;
-            poligons[0]->roughness = radians(10);
-            poligons[0]->roughnessSamples = 2;
+            poligons[0]->roughness = radians(3);
+            poligons[0]->roughnessSamples = 1;
 
             l3SetPoligonsToObject(obj3, sizeof(poligons) / sizeof(l3Poligon *), poligons);
             l3AddObjectToEnvironment(&env, obj3, "plane");
@@ -358,7 +311,7 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             l3AddObjectToEnvironment(&env, sky, "sky");
         }
 
-        l3SetCameraInfoToEnvironment(&env, 0, 10, -60,
+        l3SetCameraInfoToEnvironment(&env, 0, 5, -70,
                                      0, 0, 0,
                                      0, 1, 0,
                                      radians(50), 2, 100000);

@@ -238,6 +238,7 @@ bool l3FindRayCrossPoint(l3Ray *ray, l3Environment *env) {
 
     for (size_t j = 0, l = env->objects.length; j < l; j++) {
         l3Object *obj = array_at(&env->objects, j);
+        if (obj->ignore) continue;
         // 余計遅くなった（ポリゴン数が少なかったから？）
         if (obj->bounding_radius) {
             // bounding
@@ -494,16 +495,16 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                 l3AddColor(sumcolor, trans_ray.color);
             }
         }
-        l3Type theta = l3InnerProductVec(normal, inv_ray_direction, 2);
+        l3Type theta = acosf(l3InnerProductVec3(normal, inv_ray_direction));
         l3Mat31A k_s;
         l3Mat31A k_d;
         l3Type k_eds = 1 - ray->poligon->transparency;
         l3Type k_e = env->environmentLightRate * k_eds,
                k_ds = (1 - k_e) * k_eds;
 
-        k_s[0] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[0]));
-        k_s[1] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[1]));
-        k_s[2] = k_ds * (l3ReflectionRate(theta / (2 * PI), ray->poligon->metalness[2]));
+        k_s[0] = k_ds * (l3ReflectionRate(theta, ray->poligon->metalness[0]));
+        k_s[1] = k_ds * (l3ReflectionRate(theta, ray->poligon->metalness[1]));
+        k_s[2] = k_ds * (l3ReflectionRate(theta, ray->poligon->metalness[2]));
         k_d[0] = k_ds * (1 - k_s[0]);
         k_d[1] = k_ds * (1 - k_s[1]);
         k_d[2] = k_ds * (1 - k_s[2]);
@@ -599,6 +600,7 @@ bool l3TraceRay(l3Ray *ray, l3Environment *env, int depth) {
                 // ラフネスありの鏡面反射Ray
                 l3RGB specular_color = {0};
                 // 増やせばラフネスのアンチエイリアスができるが、負荷が大きすぎる。1でもラフネス感は出る
+                if (!ray->poligon->roughnessSamples) ray->poligon->roughnessSamples = 1;
                 for (int j = 0; j < ray->poligon->roughnessSamples; j++) {
                     l3Ray specular = {0};
                     l3Mat41A dir = {0};

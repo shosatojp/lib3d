@@ -57,6 +57,7 @@ void l3MultithreadSequentialRenderer(l3Environment* env,
         _env->frame_end = options->frame_begin + options->frames;
         _env->transitionFn = transitionFn;
         _env->renderType = l3MultiThreadRenderingTypeSequential;
+        _env->prefix = options->prefix;
         printf("thread %d: %d - %d (every %d frames)\n", i, _env->frame_begin, _env->frame_end, _env->thread_count);
         pthread_create(&threads[i], NULL, (void* (*)(void*))options->renderer, _env);
     }
@@ -155,7 +156,7 @@ void l3RaytracingRenderer(l3Environment* env) {
 
         // PPMに出力
         char name[100] = {0};
-        sprintf(name, "%s/%06d.ppm", env->outdir, f);
+        sprintf(name, "%s/%s%06d.ppm", env->outdir, env->prefix, f);
         l3WriteBuffer(buf, env->w, env->h, name);
 
         // 初期化

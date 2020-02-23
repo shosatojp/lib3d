@@ -189,7 +189,7 @@ typedef struct _l3Poligon {
 typedef struct _l3Object {
     l3Poligon** poligons;  // poligonのポインタの配列のインデックスの配列 // heap 中身開放する
     int poligon_count;
-
+    bool ignore;
     array vertices;
 
     l3Type dx, dy, dz;
@@ -254,6 +254,8 @@ struct _l3Environment {
     l3RGB environmentColor;
     l3Type environmentLightRate;
     l3Type environmentLightIntensity;
+    const char* prefix;
+
 };
 
 typedef struct _l3Ray {
@@ -287,6 +289,7 @@ typedef struct _l3Options {
     l3Renderer* renderer;
     int frame_begin;
     int frame_end;
+    const char* prefix;
 } l3Options;
 
 typedef struct _l3Voxel {
