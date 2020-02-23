@@ -25,24 +25,24 @@ static void transition(l3Environment* env, int frame) {
 
     // sphere->poligons[0]->textureRotate += radians(1);
 
-    env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
-    env->camera.coordinate[1] = (frame + 1) / 3.0;
-    env->camera.coordinate[2] = 400.0 / ((frame + 1) / 30.0) * sin(-(frame + 1) / 100.0 * 2 * PI);
+    // env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
+    // env->camera.coordinate[1] = (frame + 1) / 3.0;
+    // env->camera.coordinate[2] = 400.0 / ((frame + 1) / 30.0) * sin(-(frame + 1) / 100.0 * 2 * PI);
 
-    l3Mat33A p_wtoc = {0};
-    l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
-    l3Object* obj6 = l3FindObject(env, "obj6");
-    l3Mat31A cameraZ = {0};
-    l3SubMat3(env->camera.target, env->camera.coordinate, cameraZ);
-    l3NormarizeVec3(cameraZ, cameraZ);
-    l3DivMat(cameraZ, 1000.0, cameraZ, 3);
-    l3Type vs[] = {env->w / 2.0, env->h / 2.0,
-                   env->w, env->h};
-    l3Type cs[] = {vs[0], vs[1], vs[2], vs[1], vs[0], vs[3], vs[2], vs[3]};
-    for (int i = 0; i < 4; i++) {
-        l3ConvertCoordinateOnScreen((l3Vertex*)array_at(&obj6->vertices, i),
-                                    p_wtoc, cameraZ, env, cs[i * 2], cs[i * 2 + 1]);
-    }
+    // l3Mat33A p_wtoc = {0};
+    // l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
+    // l3Object* obj6 = l3FindObject(env, "obj6");
+    // l3Mat31A cameraZ = {0};
+    // l3SubMat3(env->camera.target, env->camera.coordinate, cameraZ);
+    // l3NormarizeVec3(cameraZ, cameraZ);
+    // l3DivMat(cameraZ, 1000.0, cameraZ, 3);
+    // l3Type vs[] = {env->w / 2.0, env->h / 2.0,
+    //                env->w, env->h};
+    // l3Type cs[] = {vs[0], vs[1], vs[2], vs[1], vs[0], vs[3], vs[2], vs[3]};
+    // for (int i = 0; i < 4; i++) {
+    //     l3ConvertCoordinateOnScreen((l3Vertex*)array_at(&obj6->vertices, i),
+    //                                 p_wtoc, cameraZ, env, cs[i * 2], cs[i * 2 + 1]);
+    // }
 }
 
 int scene_core(int argc, const char* argv[], l3Options* options) {
