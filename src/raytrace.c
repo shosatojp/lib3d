@@ -239,17 +239,17 @@ bool l3FindRayCrossPoint(l3Ray *ray, l3Environment *env) {
     for (size_t j = 0, l = env->objects.length; j < l; j++) {
         l3Object *obj = array_at(&env->objects, j);
         // 余計遅くなった（ポリゴン数が少なかったから？）
-        // if (obj->bounding_radius) {
-        //     // bounding
-        //     l3Mat31A tmp = {0};
-        //     l3SubMat3(obj->boundingCenter, rayStartPoint, tmp);
-        //     l3Type l = l3VecAbs3(tmp);
-        //     l3Type cos_theta = l3InnerProductVec3(tmp, rayDirection) / l;
-        //     l3Type r = l * sqrtf(1 - cos_theta * cos_theta);
-        //     if (r > obj->bounding_radius) {
-        //         continue;
-        //     }
-        // }
+        if (obj->bounding_radius) {
+            // bounding
+            l3Mat31A tmp = {0};
+            l3SubMat3(obj->boundingCenter, rayStartPoint, tmp);
+            l3Type l = l3VecAbs3(tmp);
+            l3Type cos_theta = l3InnerProductVec3(tmp, rayDirection) / l;
+            l3Type r = l * sqrtf(1 - cos_theta * cos_theta);
+            if (r > obj->bounding_radius) {
+                continue;
+            }
+        }
 
         // ポリゴン毎に
         l3Poligon **poligons = obj->poligons;
