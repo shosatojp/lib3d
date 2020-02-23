@@ -31,6 +31,7 @@ int main(int argc, const char* argv[]) {
     options.renderer = l3RaytracingRenderer;
     if (!l3ParseArgs(argc, argv, &options)) exit(0);
 
-    scene_core(argc, argv, &options);
+    // scene_core(argc, argv, &options);
+    scene_eatora(argc, argv, &options);
     // scene_bezier(argc, argv, &options);
 }

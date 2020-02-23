@@ -189,7 +189,7 @@ typedef struct _l3Poligon {
 typedef struct _l3Object {
     l3Poligon** poligons;  // poligonのポインタの配列のインデックスの配列 // heap 中身開放する
     int poligon_count;
-
+    bool ignore;
     array vertices;
 
     l3Type dx, dy, dz;
