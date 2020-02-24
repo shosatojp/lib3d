@@ -1,6 +1,6 @@
 #include "lib3d.h"
 
-void l3ConvertCoordinateOnScreen(l3Vertex* v, l3Mat33 p_wtoc, l3Mat31 cameraZ, l3Environment* env, int x, int y) {
+void l3ConvertCoordinateOnScreen(l3Vertex *v, l3Mat33 p_wtoc, l3Mat31 cameraZ, l3Environment *env, int x, int y) {
     l3Mat41A _;
     l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,
                                    env->camera.near, env->w, env->h, x, y,
@@ -9,11 +9,11 @@ void l3ConvertCoordinateOnScreen(l3Vertex* v, l3Mat33 p_wtoc, l3Mat31 cameraZ, l
     v->converted = true;
 }
 
-static void transition(l3Environment* env, int frame) {
-    l3Object* obj = l3FindObject(env, "box");
-    obj->theta_y += radians(360 / 100);
-    obj->theta_x += radians(360 / 100);
-    obj->theta_z += radians(360 / 100);
+static void transition(l3Environment *env, int frame) {
+    // l3Object *obj = l3FindObject(env, "box");
+    // obj->theta_y += radians(360 / 100);
+    // obj->theta_x += radians(360 / 100);
+    // obj->theta_z += radians(360 / 100);
     // obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
     // obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
 
@@ -23,8 +23,8 @@ static void transition(l3Environment* env, int frame) {
     // sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
     // sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
 
-    l3Object *ramiel_trans = l3FindObject(env, "ramiel_trans");
-    ramiel_trans->theta_x = (frame / 10.0 * 2 * PI)*l3TimeTransition(l3TimeType_EasyEaseIn,frame,0,100);
+    // l3Object *ramiel_trans = l3FindObject(env, "ramiel_trans");
+    // ramiel_trans->theta_x = (frame / 10.0 * 2 * PI) * l3TimeTransition(l3TimeType_EasyEaseIn, frame, 0, 100);
 
     // sphere->poligons[0]->textureRotate += radians(1);
 
@@ -48,8 +48,7 @@ static void transition(l3Environment* env, int frame) {
     // }
 }
 
-int scene_core(int argc, const char *argv[], l3Options *options)
-{
+int scene_core(int argc, const char *argv[], l3Options *options) {
     l3Environment env;
     {
         l3RGB red = {255, 0, 0};
@@ -150,13 +149,13 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             l3SetScaleObject(obj4, 10, 10, 10);
             // l3AddObjectToEnvironment(&env, obj4, "boxddd3");
         }
-        l3Object* obj6 = l3CreateObject();
+        l3Object *obj6 = l3CreateObject();
         {
             l3AddVertexToObject(obj6, l3CreateVertex(0, 20, 0, &red));
             l3AddVertexToObject(obj6, l3CreateVertex(0, 20, 0, &red));
             l3AddVertexToObject(obj6, l3CreateVertex(0, 20, 0, &red));
             l3AddVertexToObject(obj6, l3CreateVertex(0, 20, 0, &red));
-            l3Poligon* poligons[] = {
+            l3Poligon *poligons[] = {
                 l3CreatePoligon(0, 1, 2),
                 l3CreatePoligon(1, 3, 2),
             };
@@ -169,11 +168,11 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             poligons[1]->color.b = 50;
             poligons[1]->material = l3PoligonMaterialColor;
 
-            l3SetPoligonsToObject(obj6, sizeof(poligons) / sizeof(l3Poligon*), poligons);
+            l3SetPoligonsToObject(obj6, sizeof(poligons) / sizeof(l3Poligon *), poligons);
             l3SetTransposeObject(obj6, 0, 0, 0);
             // l3AddObjectToEnvironment(&env, obj6, "obj6");
         }
-        l3Object* column = l3CreateObject();
+        l3Object *column = l3CreateObject();
         {
             int vs[] = {
                 l3AddVertexToObject(column, l3CreateVertex(0, 0, 0, &red)),
@@ -189,7 +188,7 @@ int scene_core(int argc, const char *argv[], l3Options *options)
 
             l3SetPoligonsToObject(column, sizeof(poligons) / sizeof(l3Poligon *), poligons);
             l3SetTransposeObject(column, 0, 0, 0);
-            l3AddObjectToEnvironment(&env, column, "column");
+            // l3AddObjectToEnvironment(&env, column, "column");
         }
         l3Texture texture2;
         // l3Load2DTexture("assets/star.ppm", &texture2);
@@ -211,13 +210,12 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             poligons[0]->lightColor.b = 50;
             poligons[0]->material = l3PoligonMaterialColor;
             // poligons[0]->lightType = l3LightTypePoint;
-            poligons[0]->lightIntensity = 2;
+            // poligons[0]->lightIntensity = 1;
             // poligons[0]->transparency = 0.5;
-            poligons[0]->lightAttenuation = 0.005;
-            poligons[0]->metalness[0] = 0.5;
-            poligons[0]->metalness[1] = 0.5;
-            poligons[0]->metalness[2] = 0.5;
-            poligons[0]->roughness = radians(0);
+            // poligons[0]->lightAttenuation = 0.005;
+            poligons[0]->metalness[0] = 0.1;
+            poligons[0]->metalness[1] = 0.1;
+            poligons[0]->metalness[2] = 0.1;
 
             // l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
             // poligons[0]->textureType = l3TextureTypeTiled;
@@ -229,23 +227,27 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             poligons[0]->normal[1] = 1;
             poligons[0]->normal[2] = 0;
 
-            l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon*), poligons);
-            l3SetTransposeObject(sphere, -30, 0, 0);
+            l3SetPoligonsToObject(sphere, sizeof(poligons) / sizeof(l3Poligon *), poligons);
+            l3SetTransposeObject(sphere, 15 * cosf(radians(90)), 0, 15 * sinf(radians(90)));
             l3AddObjectToEnvironment(&env, sphere, "sphere");
         }
-        l3Object* sphere_green = l3CloneObject(sphere);
+        l3Object *sphere_green = l3CloneObject(sphere);
         {
-            sphere_green->poligons[0]->roughness = radians(0.0001);
-            l3SetTransposeObject(sphere_green, 0, 0, 0);
+            sphere_green->poligons[0]->color.r = 50;
+            sphere_green->poligons[0]->color.g = 255;
+            sphere_green->poligons[0]->color.b = 50;
+            l3SetTransposeObject(sphere, 15 * cosf(radians(210)), 0, 15 * sinf(radians(210)));
             l3AddObjectToEnvironment(&env, sphere_green, "sphere_green");
         }
-        l3Object* sphere_blue = l3CloneObject(sphere);
+        l3Object *sphere_blue = l3CloneObject(sphere);
         {
-            sphere_blue->poligons[0]->roughness = radians(50);
-            l3SetTransposeObject(sphere_blue, 30, 0, 0);
+            sphere_blue->poligons[0]->color.r = 50;
+            sphere_blue->poligons[0]->color.g = 50;
+            sphere_blue->poligons[0]->color.b = 255;
+            l3SetTransposeObject(sphere, 15 * cosf(radians(330)), 0, 15 * sinf(radians(330)));
             l3AddObjectToEnvironment(&env, sphere_blue, "sphere_blue");
         }
-        l3Object* sphere2 = l3CreateObject();
+        l3Object *sphere2 = l3CreateObject();
         {
             int vs[] = {
                 l3AddVertexToObject(sphere2, l3CreateVertex(0, 0, 0, &red)),
@@ -269,13 +271,13 @@ int scene_core(int argc, const char *argv[], l3Options *options)
 
             l3SetPoligonsToObject(sphere2, sizeof(poligons) / sizeof(l3Poligon *), poligons);
             l3SetTransposeObject(sphere2, 0, 100, 0);
-            l3AddObjectToEnvironment(&env, sphere2, "sphere2");
+            // l3AddObjectToEnvironment(&env, sphere2, "sphere2");
         }
 
         l3Object *obj3 = l3CreateObject();
         {
-            l3AddVertexToObject(obj3, l3CreateVertex(0, 0, 0, &blue));
-            l3Mat31A normal = {0, 1, 0}; // 正しい
+            l3AddVertexToObject(obj3, l3CreateVertex(0, -10, 0, &blue));
+            l3Mat31A normal = {0, 1, 0};  // 正しい
             l3SetTransposeObject(obj3, 0, 0, 0);
             l3Poligon *poligons[] = {
                 l3CreatePoligonPlane(0, normal),
@@ -311,7 +313,7 @@ int scene_core(int argc, const char *argv[], l3Options *options)
             l3AddObjectToEnvironment(&env, sky, "sky");
         }
 
-        l3SetCameraInfoToEnvironment(&env, 0, 5, -70,
+        l3SetCameraInfoToEnvironment(&env, 0, 14, -40,
                                      0, 0, 0,
                                      0, 1, 0,
                                      radians(50), 2, 100000);
@@ -320,7 +322,8 @@ int scene_core(int argc, const char *argv[], l3Options *options)
         env.environmentLightRate = 0.1;
         env.environmentLightIntensity = 2;
 
-        l3MultithreadSequentialRenderer(&env, transition, options);
+        l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
+        // l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
     return 0;

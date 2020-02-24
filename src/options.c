@@ -16,6 +16,10 @@ bool l3ParseArgs(int argc, const char* argv[], l3Options* r) {
             r->frame_begin = atoi(argv[++i]);
         } else if (!strcmp(argv[i], "-p")) {
             r->prefix = argv[++i];
+        } else if (!strcmp(argv[i], "-bx")) {
+            r->block_x = atoi(argv[++i]);
+        } else if (!strcmp(argv[i], "-by")) {
+            r->block_y = atoi(argv[++i]);
         } else if (!strcmp(argv[i], "-q")) {
             ++i;
             if (!strcmp(argv[i], "4k")) {

@@ -1,10 +1,8 @@
 #include "array.h"
 #include "lib3d.h"
 
-static void transition(l3Environment *env, int frame)
-{
-
-    int i, mode = 1; //0は普通、１は変形
+static void transition(l3Environment *env, int frame) {
+    int i, mode = 1;  //0は普通、１は変形
 
     l3Object *ramiel_normal = l3FindObject(env, "ramiel_normal");
     l3Vertex *v0 = array_at(&ramiel_normal->vertices, 0);
@@ -56,23 +54,19 @@ static void transition(l3Environment *env, int frame)
     rings[0] = array_at(&ring->vertices, 0);
     rings[1] = array_at(&ring->vertices, 1);
 
-    for (i = 0; i <= 35; i++)
-    {
+    for (i = 0; i <= 35; i++) {
         ramielv[i] = array_at(&ramiel_trans->vertices, i);
         ramielv2[i] = array_at(&ramiel_trans2->vertices, i);
     }
 
-    if (mode == 0)
-    {
+    if (mode == 0) {
         v11->coordinate[1] = v0->coordinate[1];
     }
 
-    if (mode == 1)
-    {
+    if (mode == 1) {
         int keyframe1 = 30, keyframe2 = 90, keyframe3 = 120, keyframe4 = 170, keyframe5 = 200, keyframe6 = 260, keyframe7 = 290;
 
-        for (i = 0; i < 36; i++)
-        {
+        for (i = 0; i < 36; i++) {
             ramielv[i]->coordinate[0] = 0;
             ramielv[i]->coordinate[1] = 0;
             ramielv[i]->coordinate[2] = 0;
@@ -99,15 +93,11 @@ static void transition(l3Environment *env, int frame)
         beams[1]->coordinate[1] = ramiel_core->dy;
         beams[1]->coordinate[2] = 0;
 
-        if (frame < keyframe1)
-        {
-
+        if (frame < keyframe1) {
             ramiel_normal->dy = 800 - 600 * l3TimeTransition(l3TimeType_linear, frame, 0, keyframe1);
         }
 
-        if (frame >= keyframe1 && frame < keyframe2)
-        {
-
+        if (frame >= keyframe1 && frame < keyframe2) {
             bezier in[2], l1[2], l2[2], l3[2], l4[2];
             {
                 l3SetBezierPoint(&in[0], 0, 0, 200);
@@ -136,8 +126,7 @@ static void transition(l3Environment *env, int frame)
             // l3PrintMat(v10->coordinate, 4, 1);
         }
 
-        if (frame >= keyframe2 && frame <= keyframe3)
-        {
+        if (frame >= keyframe2 && frame <= keyframe3) {
             bezier in[2], l1[2], l2[2], l3[2], l4[2], l5[2];
             {
                 l3SetBezierPoint(&in[0], 0, 0, 0);
@@ -173,11 +162,8 @@ static void transition(l3Environment *env, int frame)
             // l3PrintMat(v10->coordinate, 4, 1);
         }
 
-        if (frame >= keyframe2)
-        {
-
-            for (i = 1; i <= 5; i++)
-            {
+        if (frame >= keyframe2) {
+            for (i = 1; i <= 5; i++) {
                 l3PolarToMat41A(p[1 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), PI, PI / 2 + 2 * PI / 5 * (i - 1));
                 l3PolarToMat41A(p[2 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), 5 * PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
                 l3PolarToMat41A(p[3 + 7 * (i - 1)], 300 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 2 - PI / 6) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
@@ -187,8 +173,7 @@ static void transition(l3Environment *env, int frame)
                 l3PolarToMat41A(p[7 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3), (PI / 3) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
             }
 
-            for (i = 0; i < 36; i++)
-            {
+            for (i = 0; i < 36; i++) {
                 ramielv[i]->coordinate[0] = p[i][0];
                 ramielv[i]->coordinate[1] = p[i][1];
                 ramielv[i]->coordinate[2] = p[i][2];
@@ -197,10 +182,8 @@ static void transition(l3Environment *env, int frame)
             ramiel_trans->theta_x += (2 * PI / 30) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe2, keyframe3) * (1.1 - l3TimeTransition(l3TimeType_linear, frame, keyframe4, keyframe5)) * (1 - l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6));
         }
 
-        if (frame >= keyframe3)
-        {
-            for (i = 1; i <= 5; i++)
-            {
+        if (frame >= keyframe3) {
+            for (i = 1; i <= 5; i++) {
                 l3PolarToMat41A(p2[1 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), PI, PI / 2 + 2 * PI / 5 * (i - 1));
                 l3PolarToMat41A(p2[2 + 7 * (i - 1)], 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), 5 * PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
                 l3PolarToMat41A(p2[3 + 7 * (i - 1)], 300 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 2 - PI / 6) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 + 2 * PI / 5 * (i - 1));
@@ -210,8 +193,7 @@ static void transition(l3Environment *env, int frame)
                 l3PolarToMat41A(p2[7 + 7 * (i - 1)], 30 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4), (PI / 3) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) + PI / 6 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe4, keyframe6), PI / 2 - PI / 10 + 2 * PI / 5 * (i - 1));
             }
 
-            for (i = 0; i < 36; i++)
-            {
+            for (i = 0; i < 36; i++) {
                 ramielv2[i]->coordinate[0] = p2[i][0];
                 ramielv2[i]->coordinate[1] = p2[i][1];
                 ramielv2[i]->coordinate[2] = p2[i][2];
@@ -220,9 +202,7 @@ static void transition(l3Environment *env, int frame)
             ramiel_trans2->theta_x -= (2 * PI / 30) * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe3, keyframe4) * (1.1 - l3TimeTransition(l3TimeType_linear, frame, keyframe4, keyframe5)) * (1 - l3TimeTransition(l3TimeType_linear, frame, keyframe5, keyframe6));
         }
 
-        if (frame >= keyframe5)
-        {
-
+        if (frame >= keyframe5) {
             beamlight2->dx = 1000 - 700 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6);
             beamlight2->dy = 250;
             beamlight2->poligons[0]->sphere_radius = 200 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6);
@@ -246,8 +226,7 @@ static void transition(l3Environment *env, int frame)
 
             ramiel_core->poligons[0]->lightIntensity = 100 * l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe5, keyframe6);
 
-            if (frame >= keyframe6)
-            {
+            if (frame >= keyframe6) {
                 ring->poligons[0]->lightIntensity = 100 * (1.0 - l3TimeTransition(l3TimeType_EasyEaseOut, frame, keyframe6, keyframe7));
                 beam->poligons[0]->lightIntensity = 1000 * rand();
                 beams[1]->coordinate[0] = 1000;
@@ -326,8 +305,7 @@ static void transition(l3Environment *env, int frame)
     }
 }
 
-int scene_ramiel(int argc, const char *argv[], l3Options *options)
-{
+int scene_ramiel(int argc, const char *argv[], l3Options *options) {
     l3Environment env;
     {
         int i;
@@ -347,15 +325,15 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
         l3Object *ramiel_normal = l3CreateObject();
         {
             int vs[] = {
-                l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, 0, &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, 0, &ramiel_blue)),  //0
                 l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 200, 0, &ramiel_blue)),
                 l3AddVertexToObject(ramiel_normal, l3CreateVertex(200, 0, 0, &ramiel_blue)),
                 l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, -200, &ramiel_blue)),
                 l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, 200, &ramiel_blue)),
                 l3AddVertexToObject(ramiel_normal, l3CreateVertex(-200, 0, 0, &ramiel_blue)),
-                l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, -200, 0, &ramiel_blue)), //6
+                l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, -200, 0, &ramiel_blue)),  //6
 
-                l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, 200, &ramiel_blue)), //7 開くよう
+                l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, 200, &ramiel_blue)),  //7 開くよう
                 l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, 200, &ramiel_blue)),
                 l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, 200, &ramiel_blue)),
                 l3AddVertexToObject(ramiel_normal, l3CreateVertex(0, 0, 200, &ramiel_blue)),
@@ -384,8 +362,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
 
             };
 
-            for (i = 0; i < 16; i++)
-            {
+            for (i = 0; i < 16; i++) {
                 poligons[i]->material = l3PoligonMaterialColor;
                 poligons[i]->color = ramiel_blue;
 
@@ -411,12 +388,10 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
 
         l3Object *ramiel_trans = l3CreateObject();
         {
-
             l3Mat41A p[36] = {0};
             l3PolarToMat41A(p[0], 0, 0, 0);
 
-            for (i = 1; i <= 5; i++)
-            {
+            for (i = 1; i <= 5; i++) {
                 l3PolarToMat41A(p[1 + 7 * (i - 1)], 30, PI, PI / 2 + 2 * PI / 5 * (i - 1));
                 l3PolarToMat41A(p[2 + 7 * (i - 1)], 100, 5 * PI / 6, PI / 2 + 2 * PI / 5 * (i - 1));
                 l3PolarToMat41A(p[3 + 7 * (i - 1)], 300, PI / 2 - PI / 6, PI / 2 + 2 * PI / 5 * (i - 1));
@@ -428,7 +403,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
 
             int vs[] = {
 
-                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[0][0], p[0][1], p[0][2], &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[0][0], p[0][1], p[0][2], &ramiel_blue)),  //0
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[1][0], p[1][1], p[1][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[2][0], p[2][1], p[2][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[3][0], p[3][1], p[3][2], &ramiel_blue)),
@@ -439,7 +414,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[8][0], p[8][1], p[8][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[9][0], p[9][1], p[9][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[10][0], p[10][1], p[10][2], &ramiel_blue)),
-                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[11][0], p[11][1], p[11][2], &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[11][0], p[11][1], p[11][2], &ramiel_blue)),  //0
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[12][0], p[12][1], p[12][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[13][0], p[13][1], p[13][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[14][0], p[14][1], p[14][2], &ramiel_blue)),
@@ -450,7 +425,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[19][0], p[19][1], p[19][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[20][0], p[20][1], p[20][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[21][0], p[21][1], p[21][2], &ramiel_blue)),
-                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[22][0], p[22][1], p[22][2], &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[22][0], p[22][1], p[22][2], &ramiel_blue)),  //0
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[23][0], p[23][1], p[23][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[24][0], p[24][1], p[24][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[25][0], p[25][1], p[25][2], &ramiel_blue)),
@@ -461,7 +436,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[30][0], p[30][1], p[30][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[31][0], p[31][1], p[31][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[32][0], p[32][1], p[32][2], &ramiel_blue)),
-                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[33][0], p[33][1], p[33][2], &ramiel_blue)), //0
+                l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[33][0], p[33][1], p[33][2], &ramiel_blue)),  //0
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[34][0], p[34][1], p[34][2], &ramiel_blue)),
                 l3AddVertexToObject(ramiel_trans, l3CreateVertex(p[35][0], p[35][1], p[35][2], &ramiel_blue)),
             };
@@ -470,7 +445,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
 
             l3Poligon *poligons[] = {
 
-                l3CreatePoligon(3 + 7 * 0, 4 + 7 * 0, 6 + 7 * 0), //0
+                l3CreatePoligon(3 + 7 * 0, 4 + 7 * 0, 6 + 7 * 0),  //0
                 l3CreatePoligon(6 + 7 * 0, 4 + 7 * 0, 7 + 7 * 0),
                 l3CreatePoligon(0 + 7 * 0, 6 + 7 * 0, 7 + 7 * 0),
                 l3CreatePoligon(7 + 7 * 0, 4 + 7 * 0, 6 + 7 * (0 + 1)),
@@ -479,9 +454,9 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 l3CreatePoligon(2 + 7 * 0, 4 + 7 * 0, 3 + 7 * 0),
                 l3CreatePoligon(2 + 7 * 0, 5 + 7 * 0, 4 + 7 * 0),
                 l3CreatePoligon(4 + 7 * 0, 5 + 7 * 0, 2 + 7 * (0 + 1)),
-                l3CreatePoligon(3 + 7 * (0 + 1), 4 + 7 * 0, 2 + 7 * (0 + 1)), //9
+                l3CreatePoligon(3 + 7 * (0 + 1), 4 + 7 * 0, 2 + 7 * (0 + 1)),  //9
 
-                l3CreatePoligon(3 + 7 * 1, 4 + 7 * 1, 6 + 7 * 1), //0
+                l3CreatePoligon(3 + 7 * 1, 4 + 7 * 1, 6 + 7 * 1),  //0
                 l3CreatePoligon(6 + 7 * 1, 4 + 7 * 1, 7 + 7 * 1),
                 l3CreatePoligon(0 + 7 * 1, 6 + 7 * 1, 7 + 7 * 1),
                 l3CreatePoligon(7 + 7 * 1, 4 + 7 * 1, 6 + 7 * (1 + 1)),
@@ -490,9 +465,9 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 l3CreatePoligon(2 + 7 * 1, 4 + 7 * 1, 3 + 7 * 1),
                 l3CreatePoligon(2 + 7 * 1, 5 + 7 * 1, 4 + 7 * 1),
                 l3CreatePoligon(4 + 7 * 1, 5 + 7 * 1, 2 + 7 * (1 + 1)),
-                l3CreatePoligon(3 + 7 * (1 + 1), 4 + 7 * 1, 2 + 7 * (1 + 1)), //9
+                l3CreatePoligon(3 + 7 * (1 + 1), 4 + 7 * 1, 2 + 7 * (1 + 1)),  //9
 
-                l3CreatePoligon(3 + 7 * 2, 4 + 7 * 2, 6 + 7 * 2), //0
+                l3CreatePoligon(3 + 7 * 2, 4 + 7 * 2, 6 + 7 * 2),  //0
                 l3CreatePoligon(6 + 7 * 2, 4 + 7 * 2, 7 + 7 * 2),
                 l3CreatePoligon(0 + 7 * 2, 6 + 7 * 2, 7 + 7 * 2),
                 l3CreatePoligon(7 + 7 * 2, 4 + 7 * 2, 6 + 7 * (2 + 1)),
@@ -501,9 +476,9 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 l3CreatePoligon(2 + 7 * 2, 4 + 7 * 2, 3 + 7 * 2),
                 l3CreatePoligon(2 + 7 * 2, 5 + 7 * 2, 4 + 7 * 2),
                 l3CreatePoligon(4 + 7 * 2, 5 + 7 * 2, 2 + 7 * (2 + 1)),
-                l3CreatePoligon(3 + 7 * (2 + 1), 4 + 7 * 2, 2 + 7 * (2 + 1)), //9
+                l3CreatePoligon(3 + 7 * (2 + 1), 4 + 7 * 2, 2 + 7 * (2 + 1)),  //9
 
-                l3CreatePoligon(3 + 7 * 3, 4 + 7 * 3, 6 + 7 * 3), //0
+                l3CreatePoligon(3 + 7 * 3, 4 + 7 * 3, 6 + 7 * 3),  //0
                 l3CreatePoligon(6 + 7 * 3, 4 + 7 * 3, 7 + 7 * 3),
                 l3CreatePoligon(0 + 7 * 3, 6 + 7 * 3, 7 + 7 * 3),
                 l3CreatePoligon(7 + 7 * 3, 4 + 7 * 3, 6 + 7 * (3 + 1)),
@@ -512,9 +487,9 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 l3CreatePoligon(2 + 7 * 3, 4 + 7 * 3, 3 + 7 * 3),
                 l3CreatePoligon(2 + 7 * 3, 5 + 7 * 3, 4 + 7 * 3),
                 l3CreatePoligon(4 + 7 * 3, 5 + 7 * 3, 2 + 7 * (3 + 1)),
-                l3CreatePoligon(3 + 7 * (3 + 1), 4 + 7 * 3, 2 + 7 * (3 + 1)), //9
+                l3CreatePoligon(3 + 7 * (3 + 1), 4 + 7 * 3, 2 + 7 * (3 + 1)),  //9
 
-                l3CreatePoligon(3 + 7 * 4, 4 + 7 * 4, 6 + 7 * 4), //0
+                l3CreatePoligon(3 + 7 * 4, 4 + 7 * 4, 6 + 7 * 4),  //0
                 l3CreatePoligon(6 + 7 * 4, 4 + 7 * 4, 7 + 7 * 4),
                 l3CreatePoligon(0 + 7 * 4, 6 + 7 * 4, 7 + 7 * 4),
                 l3CreatePoligon(7 + 7 * 4, 4 + 7 * 4, 6 + 7 * 0),
@@ -523,12 +498,11 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 l3CreatePoligon(2 + 7 * 4, 4 + 7 * 4, 3 + 7 * 4),
                 l3CreatePoligon(2 + 7 * 4, 5 + 7 * 4, 4 + 7 * 4),
                 l3CreatePoligon(4 + 7 * 4, 5 + 7 * 4, 2 + 7 * 0),
-                l3CreatePoligon(3 + 7 * 0, 4 + 7 * 4, 2 + 7 * 0), //9
+                l3CreatePoligon(3 + 7 * 0, 4 + 7 * 4, 2 + 7 * 0),  //9
 
             };
 
-            for (i = 0; i <= 4; i++)
-            {
+            for (i = 0; i <= 4; i++) {
                 poligons[i * 10]->material = l3PoligonMaterialColor;
                 poligons[i * 10]->color = ramiel_blue;
 
@@ -560,8 +534,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                 poligons[9 + i * 10]->color = ramiel_blue;
             }
 
-            for (i = 0; i <= 36; i++)
-            {
+            for (i = 0; i <= 36; i++) {
                 poligons[i]->metalness[0] = 0.5;
                 poligons[i]->metalness[1] = 0.5;
                 poligons[i]->metalness[2] = 0.0005;
@@ -764,15 +737,13 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             //l3Texture texture;
             //l3Load2DTexture("assets/building.ppm", &texture);
             int i;
-            for (i = 0; i < 11; ++i)
-            {
+            for (i = 0; i < 11; ++i) {
                 b01->poligons[i]->color.r = 0;
                 b01->poligons[i]->color.g = 0;
                 b01->poligons[i]->color.b = 0;
             }
             //テクスチャ読み込み・貼り付け
-            for (i = 0; i < 11; ++i)
-            {
+            for (i = 0; i < 11; ++i) {
                 l3Texture texture;
                 l3Load2DTexture("assets/building.ppm", &texture);
                 l3Mat32A texture_vertices = {0.5, 0.5, 0, 1, 1, 1};
@@ -791,12 +762,10 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
             //l3AddObjectToEnvironment(&env, b01, "box01");
         }
         double q, j;
-        for (q = 0; q < 7; ++q)
-        {
+        for (q = 0; q < 7; ++q) {
             double n = (q + 1.0) * 10.0;
-            for (j = 0; j < n; ++j)
-            {
-                l3Object *b02 = l3CloneObject(b01); //クローン
+            for (j = 0; j < n; ++j) {
+                l3Object *b02 = l3CloneObject(b01);  //クローン
                 {
                     l3SetTransposeObject(b01, (q + 5.0) * 80 * cos(j / n * 2.0 * PI), 20.0, (q + 5.0) * 80 * sin(j / n * 2.0 * PI));
                     l3SetScaleObject(b01, 20 + (rand() % 5) * 5, 50 + (rand() % 10) * 20, 20 + (rand() % 5) * 5);
@@ -808,7 +777,7 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
         l3Object *obj3 = l3CreateObject();
         {
             l3AddVertexToObject(obj3, l3CreateVertex(0, 0, 0, &blue));
-            l3Mat31A normal = {0, 1, 0}; // 正しい
+            l3Mat31A normal = {0, 1, 0};  // 正しい
             l3SetTransposeObject(obj3, 0, 0, 0);
             l3Poligon *poligons[] = {
                 l3CreatePoligonPlane(0, normal),
@@ -852,7 +821,8 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options)
                                      0, 1, 0,
                                      radians(50), 2, 100000);
 
-        l3MultithreadSequentialRenderer(&env, transition, options);
+        l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
+        // l3MultithreadSequentialRenderer(&env, transition, options);
         // l3MultithreadRenderer(&env, options->renderer, transition, options->frames, options->threads);
         // l3MultithreadSequentialRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
 

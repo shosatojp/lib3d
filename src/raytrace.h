@@ -1,7 +1,7 @@
 #include "common.h"
 #include "lib3d.h"
 
-#define l3RAY_TRACE_MAX_DEPTH 1
+#define l3RAY_TRACE_MAX_DEPTH 10
 
 void l3GetRayStartPointAndDirection(l3Mat33 p_world_to_camera, l3Mat31 camera_pos, l3Type near,
                                     l3Type w, l3Type h,

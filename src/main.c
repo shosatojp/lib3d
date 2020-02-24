@@ -1,5 +1,6 @@
 #include "lib3d.h"
 #include "scenes.h"
+#include "threadpool.h"
 
 /**
  * シーンファイルの分け方
@@ -18,7 +19,8 @@
  */
 
 int main(int argc, const char* argv[]) {
-    // voxel_test();
+    // threadpool_test();
+    // // voxel_test();
     // exit(0);
     // default options
     l3Options options = {0};
@@ -30,13 +32,16 @@ int main(int argc, const char* argv[]) {
     options.threads = 1;
     options.renderer = l3RaytracingRenderer;
     options.prefix = "";
+    options.block_x = 1;
+    options.block_y = 1;
     if (!l3ParseArgs(argc, argv, &options)) exit(0);
 
-    // scene_core(argc, argv, &options);
+    // voxel_test();
+
+    scene_core(argc, argv, &options);
     // scene_eatora(argc, argv, &options);
     // scene_bezier(argc, argv, &options);
     // scene_ramiel(argc, argv, &options);
     // scene_start(argc, argv, &options);
-    scene_last(argc, argv, &options);
-    
+    //scene_last(argc, argv, &options);
 }

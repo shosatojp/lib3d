@@ -1,6 +1,8 @@
 #include "lib3d.h"
+#include "threadpool.h"
 
 static int frame_count = 0;
+static int block_count = 0;
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 
 void l3MultithreadRenderer(l3Environment* env, l3Renderer* renderer, l3FrameTransitionFunction* transitionFn, int frames, int thread_count) {
@@ -73,6 +75,102 @@ void l3MultithreadSequentialRenderer(l3Environment* env,
 }
 #define l3ANTI_ALIASING_RAYS_COUNT 6
 // #define l3ANTI_ALIASING_ENABLED
+
+void l3RaytracingBlockMultithreadedRenderer(l3Environment* env,
+                                            l3FrameTransitionFunction* transitionFn,
+                                            l3Options* options) {
+    time_t s, f;
+    time(&s);
+
+    thread_pool pool;
+    init_pool(&pool, options->threads, 10);
+    start_pool(&pool);
+
+    int block_x = options->block_x,
+        block_y = options->block_y,
+        block_h = env->h / block_y,
+        amari_y = env->h % block_y,
+        block_w = env->w / block_x,
+        amari_x = env->w % block_x;
+    for (int f = options->frame_begin; f < options->frame_begin + options->frames; f++) {
+        for (int y = 0; y < block_y; y++) {
+            for (int x = 0; x < block_x; x++) {
+                l3BlockRendererInfo* bri = calloc(sizeof(l3BlockRendererInfo), 1);
+                l3Environment* _env = l3CloneEnvironment(env);
+                l3SolvePtrsEnvironment(_env);
+                l3SetWorldCoordinate(_env);
+                _env->prefix = options->prefix;
+                _env->livetime = block_x * block_y;
+                bri->y_begin = block_h * y + min(amari_y, y);
+                bri->y_end = block_h * (y + 1) + min(amari_y, y + 1);
+                bri->x_begin = block_w * x + min(amari_x, x);
+                bri->x_end = block_w * (x + 1) + min(amari_x, x + 1);
+                bri->frame = f;
+                bri->block_x = block_x;
+                bri->block_y = block_y;
+                bri->block_cx = x;
+                bri->block_cy = y;
+                bri->env = _env;
+                // l3RaytracingBlockRenderer(bri, 0);
+                add_task(&pool, (void (*)(void*, int))l3RaytracingBlockRenderer, (void*)bri);
+            }
+        }
+        // transitionFn(env, f);
+    }
+
+    exit_pool(&pool);
+    finalize_pool(&pool);
+    time(&f);
+    printf("rendering finished successfully.\ntotal: %d blocks, %ld s, %.3f s/block\n", block_count, f - s, (double)(f - s) / (options->frames * options->block_x * options->block_y));
+    printf("out dir: %s\n", options->outdir);
+}
+
+void l3RaytracingBlockRenderer(l3BlockRendererInfo* blockinfo, int thread_num) {
+    l3Environment* env = blockinfo->env;
+    printf("rendering frame %d (%d %d)\n", blockinfo->frame, blockinfo->block_cx, blockinfo->block_cy);
+
+    // solve ptrs
+    /* 動かす */
+    int w = blockinfo->x_end - blockinfo->x_begin;
+    int h = blockinfo->y_end - blockinfo->y_begin;
+
+    // バッファーを作る
+    unsigned char* buf = l3CreateBuffer(w, h);
+    //for begin
+    l3ClearBuffer(buf, w, h, 255);
+
+    // ワールド座標を設定
+    l3Mat33A p_wtoc = {0};
+    l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
+
+    for (int j = blockinfo->y_begin; j < blockinfo->y_end; j++) {
+        for (int i = blockinfo->x_begin; i < blockinfo->x_end; i++) {
+            l3Ray ray = {0};
+            l3GetRayStartPointAndDirection(p_wtoc, env->camera.coordinate,
+                                           env->camera.near, env->w, env->h, i, j,
+                                           ray.rayStartPoint, ray.rayDirection);
+            l3TraceRay(&ray, env, 0);
+
+            // バッファ(i,j)に色を設定
+            l3SET_BUFFER_RGB(buf, w, h, i - blockinfo->x_begin, j - blockinfo->y_begin, ray.color);
+        }
+    }
+    // PPMに出力
+    char name[100] = {0};
+    sprintf(name, "%s/%s%06d-%03d-%03d.ppm", env->outdir, env->prefix, blockinfo->frame, blockinfo->block_cy, blockinfo->block_cx);
+    l3WriteBuffer(buf, w, h, name);
+    block_count++;
+
+    // 初期化
+    l3ClearEnvironment(env);
+    safe_free(buf);
+    safe_free(blockinfo);
+
+    if (!--env->livetime) {
+        l3DestructEnvironment(env);
+        safe_free(env);
+    }
+}
 
 void l3RaytracingRenderer(l3Environment* env) {
     // バッファーを作る

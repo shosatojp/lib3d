@@ -15,7 +15,7 @@ void l3WriteBuffer(unsigned char* buffer, int w, int h, const char* name) {
  * freeする必要あり
  */
 unsigned char* l3CreateBuffer(int w, int h) {
-    int size = w * h * sizeof(char) * 3;
+    size_t size = w * h * sizeof(char) * 3;
     return (unsigned char*)malloc(size);
 }
 

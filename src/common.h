@@ -242,6 +242,8 @@ struct _l3Environment {
     int frame_begin;
     int frame_end;
     int thread_count;
+    // int x_begin, x_end, y_begin, y_end;
+    // int block_x, block_y, block_cx, block_cy;
     // int frame_per_thread;
     // time
     l3PixelInfo* map;
@@ -255,7 +257,7 @@ struct _l3Environment {
     l3Type environmentLightRate;
     l3Type environmentLightIntensity;
     const char* prefix;
-
+    int livetime;
 };
 
 typedef struct _l3Ray {
@@ -290,6 +292,7 @@ typedef struct _l3Options {
     int frame_begin;
     int frame_end;
     const char* prefix;
+    int block_x,block_y;
 } l3Options;
 
 typedef struct _l3Voxel {
