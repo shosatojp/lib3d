@@ -322,8 +322,8 @@ int scene_core(int argc, const char *argv[], l3Options *options) {
         env.environmentLightRate = 0.1;
         env.environmentLightIntensity = 2;
 
-        // l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
-        l3MultithreadSequentialRenderer(&env, transition, options);
+        l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
+        // l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
     return 0;

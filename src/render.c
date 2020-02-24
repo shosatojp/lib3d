@@ -169,7 +169,7 @@ void l3RaytracingBlockRenderer(l3BlockRendererInfo* blockinfo, int thread_num) {
     safe_free(buf);
     safe_free(blockinfo);
 
-    if (!--env->livetime) {
+    if (!(--env->livetime)) {
         l3DestructEnvironment(env);
         safe_free(env);
     }
