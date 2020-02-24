@@ -17,9 +17,9 @@ static void transition(l3Environment *env, int frame) {
     // obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
     // obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
 
-    // l3Object* sphere = l3FindObject(env, "sphere");
+    l3Object* sphere = l3FindObject(env, "sphere");
     // sphere->theta_y += radians(360 / 100);
-    // sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
+    sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
     // sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
     // sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
 
@@ -29,8 +29,8 @@ static void transition(l3Environment *env, int frame) {
     // sphere->poligons[0]->textureRotate += radians(1);
 
     // env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
-    // env->camera.coordinate[1] = 70 * sinf(frame / 300.0 * (PI/2));
-    // env->camera.coordinate[2] = 70 * -cosf(frame / 300.0 * (PI/2));
+    env->camera.coordinate[1] = 70 * sinf(frame / 100.0 * (PI/2));
+    env->camera.coordinate[2] = 70 * -cosf(frame / 100.0 * (PI/2));
 
     // l3Mat33A p_wtoc = {0};
     // l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
@@ -322,8 +322,8 @@ int scene_core(int argc, const char *argv[], l3Options *options) {
         env.environmentLightRate = 0.1;
         env.environmentLightIntensity = 2;
 
-        l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
-        // l3MultithreadSequentialRenderer(&env, transition, options);
+        // l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
+        l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
     return 0;

@@ -1,13 +1,13 @@
 #include "lib3d.h"
 #include <math.h>
 
-double logn(int base, double antilog) {
+ double logn(int  base, double  antilog) {
     return log(antilog) / log((double)base);
 }
 
-double l3TimeTransition(l3TimeTransitionType TypeId ,int frame, int start_frame,int end_frame){
-    double t;
-    double p;
+double l3TimeTransition(l3TimeTransitionType  TypeId ,int volatile  frame, int volatile start_frame,int volatile end_frame){
+    volatile double t;
+    volatile double p;
      if(frame<start_frame){
         p=0.0;
     }else if(frame>end_frame){

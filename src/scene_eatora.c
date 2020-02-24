@@ -1,8 +1,8 @@
 #include "array.h"
 #include "lib3d.h"
 
-static void transition(l3Environment* env, int frame) {
-    l3Object* eatora = l3FindObject(env, "eatora");
+ static void transition(l3Environment* env, int frame) {
+     l3Object* eatora = l3FindObject(env, "eatora");
 
     {  // イージング処理集
         if (frame >= 50 && frame <= 150) {
@@ -30,7 +30,7 @@ static void transition(l3Environment* env, int frame) {
         }
     }
     {
-        l3Object* atfield = l3FindObject(env, "atfield");
+         l3Object* atfield = l3FindObject(env, "atfield");
         if (frame <= 150) {
             for (int i = 0; i < 6; i++) {
                 atfield->poligons[i]->transparency = 0.99;
@@ -50,7 +50,7 @@ static void transition(l3Environment* env, int frame) {
 
     {                          //運動カメラ
         {                      //bezier曲線移動サンプル
-            bezier cpoint[4];  //カメラ座標ベジェ
+             bezier cpoint[4];  //カメラ座標ベジェ
             {
                 cpoint[0].x = -100;
                 cpoint[0].y = 20;
@@ -66,7 +66,7 @@ static void transition(l3Environment* env, int frame) {
                 cpoint[3].z = 100;
             }
 
-            bezier camera_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 0, 50), 4, cpoint);
+             bezier camera_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 0, 50), 4, cpoint);
 
             env->camera.coordinate[0] = camera_bezier.x;
             env->camera.coordinate[1] = camera_bezier.y;
@@ -74,7 +74,7 @@ static void transition(l3Environment* env, int frame) {
         }
 
         {
-            bezier cpoint[4];  //ターゲット座標ベジェ
+             bezier cpoint[4];  //ターゲット座標ベジェ
             {
                 cpoint[0].x = 60;
                 cpoint[0].y = 40;
@@ -90,7 +90,7 @@ static void transition(l3Environment* env, int frame) {
                 cpoint[3].z = 35;
             }
 
-            bezier cameratarget_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 0, 50), 4, cpoint);
+             bezier cameratarget_bezier = l3GetBezierCurve(l3TimeTransition(l3TimeType_EasyEase, frame, 0, 50), 4, cpoint);
 
             env->camera.target[0] = cameratarget_bezier.x;
             env->camera.target[1] = cameratarget_bezier.y;
@@ -716,4 +716,5 @@ int scene_eatora(int argc, const char* argv[], l3Options* options) {
 
         l3DestructEnvironment(&env);
     }
+    return 0;
 }

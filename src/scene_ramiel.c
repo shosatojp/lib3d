@@ -821,8 +821,8 @@ int scene_ramiel(int argc, const char *argv[], l3Options *options) {
                                      0, 1, 0,
                                      radians(50), 2, 100000);
 
-        l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
-        // l3MultithreadSequentialRenderer(&env, transition, options);
+        // l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
+        l3MultithreadSequentialRenderer(&env, transition, options);
         // l3MultithreadRenderer(&env, options->renderer, transition, options->frames, options->threads);
         // l3MultithreadSequentialRenderer(&env, l3RasterizingRenderer, transition, 100, 16);
 

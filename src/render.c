@@ -61,7 +61,7 @@ void l3MultithreadSequentialRenderer(l3Environment* env,
         _env->renderType = l3MultiThreadRenderingTypeSequential;
         _env->prefix = options->prefix;
         printf("thread %d: %d - %d (every %d frames)\n", i, _env->frame_begin, _env->frame_end, _env->thread_count);
-        pthread_create(&threads[i], NULL, (void* (*)(void*))options->renderer, _env);
+        pthread_create(&threads[i], NULL, (void* (*)(void*))l3RaytracingRenderer, _env);
     }
     // 片付け
     for (int i = 0; i < thread_count; i++) {
@@ -92,13 +92,15 @@ void l3RaytracingBlockMultithreadedRenderer(l3Environment* env,
         amari_y = env->h % block_y,
         block_w = env->w / block_x,
         amari_x = env->w % block_x;
+    for (int i = 0; i < options->frame_begin; i++) {
+        transitionFn(env, i);
+    }
     for (int f = options->frame_begin; f < options->frame_begin + options->frames; f++) {
+        transitionFn(env, f);
         for (int y = 0; y < block_y; y++) {
             for (int x = 0; x < block_x; x++) {
                 l3BlockRendererInfo* bri = calloc(sizeof(l3BlockRendererInfo), 1);
                 l3Environment* _env = l3CloneEnvironment(env);
-                l3SolvePtrsEnvironment(_env);
-                l3SetWorldCoordinate(_env);
                 _env->prefix = options->prefix;
                 _env->livetime = 1;
                 bri->y_begin = block_h * y + min(amari_y, y);
@@ -115,7 +117,7 @@ void l3RaytracingBlockMultithreadedRenderer(l3Environment* env,
                 add_task(&pool, (void (*)(void*, int))l3RaytracingBlockRenderer, (void*)bri);
             }
         }
-        // transitionFn(env, f);
+        l3ClearEnvironment(env);
     }
 
     exit_pool(&pool);
@@ -128,7 +130,8 @@ void l3RaytracingBlockMultithreadedRenderer(l3Environment* env,
 void l3RaytracingBlockRenderer(l3BlockRendererInfo* blockinfo, int thread_num) {
     l3Environment* env = blockinfo->env;
     printf("rendering frame %d (%d %d)\n", blockinfo->frame, blockinfo->block_cx, blockinfo->block_cy);
-
+    l3SolvePtrsEnvironment(env);
+    l3SetWorldCoordinate(env);
     // solve ptrs
     /* 動かす */
     int w = blockinfo->x_end - blockinfo->x_begin;

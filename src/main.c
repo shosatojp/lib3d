@@ -39,9 +39,9 @@ int main(int argc, const char* argv[]) {
     // voxel_test();
 
     // scene_core(argc, argv, &options);
-    // scene_eatora(argc, argv, &options);
+    scene_eatora(argc, argv, &options);
     // scene_bezier(argc, argv, &options);
-    scene_ramiel(argc, argv, &options);
+    // scene_ramiel(argc, argv, &options);
     // scene_start(argc, argv, &options);
     //scene_last(argc, argv, &options);
 }

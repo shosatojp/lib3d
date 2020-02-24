@@ -119,7 +119,7 @@ int scene_bezier(int argc, const char* argv[],l3Options* options) {
             poligons[0]->color.g = 255;
             poligons[0]->color.b = 255;
             poligons[0]->lightType = l3LightTypePoint;
-            poligons[0]->lightIntensity = 0.4;
+            poligons[0]->lightIntensity = 1;
             // poligons[0]->lightAttenuation = 1;
             poligons[0]->normal[0] = 0;
             poligons[0]->normal[1] = -1;
@@ -178,8 +178,9 @@ int scene_bezier(int argc, const char* argv[],l3Options* options) {
             poligons[0]->color.r = 200;
             poligons[0]->color.g = 200;
             poligons[0]->color.b = 200;
+            poligons[0]->lightColor = white;
             poligons[0]->lightType = l3LightTypeParallel;
-            poligons[0]->lightIntensity = 1;
+            poligons[0]->lightIntensity = 2;
             poligons[0]->normal[0] = 1;
             poligons[0]->normal[1] = -1;
             poligons[0]->normal[2] = 1;
