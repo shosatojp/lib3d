@@ -100,7 +100,7 @@ void l3RaytracingBlockMultithreadedRenderer(l3Environment* env,
                 l3SolvePtrsEnvironment(_env);
                 l3SetWorldCoordinate(_env);
                 _env->prefix = options->prefix;
-                _env->livetime = block_x * block_y;
+                _env->livetime = 1;
                 bri->y_begin = block_h * y + min(amari_y, y);
                 bri->y_end = block_h * (y + 1) + min(amari_y, y + 1);
                 bri->x_begin = block_w * x + min(amari_x, x);

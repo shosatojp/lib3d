@@ -1,7 +1,7 @@
 TARGET := lib3d
 CC := gcc
 # -mtune=native -march=native -mfpmath=both 
-CCOPT := -g -lm -O0 -std=c11 -pthread -Wall -W -Wno-unused-variable -Wno-unused-parameter -Wno-parentheses -Wno-type-limits -Wno-cast-function-type
+CCOPT := -g -lm -O3 -std=c11 -pthread -Wall -W -Wno-unused-variable -Wno-unused-parameter -Wno-parentheses -Wno-type-limits -Wno-cast-function-type
 SRCDIR := src
 TARGETOPT := -o bin -t 4 -f 10 -q ld
 # TARGETOPT := -o bin -t 1 -f 1 -q ld -b 59
