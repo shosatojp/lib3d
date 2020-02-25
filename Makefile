@@ -35,4 +35,10 @@ clean:
 	-rm src/*.o *.o
 	-rm -rf bin
 
+concat:
+	-find bin -name *.ppm | xargs -L 3 -P 16 -I @ bash -c 'convert @ `echo @ | sed -e "s/.ppm/.png/"` && rm @'
+	-seq 0 100 | xargs -L 1 -P 16 -I @ bash -c 'montage "bin/`printf "%06d" @`-*.png" -geometry +0+0 -tile 2x2 bin/`printf "%06d" @`.png && convert bin/`printf "%06d" @`.png bin/`printf "%06d" @`.png && rm bin/`printf "%06d" @`-*.png'
+	ffmpeg -pattern_type glob -framerate 30 -i "bin/*.png" -c:v libx264 -strict -2 -preset slow -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -f mp4 bin/out.mp4 -y
+	rm bin/*.png
+
 FORCE:;
