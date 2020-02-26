@@ -26,6 +26,7 @@ typedef struct {
     int thread_count;
 
     pthread_mutex_t mutex;
+    pthread_cond_t cond;
 
     bool exit;
 } thread_pool;
@@ -35,10 +36,9 @@ typedef struct {
     int thread_num;
 } executor_info;
 
-void init_pool(thread_pool* pool, int thread_count,int max_tasks);
-void add_task(thread_pool* pool, task_function* fn, void* arg);
-void executor(executor_info* info);
-void start_pool(thread_pool* pool);
-void exit_pool(thread_pool* pool);
-void finalize_pool(thread_pool* pool);
+void pool_init(thread_pool* pool, int thread_count,int max_tasks);
+void pool_push(thread_pool* pool, task_function* fn, void* arg);
+void pool_start(thread_pool* pool);
+void pool_exit(thread_pool* pool);
+void pool_finalize(thread_pool* pool);
 int threadpool_test();

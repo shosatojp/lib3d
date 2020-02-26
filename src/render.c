@@ -83,8 +83,8 @@ void l3RaytracingBlockMultithreadedRenderer(l3Environment* env,
     time(&s);
 
     thread_pool pool;
-    init_pool(&pool, options->threads, 10);
-    start_pool(&pool);
+    pool_init(&pool, options->threads, 10);
+    pool_start(&pool);
 
     int block_x = options->block_x,
         block_y = options->block_y,
@@ -114,14 +114,14 @@ void l3RaytracingBlockMultithreadedRenderer(l3Environment* env,
                 bri->block_cy = y;
                 bri->env = _env;
                 // l3RaytracingBlockRenderer(bri, 0);
-                add_task(&pool, (void (*)(void*, int))l3RaytracingBlockRenderer, (void*)bri);
+                pool_push(&pool, (void (*)(void*, int))l3RaytracingBlockRenderer, (void*)bri);
             }
         }
         l3ClearEnvironment(env);
     }
 
-    exit_pool(&pool);
-    finalize_pool(&pool);
+    pool_exit(&pool);
+    pool_finalize(&pool);
     time(&f);
     printf("rendering finished successfully.\ntotal: %d blocks, %ld s, %.3f s/block\n", block_count, f - s, (double)(f - s) / (options->frames * options->block_x * options->block_y));
     printf("out dir: %s\n", options->outdir);

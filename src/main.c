@@ -19,9 +19,9 @@
  */
 
 int main(int argc, const char* argv[]) {
-    // threadpool_test();
-    // // voxel_test();
-    // exit(0);
+    threadpool_test();
+    // voxel_test();
+    exit(0);
     // default options
     l3Options options = {0};
     options.outdir = "bin";
