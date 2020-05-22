@@ -1,4 +1,4 @@
-# 3Dを描画するライブラリ
+# Raytracing Library
 
 ## サンプル
 ### 動画
