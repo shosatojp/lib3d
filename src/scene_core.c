@@ -17,9 +17,44 @@ static void transition(l3Environment *env, int frame) {
     // obj->dx = 15 * cos(frame / 100.0 * 2 * PI + PI);
     // obj->dz = 15 * sin(frame / 100.0 * 2 * PI + PI);
 
-    l3Object* sphere = l3FindObject(env, "sphere");
+    l3Object *sphere = l3FindObject(env, "sphere");
     // sphere->theta_y += radians(360 / 100);
-    sphere->dy = 50 * fabs(sin(1.0 * frame / 5.0));
+    sphere->dy = 20 * fabs(sin(1.0 * frame / 5.0));
+    l3Object *sphere_green = l3FindObject(env, "sphere_green");
+    // sphere_green->theta_y += radians(360 / 100);
+    sphere_green->dy = 20 * fabs(sin(1.0 * frame / 5.0 + 2 / 6.0 * PI));
+    l3Object *sphere_blue = l3FindObject(env, "sphere_blue");
+    // sphere_blue->theta_y += radians(360 / 100);
+    sphere_blue->dy = 20 * fabs(sin(1.0 * frame / 5.0 + 1 / 6.0 * PI));
+
+    l3Object *s, *a, *b;
+    switch ((frame / 50) % 3) {
+        case 0:
+            s = sphere;
+            a = sphere_blue;
+            b = sphere_green;
+            break;
+        case 1:
+            s = sphere_green;
+            a = sphere;
+            b = sphere_blue;
+            break;
+        case 2:
+            s = sphere_blue;
+            a = sphere;
+            b = sphere_green;
+            break;
+    }
+    s->poligons[0]->material = l3PoligonMaterialColor;
+    s->poligons[0]->lightType = l3LightTypePoint;
+    s->poligons[0]->lightIntensity = 2;
+    a->poligons[0]->lightType = 0;
+    b->poligons[0]->lightType = 0;
+
+    s->poligons[0]->transparency = 0;
+    a->poligons[0]->transparency = 0.5;
+    b->poligons[0]->transparency = 0;
+
     // sphere->dx = 15 * cos(frame / 100.0 * 2 * PI);
     // sphere->dz = 15 * sin(frame / 100.0 * 2 * PI);
 
@@ -28,9 +63,9 @@ static void transition(l3Environment *env, int frame) {
 
     // sphere->poligons[0]->textureRotate += radians(1);
 
-    // env->camera.coordinate[0] = 400.0 / ((frame + 1) / 30.0) * cos(-(frame + 1) / 100.0 * 2 * PI);
-    env->camera.coordinate[1] = 70 * sinf(frame / 100.0 * (PI/2));
-    env->camera.coordinate[2] = 70 * -cosf(frame / 100.0 * (PI/2));
+    env->camera.coordinate[0] = 50.0 * cos(-(frame + 1) / 100.0 * 2 * PI);
+    env->camera.coordinate[2] = 50.0 * sin(-(frame + 1) / 100.0 * 2 * PI);
+    // env->camera.coordinate[1] = 30 * -cosf(frame / 20.0 * (PI / 2)) + 40;
 
     // l3Mat33A p_wtoc = {0};
     // l3MakeWorldToCameraBasisChangeMat33(&env->camera, p_wtoc);
@@ -208,11 +243,8 @@ int scene_core(int argc, const char *argv[], l3Options *options) {
             poligons[0]->lightColor.r = 255;
             poligons[0]->lightColor.g = 50;
             poligons[0]->lightColor.b = 50;
-            poligons[0]->material = l3PoligonMaterialColor;
-            // poligons[0]->lightType = l3LightTypePoint;
-            // poligons[0]->lightIntensity = 1;
             // poligons[0]->transparency = 0.5;
-            // poligons[0]->lightAttenuation = 0.005;
+            poligons[0]->lightAttenuation = 0.005;
             poligons[0]->metalness[0] = 0.1;
             poligons[0]->metalness[1] = 0.1;
             poligons[0]->metalness[2] = 0.1;
@@ -236,6 +268,9 @@ int scene_core(int argc, const char *argv[], l3Options *options) {
             sphere_green->poligons[0]->color.r = 50;
             sphere_green->poligons[0]->color.g = 255;
             sphere_green->poligons[0]->color.b = 50;
+            sphere_green->poligons[0]->lightColor.r = 50;
+            sphere_green->poligons[0]->lightColor.g = 255;
+            sphere_green->poligons[0]->lightColor.b = 50;
             l3SetTransposeObject(sphere, 15 * cosf(radians(210)), 0, 15 * sinf(radians(210)));
             l3AddObjectToEnvironment(&env, sphere_green, "sphere_green");
         }
@@ -244,6 +279,9 @@ int scene_core(int argc, const char *argv[], l3Options *options) {
             sphere_blue->poligons[0]->color.r = 50;
             sphere_blue->poligons[0]->color.g = 50;
             sphere_blue->poligons[0]->color.b = 255;
+            sphere_blue->poligons[0]->lightColor.r = 50;
+            sphere_blue->poligons[0]->lightColor.g = 50;
+            sphere_blue->poligons[0]->lightColor.b = 255;
             l3SetTransposeObject(sphere, 15 * cosf(radians(330)), 0, 15 * sinf(radians(330)));
             l3AddObjectToEnvironment(&env, sphere_blue, "sphere_blue");
         }
@@ -314,7 +352,7 @@ int scene_core(int argc, const char *argv[], l3Options *options) {
         }
 
         l3SetCameraInfoToEnvironment(&env, 0, 14, -40,
-                                     0, 0, 0,
+                                     0, 10, 0,
                                      0, 1, 0,
                                      radians(50), 2, 100000);
 
@@ -322,8 +360,8 @@ int scene_core(int argc, const char *argv[], l3Options *options) {
         env.environmentLightRate = 0.1;
         env.environmentLightIntensity = 2;
 
-        l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
-        // l3MultithreadSequentialRenderer(&env, transition, options);
+        // l3RaytracingBlockMultithreadedRenderer(&env, transition, options);
+        l3MultithreadSequentialRenderer(&env, transition, options);
         l3DestructEnvironment(&env);
     }
     return 0;

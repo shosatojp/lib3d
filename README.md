@@ -1,14 +1,32 @@
 # 3Dを描画するライブラリ
 
-## 使用方法
-```cpp
-// lib3d.hをインクルードする
-#include "lib3d.h"
-```
+## サンプル
+### 動画
 
-## サンプル動画
+[https://www.youtube.com/watch?v=zWNcbkaHyB4](https://www.youtube.com/watch?v=zWNcbkaHyB4)
 
-![](sample.gif)
+### 画像
+
+![影](./images/kage.png)
+
+![鏡面反射](./images/metal.png)
+
+![ラフネスの違い、左から50,5,0](./images/roughness.png)
+
+![入射レイと法線ベクトルの角度が45度のとき](./images/kakudo45.png)
+
+![金属度の違い、左から0.9,0.5,0.1](./images/metalness.png)
+
+![透明なオブジェクト](./images/transparent.png)
+
+![光源](./images/lightgreen.png)
+
+![様々な光源色](./images/kougen.png)
+
+![タイルマッピング](./images/tile.png)
+
+![UVマッピング](./images/uv.png)
+
 
 ### コンパイル
 ```sh
@@ -31,6 +49,14 @@ make mp4
 make clean
 ```
 
+## 使用方法
+```cpp
+// lib3d.hをインクルードする
+#include "lib3d.h"
+```
+
+
+<!-- 
 ## APIの使い方
 ### テクスチャ
 ```cpp
@@ -84,4 +110,4 @@ typedef enum _l3CoordinateSystem {
     l3CoordinateSystemLocal,
     l3CoordinateSystemWorld,
 } l3CoordinateSystem;
-```
+``` -->
