@@ -1,5 +1,5 @@
 #include <pthread.h>
-#include "array.h"
+#include <stdbool.h>
 
 int usleep(int);
 
@@ -10,8 +10,7 @@ typedef struct _task task;
 
 struct _task {
     void* arg;
-    task_function* fn;
-
+    void (*fn)(void*, int);
     task* prev;
     task* next;
 };
@@ -36,8 +35,8 @@ typedef struct {
     int thread_num;
 } executor_info;
 
-void pool_init(thread_pool* pool, int thread_count,int max_tasks);
-void pool_push(thread_pool* pool, task_function* fn, void* arg);
+void pool_init(thread_pool* pool, int thread_count, int max_tasks);
+void pool_submit(thread_pool* pool, void (*fn)(void*, int), void* arg);
 void pool_start(thread_pool* pool);
 void pool_exit(thread_pool* pool);
 void pool_finalize(thread_pool* pool);

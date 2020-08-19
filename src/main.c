@@ -1,6 +1,6 @@
 #include "lib3d.h"
 #include "scenes.h"
-#include "threadpool.h"
+#include "pool.h"
 
 /**
  * シーンファイルの分け方
@@ -19,9 +19,9 @@
  */
 
 int main(int argc, const char* argv[]) {
-    threadpool_test();
+    // threadpool_test();
     // voxel_test();
-    exit(0);
+    // exit(0);
     // default options
     l3Options options = {0};
     options.outdir = "bin";
@@ -38,10 +38,10 @@ int main(int argc, const char* argv[]) {
 
     // voxel_test();
 
-    scene_core(argc, argv, &options);
+    // scene_core(argc, argv, &options);
     // scene_eatora(argc, argv, &options);
     // scene_bezier(argc, argv, &options);
-    // scene_ramiel(argc, argv, &options);
+    scene_ramiel(argc, argv, &options);
     // scene_start(argc, argv, &options);
     //scene_last(argc, argv, &options);
 }

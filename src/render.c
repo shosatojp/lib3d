@@ -1,5 +1,5 @@
 #include "lib3d.h"
-#include "threadpool.h"
+#include "pool.h"
 
 static int frame_count = 0;
 static int block_count = 0;
@@ -114,7 +114,7 @@ void l3RaytracingBlockMultithreadedRenderer(l3Environment* env,
                 bri->block_cy = y;
                 bri->env = _env;
                 // l3RaytracingBlockRenderer(bri, 0);
-                pool_push(&pool, (void (*)(void*, int))l3RaytracingBlockRenderer, (void*)bri);
+                pool_submit(&pool, (void (*)(void*, int))l3RaytracingBlockRenderer, (void*)bri);
             }
         }
         l3ClearEnvironment(env);
@@ -165,14 +165,14 @@ void l3RaytracingBlockRenderer(l3BlockRendererInfo* blockinfo, int thread_num) {
     block_count++;
 
     // 初期化
-    l3ClearEnvironment(env);
+    // l3ClearEnvironment(env);
     safe_free(buf);
     safe_free(blockinfo);
 
-    if (!(--env->livetime)) {
-        l3DestructEnvironment(env);
-        safe_free(env);
-    }
+    // if (!(--env->livetime)) {
+    l3DestructEnvironment(env);
+    safe_free(env);
+    // }
 }
 
 void l3RaytracingRenderer(l3Environment* env) {

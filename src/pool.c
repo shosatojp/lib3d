@@ -1,4 +1,4 @@
-#include "threadpool.h"
+#include "pool.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,10 +13,10 @@ void pool_init(thread_pool* pool, int thread_count, int max_tasks) {
     pthread_cond_init(&pool->cond, NULL);
 }
 
-void pool_push(thread_pool* pool, task_function* fn, void* arg) {
-    while (pool->task_count > pool->max_tasks) {
+void pool_submit(thread_pool* pool, void (*fn)(void*, int), void* arg) {
+    while (pool->task_count >= pool->max_tasks - 1)
         usleep(10000);
-    }
+
     pthread_mutex_lock(&pool->mutex);
     task* t = malloc(sizeof(task));
     t->fn = fn;
@@ -33,19 +33,14 @@ void pool_push(thread_pool* pool, task_function* fn, void* arg) {
     }
     pool->task_count++;
 
-    pthread_mutex_unlock(&pool->mutex);
     pthread_cond_signal(&pool->cond);
-
-    printf("add task\n");
+    pthread_mutex_unlock(&pool->mutex);
 }
 
 static void pool_executor(executor_info* info) {
     thread_pool* pool = info->pool;
     while (1) {
         pthread_mutex_lock(&pool->mutex);
-        // printf("cond wait %d\n", info->thread_num);
-        // printf("cond wakeup %d\n", info->thread_num);
-        // fflush(stdout);
         if (pool->task_head) {
             task t = *pool->task_head;
 
@@ -71,7 +66,7 @@ static void pool_executor(executor_info* info) {
 
 void pool_start(thread_pool* pool) {
     for (int i = 0; i < pool->thread_count; i++) {
-        executor_info* info = calloc(sizeof(executor_info), 1);
+        executor_info* info = malloc(sizeof(executor_info));
         info->pool = pool;
         info->thread_num = i;
         pthread_create(&pool->threads[i], NULL, (void* (*)(void*))pool_executor, (void*)info);
@@ -97,19 +92,19 @@ void pool_finalize(thread_pool* pool) {
 }
 
 void fn(void* arg, int thread_n) {
-    // usleep(10000);
-    printf("hoge  %d  %ld\n", thread_n, arg);
+    usleep(100000);
+    printf("hoge  %d  %ld\n", thread_n, (long)arg);
     fflush(stdout);
     return;
 }
 
 int threadpool_test() {
     thread_pool pool;
-    pool_init(&pool, 1, 2);
+    pool_init(&pool, 10, 100);
     pool_start(&pool);
 
-    for (int i = 0; i < 100; i++) {
-        pool_push(&pool, fn, i);
+    for (int i = 0; i < 1000; i++) {
+        pool_submit(&pool, fn, (void*)(long)i);
     }
 
     pool_exit(&pool);
